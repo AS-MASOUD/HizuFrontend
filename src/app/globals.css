@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #F7F5EE;
+    color: #161A1D;
+    font-family: 'Vazirmatn', 'Space Grotesk', sans-serif;
+  }
+  body {
+    overscroll-behavior: none;
+    background-color: #F7F5EE;
+    background-image: 
+      radial-gradient(ellipse 70% 40% at 50% -5%, rgba(56, 189, 248, 0.08), transparent 60%),
+      radial-gradient(at 15% 25%, rgba(212, 235, 176, 0.15) 0px, transparent 50%),
+      radial-gradient(at 85% 65%, rgba(229, 208, 162, 0.12) 0px, transparent 55%),
+      linear-gradient(rgba(28, 33, 27, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28, 33, 27, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    background-attachment: fixed;
+  }
+}
+
+/* Crisp Architectural Pop-up Card Effect */
+.card-popup {
+  background: #FFFFFF;
+  border: 1px solid rgba(28, 33, 27, 0.08);
+  box-shadow: 0 14px 34px -6px rgba(28, 33, 27, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.card-popup-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-popup-hover:hover {
+  background: #FFFFFF;
+  border-color: rgba(8, 39, 25, 0.2);
+  box-shadow: 0 22px 42px -8px rgba(28, 33, 27, 0.13), 0 6px 16px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(8, 39, 25, 0.04);
+  transform: translateY(-3px);
+}
+
+/* Warm Sand & Machined Buttons */
+.glass-btn-primary {
+  background: linear-gradient(180deg, #f2e3c6 0%, #dfc79b 100%);
+  color: #121417;
+  border: 1px solid rgba(160, 130, 80, 0.35);
+  box-shadow: 0 4px 16px rgba(180, 150, 95, 0.25), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.12);
+}
+
+.glass-btn-primary:hover {
+  background: linear-gradient(180deg, #faebd0 0%, #e7cf9f 100%);
+  box-shadow: 0 6px 22px rgba(180, 150, 95, 0.38), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.glass-btn-machined {
+  background: #FFFFFF;
+  border: 1px solid rgba(28, 33, 27, 0.12);
+  color: #1c1c17;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.glass-btn-machined:hover {
+  background: #F8F6F1;
+  border-color: rgba(8, 39, 25, 0.3);
+  color: #082719;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Technical Ruler Tickmarks */
+.technical-ruler-v {
+  background-image: repeating-linear-gradient(to bottom, rgba(28, 33, 27, 0.28) 0, rgba(28, 33, 27, 0.28) 1px, transparent 1px, transparent 7px);
+}
+
+.hero-glow {
+  background: radial-gradient(circle at 60% 30%, rgba(56, 189, 248, 0.09) 0%, rgba(229, 208, 162, 0.1) 40%, rgba(247, 245, 238, 0) 75%);
+}
