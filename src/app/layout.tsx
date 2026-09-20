@@ -9,6 +9,9 @@ import { CartProvider } from "@/providers/CartProvider";
 export const metadata: Metadata = {
   title: "هیزو | استودیو طراحی و ساخت دیجیتال",
   description: "طراحی، مهندسی دیجیتال، پرینت سه‌بعدی صنعتی، ماشین‌کاری ۵ محوره CNC و برش لیزر در قلب کارگاه تهران.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

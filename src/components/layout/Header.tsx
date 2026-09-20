@@ -3,7 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingBag, User as UserIcon, Search, ArrowLeft, Menu, X, ShieldAlert } from "lucide-react";
+import {
+  ShoppingBag,
+  User as UserIcon,
+  Search,
+  ArrowLeft,
+  Menu,
+  X,
+  ShieldAlert,
+} from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCart } from "@/providers/CartProvider";
 import { toPersianDigits } from "@/lib/utils/formatters";
@@ -37,11 +45,19 @@ export default function Header() {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-[#082719] flex items-center justify-center p-2 shadow-md border border-[#082719]/20 transition-transform group-hover:scale-105 text-[#dfc79b] font-mono font-bold text-lg">
-              H
+              <img
+                src="/Hizu-logo.svg"
+                alt="هیزو"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-xl tracking-tight text-[#161A1D]">هیزو</span>
-              <span className="font-mono text-[9px] text-[#5A626A] tracking-widest uppercase">FABRICATION LAB</span>
+              <span className="font-black text-xl tracking-tight text-[#161A1D]">
+                هیزو
+              </span>
+              <span className="font-mono text-[9px] text-[#5A626A] tracking-widest uppercase">
+                FABRICATION LAB
+              </span>
             </div>
           </Link>
 
@@ -113,7 +129,9 @@ export default function Header() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EDE8DC] border border-[#1c211b]/10 text-xs font-bold text-[#161A1D] hover:bg-[#dfc79b]/40 transition-colors"
             >
               <UserIcon className="w-4 h-4 text-[#082719]" />
-              <span className="hidden sm:inline">{user?.firstName || "حساب من"}</span>
+              <span className="hidden sm:inline">
+                {user?.firstName || "حساب من"}
+              </span>
             </Link>
           ) : (
             <Link
@@ -139,7 +157,11 @@ export default function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 rounded-lg text-[#161A1D] hover:bg-[#EDE8DC] transition-colors"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
       </div>
@@ -147,7 +169,10 @@ export default function Header() {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-[#1c211b]/10 bg-[#FFFFFF] px-6 py-6 flex flex-col gap-4 shadow-xl">
-          <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#F3EFE6] border border-[#1c211b]/10 rounded-full px-3.5 py-2 text-xs">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex items-center bg-[#F3EFE6] border border-[#1c211b]/10 rounded-full px-3.5 py-2 text-xs"
+          >
             <Search className="w-4 h-4 text-[#0284c7] ml-2" />
             <input
               type="text"

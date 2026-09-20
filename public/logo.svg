@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Hizu Digital Fabrication Studio - Geometric Emblem -->
+  <g stroke="#DFC79B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer Hexagonal / Precision Facet -->
+    <polygon points="50,10 88,32 88,76 50,98 12,76 12,32" stroke="#DFC79B" stroke-width="5" fill="none" opacity="0.4" />
+    
+    <!-- Isometric Cube / Precision Machining Motif -->
+    <path d="M50 24 L78 40 L50 56 L22 40 Z" fill="#DFC79B" fill-opacity="0.25" stroke="#DFC79B" stroke-width="4" />
+    <path d="M22 40 L50 56 V88 L22 72 Z" fill="#DFC79B" fill-opacity="0.15" stroke="#DFC79B" stroke-width="4" />
+    <path d="M78 40 L50 56 V88 L78 72 Z" fill="#DFC79B" fill-opacity="0.35" stroke="#DFC79B" stroke-width="4" />
+    
+    <!-- Center Core Stylized 'H' Axis Node -->
+    <circle cx="50" cy="56" r="4" fill="#F7F5EE" stroke="#082719" stroke-width="2" />
+  </g>
+</svg>
