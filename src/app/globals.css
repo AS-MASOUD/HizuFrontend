@@ -24,6 +24,13 @@
     background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
     background-attachment: fixed;
   }
+
+  /* Universal smooth fade on all links, buttons, and form inputs */
+  a, button, [role="button"], input, select, textarea {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 220ms;
+  }
 }
 
 /* Crisp Architectural Pop-up Card Effect */
@@ -34,14 +41,14 @@
 }
 
 .card-popup-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-popup-hover:hover {
   background: #FFFFFF;
-  border-color: rgba(8, 39, 25, 0.2);
-  box-shadow: 0 22px 42px -8px rgba(28, 33, 27, 0.13), 0 6px 16px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(8, 39, 25, 0.04);
-  transform: translateY(-3px);
+  border-color: rgba(8, 39, 25, 0.22);
+  box-shadow: 0 22px 42px -8px rgba(28, 33, 27, 0.14), 0 8px 18px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(8, 39, 25, 0.05);
+  transform: translateY(-4px) scale(1.008);
 }
 
 /* Warm Sand & Machined Buttons */
@@ -50,11 +57,17 @@
   color: #121417;
   border: 1px solid rgba(160, 130, 80, 0.35);
   box-shadow: 0 4px 16px rgba(180, 150, 95, 0.25), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.12);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-btn-primary:hover {
   background: linear-gradient(180deg, #faebd0 0%, #e7cf9f 100%);
-  box-shadow: 0 6px 22px rgba(180, 150, 95, 0.38), inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow: 0 8px 24px rgba(180, 150, 95, 0.4), inset 0 1px 0 rgba(255,255,255,0.9);
+  transform: translateY(-1.5px) scale(1.02);
+}
+
+.glass-btn-primary:active {
+  transform: translateY(0px) scale(0.98);
 }
 
 .glass-btn-machined {
@@ -62,13 +75,19 @@
   border: 1px solid rgba(28, 33, 27, 0.12);
   color: #1c1c17;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-btn-machined:hover {
   background: #F8F6F1;
   border-color: rgba(8, 39, 25, 0.3);
   color: #082719;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1.5px) scale(1.02);
+}
+
+.glass-btn-machined:active {
+  transform: translateY(0px) scale(0.98);
 }
 
 /* Technical Ruler Tickmarks */
@@ -79,3 +98,201 @@
 .hero-glow {
   background: radial-gradient(circle at 60% 30%, rgba(56, 189, 248, 0.09) 0%, rgba(229, 208, 162, 0.1) 40%, rgba(247, 245, 238, 0) 75%);
 }
+
+/* =========================================================================
+   GLAZE / SHEEN LIGHT SWEEP ANIMATIONS
+   ========================================================================= */
+
+@keyframes glaze-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+  }
+  35%, 100% {
+    transform: translateX(250%) skewX(-25deg);
+  }
+}
+
+/* Continuous high-tech subtle glaze for badges, hero banners, special tags */
+.glaze-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.glaze-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.25) 46%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.25) 54%,
+    transparent 65%
+  );
+  pointer-events: none;
+  transform: translateX(-150%) skewX(-25deg);
+  animation: glaze-sweep 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Interactive glaze sweep on hover for cards & buttons */
+.glaze-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.glaze-hover::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.25) 46%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.25) 54%,
+    transparent 65%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-150%) skewX(-25deg);
+  transition: opacity 0.3s ease;
+}
+
+.glaze-hover:hover::after {
+  opacity: 1;
+  animation: glaze-sweep 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* =========================================================================
+   TACTILE BUMPING & MICRO-MOVEMENTS
+   ========================================================================= */
+
+@keyframes subtle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-subtle-float {
+  animation: subtle-float 4.5s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3.2s ease-in-out infinite;
+}
+
+/* Interactive bump for elements on hover/click */
+.interactive-bump {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.interactive-bump:hover {
+  transform: translateY(-3px) scale(1.015);
+}
+
+.interactive-bump:active {
+  transform: translateY(0px) scale(0.985);
+}
+
+/* =========================================================================
+   BUTTERY-SMOOTH ACCORDION TRANSITIONS (CSS GRID PATTERN)
+   ========================================================================= */
+
+.accordion-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-grid.open {
+  grid-template-rows: 1fr;
+}
+
+.accordion-inner {
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 260ms ease-in-out, transform 260ms ease-in-out;
+}
+
+.accordion-grid.open .accordion-inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================================
+   DROPDOWN & POPOVER TRANSITIONS
+   ========================================================================= */
+
+.dropdown-menu-anim {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 220ms;
+}
+
+.dropdown-menu-anim.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* =========================================================================
+   SCROLL-DRIVEN & INTERSECTION REVEAL EFFECTS
+   ========================================================================= */
+
+.scroll-reveal-card {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal-card.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal-card {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Toast Progress Countdown Animation */
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+

@@ -13,6 +13,7 @@ interface CartContextType {
   subtotal: number;
   total: number;
   addToCart: (productId: string, quantity?: number) => Promise<void>;
+  addCourseToCart: (courseId: string) => Promise<void>;
   updateQuantity: (cartItemId: string, quantity: number) => Promise<void>;
   removeItem: (cartItemId: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -59,6 +60,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       success("محصول با موفقیت به سبد خرید افزوده شد.");
     } catch (err: any) {
       error(err.message || "خطا در افزودن به سبد خرید.");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addCourseToCart = async (courseId: string) => {
+    if (!isAuthenticated) {
+      error("برای ثبت‌نام و افزودن دوره به سبد خرید، لطفاً ابتدا وارد حساب کاربری خود شوید.");
+      return;
+    }
+    try {
+      setLoading(true);
+      const updated = await cartApi.addCourseItem(courseId);
+      setCart(updated);
+      success("دوره آموزشی با موفقیت به سبد خرید افزوده شد.");
+    } catch (err: any) {
+      error(err.message || "خطا در افزودن دوره به سبد خرید.");
       throw err;
     } finally {
       setLoading(false);
@@ -119,6 +138,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         subtotal,
         total,
         addToCart,
+        addCourseToCart,
         updateQuantity,
         removeItem,
         clearCart,

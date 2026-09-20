@@ -1,5 +1,12 @@
 import { apiClient } from "./client";
-import { ProductDto, ProductListDto, PagedResult } from "@/types";
+import {
+  ProductDto,
+  ProductListDto,
+  PagedResult,
+  ProductComment,
+  ProductCommentSummary,
+  CreateCommentPayload,
+} from "@/types";
 
 export interface GetProductsParams {
   page?: number;
@@ -64,6 +71,34 @@ export const productsApi = {
   async deleteProduct(id: string): Promise<void> {
     return apiClient<void>(`/api/products/${id}`, {
       method: "DELETE",
+    });
+  },
+
+  async uploadImage(
+    file: File | Blob,
+    originalFileName?: string
+  ): Promise<{ imageUrl: string; fileName: string; fileSizeBytes: number }> {
+    const formData = new FormData();
+    const name = originalFileName || (file instanceof File ? file.name : "product-image.webp");
+    formData.append("file", file, name);
+
+    return apiClient<{ imageUrl: string; fileName: string; fileSizeBytes: number }>(
+      "/api/products/upload-image",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+  },
+
+  async getComments(productId: string): Promise<ProductCommentSummary> {
+    return apiClient<ProductCommentSummary>(`/api/products/${productId}/comments`);
+  },
+
+  async submitComment(productId: string, payload: CreateCommentPayload): Promise<ProductComment> {
+    return apiClient<ProductComment>(`/api/products/${productId}/comments`, {
+      method: "POST",
+      body: JSON.stringify(payload),
     });
   },
 };

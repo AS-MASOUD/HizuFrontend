@@ -7,18 +7,36 @@ import { productsApi } from "@/lib/api/products";
 import { ProductDto } from "@/types";
 import { formatPrice, toPersianDigits } from "@/lib/utils/formatters";
 import { useCart } from "@/providers/CartProvider";
+import { useCompare } from "@/providers/CompareProvider";
 import ProductSpecsTable from "@/components/product/ProductSpecsTable";
-import { ShoppingBag, ArrowLeft, Check, ShieldCheck, Truck, RefreshCw, Wrench } from "lucide-react";
+import ProductImageSlider from "@/components/product/ProductImageSlider";
+import ProductCommentsSection from "@/components/product/ProductCommentsSection";
+import {
+  ShoppingBag,
+  ArrowLeft,
+  Check,
+  ShieldCheck,
+  Truck,
+  RefreshCw,
+  Wrench,
+  Scale,
+  Ruler,
+  Palette,
+  Layers,
+  Weight,
+  Cpu,
+  Target,
+} from "lucide-react";
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const { addToCart, loading: cartLoading } = useCart();
+  const { toggleCompare, isInCompare } = useCompare();
 
   const [product, setProduct] = useState<ProductDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -28,7 +46,6 @@ export default function ProductDetailPage() {
       .getProductBySlug(decodeURIComponent(slug))
       .then((res) => {
         setProduct(res);
-        setSelectedImage(res.imageUrl || (res.images[0]?.imageUrl ?? ""));
       })
       .catch((err) => {
         setError(err.message || "محصول یافت نشد.");
@@ -85,53 +102,16 @@ export default function ProductDetailPage() {
         <span className="text-[#161A1D] font-bold line-clamp-1">{product.name}</span>
       </nav>
 
-      {/* Main Grid: Gallery & Buy Box */}
+      {/* Main Grid: Gallery Slider & Buy Box */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        {/* Gallery */}
-        <div className="lg:col-span-6 flex flex-col gap-4">
-          <div className="relative w-full h-[400px] sm:h-[480px] rounded-2xl overflow-hidden card-popup border border-[#1c211b]/12 bg-[#16191d]">
-            {selectedImage ? (
-              <img
-                src={selectedImage}
-                alt={product.name}
-                className="w-full h-full object-cover filter contrast-[1.05]"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#5A626A] font-mono">
-                NO IMAGE AVAILABLE
-              </div>
-            )}
-            {product.tolerance && (
-              <div className="absolute bottom-3 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono text-[#dfc79b] dir-ltr border border-[#dfc79b]/30">
-                TOLERANCE: {product.tolerance}
-              </div>
-            )}
-          </div>
-
-          {/* Thumbnails */}
-          {product.images.length > 0 && (
-            <div className="flex items-center gap-3 overflow-x-auto pb-2">
-              <button
-                onClick={() => setSelectedImage(product.imageUrl || "")}
-                className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-white ${
-                  selectedImage === product.imageUrl ? "border-[#082719] shadow-md" : "border-transparent opacity-70"
-                }`}
-              >
-                <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-              </button>
-              {product.images.map((img) => (
-                <button
-                  key={img.id}
-                  onClick={() => setSelectedImage(img.imageUrl)}
-                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-white ${
-                    selectedImage === img.imageUrl ? "border-[#082719] shadow-md" : "border-transparent opacity-70"
-                  }`}
-                >
-                  <img src={img.imageUrl} alt={img.altText || product.name} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+        {/* Gallery Slider */}
+        <div className="lg:col-span-6">
+          <ProductImageSlider
+            images={product.images || []}
+            primaryImageUrl={product.imageUrl}
+            productName={product.name}
+            tolerance={product.tolerance}
+          />
         </div>
 
         {/* Product Details & Action Card */}
@@ -178,8 +158,8 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Quantity and Add to Cart */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+            {/* Quantity, Add to Cart & Compare */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <div className="flex items-center border border-[#1c211b]/20 rounded-full bg-[#FAF7F0] p-1 self-stretch sm:self-auto justify-between sm:justify-start">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -202,10 +182,43 @@ export default function ProductDetailPage() {
               <button
                 onClick={handleAddToCart}
                 disabled={cartLoading || product.stockQuantity === 0}
-                className="flex-1 w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#082719] hover:bg-[#16191d] text-white font-bold text-sm py-3.5 px-8 rounded-full transition-all shadow-md disabled:opacity-50"
+                className="flex-1 w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#082719] hover:bg-[#16191d] text-white font-bold text-sm py-3.5 px-6 rounded-full transition-all shadow-md disabled:opacity-50"
               >
                 <ShoppingBag className="w-4 h-4 text-[#dfc79b]" />
                 <span>{product.stockQuantity === 0 ? "در حال حاضر ناموجود است" : "افزودن به سبد خرید"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  toggleCompare({
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    sku: product.sku,
+                    price: product.price,
+                    compareAtPrice: product.compareAtPrice,
+                    stockQuantity: product.stockQuantity,
+                    imageUrl: product.imageUrl,
+                    material: product.material,
+                    technique: product.technique,
+                    tolerance: product.tolerance,
+                    dimensions: product.dimensions,
+                    weight: product.weight,
+                    color: product.color,
+                    categoryName: product.categoryName,
+                    description: product.description,
+                  });
+                }}
+                className={`self-stretch sm:self-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full border text-xs font-bold transition-all shadow-xs ${
+                  isInCompare(product.id)
+                    ? "bg-[#082719] text-[#dfc79b] border-[#082719] shadow-sm"
+                    : "bg-[#FAF7F0] hover:bg-[#EDE8DC] text-[#161A1D] border-[#1c211b]/15"
+                }`}
+                title={isInCompare(product.id) ? "حذف از لیست مقایسه" : "افزودن به لیست مقایسه"}
+              >
+                <Scale className="w-4 h-4" />
+                <span>{isInCompare(product.id) ? "در لیست مقایسه" : "مقایسه قطعه"}</span>
               </button>
             </div>
 
@@ -238,20 +251,105 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          {/* Technical Specs Sheet */}
+          {/* Quick Technical Specs Sheet */}
           <ProductSpecsTable product={product} />
         </div>
       </div>
 
-      {/* Description Section */}
-      <div className="card-popup rounded-2xl p-8 sm:p-10 bg-white border border-[#1c211b]/10 flex flex-col gap-4">
-        <h2 className="font-bold text-lg text-[#161A1D] border-b border-[#1c211b]/10 pb-3">
-          شرح جزئیات فنی و مهندسی
-        </h2>
-        <div className="text-sm text-[#5A626A] leading-loose whitespace-pre-line">
-          {product.description}
+      {/* SECTION 1: Detailed Physical & Manufacturing Specifications */}
+      <div className="card-popup rounded-2xl p-6 sm:p-8 bg-white border border-[#1c211b]/10 flex flex-col gap-6">
+        <div className="border-b border-[#1c211b]/10 pb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#082719] text-[#dfc79b] flex items-center justify-center font-bold">
+              <Layers className="w-4 h-4" />
+            </div>
+            <h2 className="font-black text-xl text-[#161A1D]">
+              مشخصات و ویژگی‌های فنی و مهندسی قطعه
+            </h2>
+          </div>
+          <p className="text-xs text-[#5A626A] mt-1">
+            پارامترهای ابعادی، خواص متریال و استاندارد فرآیند تولید
+          </p>
         </div>
+
+        {/* Feature Cards Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-[#5A626A] text-[11px]">
+              <Ruler className="w-3.5 h-3.5 text-[#082719]" />
+              <span>ابعاد فیزیکی</span>
+            </div>
+            <span className="font-mono font-bold text-xs text-[#161A1D] dir-ltr text-right">
+              {product.dimensions || "استاندارد کاتالوگ"}
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-[#5A626A] text-[11px]">
+              <Layers className="w-3.5 h-3.5 text-[#8f6d2f]" />
+              <span>متریال مهندسی</span>
+            </div>
+            <span className="font-bold text-xs text-[#161A1D]">
+              {product.material || "پلیمر صنعتی"}
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-[#5A626A] text-[11px]">
+              <Palette className="w-3.5 h-3.5 text-purple-700" />
+              <span>رنگ و فینیشینگ</span>
+            </div>
+            <span className="font-bold text-xs text-[#161A1D]">
+              {product.color || "مشکی مات کارگاهی"}
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-[#5A626A] text-[11px]">
+              <Weight className="w-3.5 h-3.5 text-blue-700" />
+              <span>وزن خالص</span>
+            </div>
+            <span className="font-mono font-bold text-xs text-[#161A1D] dir-ltr text-right">
+              {product.weight || "سبک‌وزن صنعتی"}
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-[#5A626A] text-[11px]">
+              <Cpu className="w-3.5 h-3.5 text-emerald-700" />
+              <span>روش تولید</span>
+            </div>
+            <span className="font-bold text-xs text-[#161A1D]">
+              {product.technique || "ساخت افزایشی / CNC"}
+            </span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-1.5">
+            <div className="flex items-center gap-1.5 text-[#5A626A] text-[11px]">
+              <Target className="w-3.5 h-3.5 text-rose-700" />
+              <span>تلرانس ساخت</span>
+            </div>
+            <span className="font-mono font-bold text-xs text-[#161A1D] dir-ltr text-right">
+              {product.tolerance || "ISO 2768-m"}
+            </span>
+          </div>
+        </div>
+
+        {/* Detailed Long Description */}
+        {product.description && (
+          <div className="pt-2">
+            <h3 className="font-bold text-sm text-[#161A1D] mb-2">
+              شرح جزئیات فنی و کاربرد صنعتی:
+            </h3>
+            <div className="text-xs sm:text-sm text-[#5A626A] leading-loose whitespace-pre-line bg-[#FAF7F0]/50 p-5 rounded-xl border border-[#1c211b]/08">
+              {product.description}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* SECTION 2: User Comments & Customer Feedback */}
+      <ProductCommentsSection productId={product.id} productName={product.name} />
     </div>
   );
 }

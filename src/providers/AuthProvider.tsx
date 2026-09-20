@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { User, Address } from "@/types";
-import { authApi, LoginPayload, RegisterPayload } from "@/lib/api/auth";
+import { authApi, LoginPayload, RegisterPayload, OtpSendResult, VerifyOtpLoginPayload } from "@/lib/api/auth";
 import { getAuthToken } from "@/lib/api/client";
 
 interface AuthContextType {
@@ -10,7 +10,10 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (payload: LoginPayload) => Promise<void>;
+  isSysManager: boolean;
+  login: (payload: LoginPayload) => Promise<User>;
+  loginWithOtp: (payload: VerifyOtpLoginPayload) => Promise<User>;
+  sendOtp: (recipient: string, purpose?: string) => Promise<OtpSendResult>;
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
   updateProfile: (payload: { firstName: string; lastName: string; phoneNumber?: string; address?: Address }) => Promise<void>;
@@ -46,9 +49,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, [refreshUser]);
 
-  const login = async (payload: LoginPayload) => {
+  const login = async (payload: LoginPayload): Promise<User> => {
     const res = await authApi.login(payload);
     setUser(res.user);
+    return res.user;
+  };
+
+  const loginWithOtp = async (payload: VerifyOtpLoginPayload): Promise<User> => {
+    const res = await authApi.verifyOtpLogin(payload);
+    setUser(res.user);
+    return res.user;
+  };
+
+  const sendOtp = async (recipient: string, purpose: string = "login") => {
+    return await authApi.sendOtp(recipient, purpose);
   };
 
   const register = async (payload: RegisterPayload) => {
@@ -72,7 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const isAuthenticated = !!user;
-  const isAdmin = user?.roles?.includes("Admin") ?? false;
+  const isSysManager = user?.roles?.includes("SysManager") ?? false;
+  const isAdmin = (user?.roles?.includes("Admin") || isSysManager) ?? false;
 
   return (
     <AuthContext.Provider
@@ -81,7 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isAuthenticated,
         isAdmin,
+        isSysManager,
         login,
+        loginWithOtp,
+        sendOtp,
         register,
         logout,
         updateProfile,

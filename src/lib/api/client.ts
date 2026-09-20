@@ -53,10 +53,18 @@ export async function apiClient<T>(
 
   const url = endpoint.startsWith("http") ? endpoint : `${API_URL}${endpoint}`;
 
-  const response = await fetch(url, {
-    ...customConfig,
-    headers: reqHeaders,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...customConfig,
+      headers: reqHeaders,
+    });
+  } catch (netErr: any) {
+    throw new ApiError(
+      "خطا در برقراری ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی نمایید.",
+      0
+    );
+  }
 
   if (response.status === 204) {
     return {} as T;
@@ -65,10 +73,42 @@ export async function apiClient<T>(
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const errorMessage =
+    // Extract ASP.NET ProblemDetails or FluentValidation error lists if present
+    let validationDetail: string | null = null;
+    if (data?.errors && typeof data.errors === "object") {
+      const allErrors = Object.values(data.errors).flat().filter(Boolean);
+      if (allErrors.length > 0) {
+        validationDetail = String(allErrors[0]);
+      }
+    }
+
+    let rawMessage =
+      validationDetail ||
       data?.detail ||
-      data?.title ||
       data?.message ||
+      data?.title;
+
+    // Translate common backend/server English phrases into friendly Persian
+    if (rawMessage) {
+      if (/one or more validation (errors|failures) have occurred/i.test(rawMessage)) {
+        rawMessage = "یک یا چند مورد از اطلاعات ارسالی نامعتبر است.";
+      } else if (/cannot add .* available stock/i.test(rawMessage)) {
+        rawMessage = "تعداد درخواستی بیشتر از موجودی انبار است.";
+      } else if (/requested quantity .* exceeds available stock/i.test(rawMessage)) {
+        rawMessage = "تعداد درخواستی بیشتر از موجودی انبار است.";
+      } else if (/insufficient stock/i.test(rawMessage)) {
+        rawMessage = "موجودی انبار برای این کالا کافی نیست.";
+      } else if (/entity .* was not found/i.test(rawMessage)) {
+        rawMessage = "مورد درخواستی در سامانه یافت نشد.";
+      } else if (/cannot delete category that contains products/i.test(rawMessage)) {
+        rawMessage = "امکان حذف دسته‌بندی دارای محصولات فعال وجود ندارد.";
+      } else if (/bad request/i.test(rawMessage)) {
+        rawMessage = "اطلاعات ارسالی نامعتبر است.";
+      }
+    }
+
+    const errorMessage =
+      rawMessage ||
       (response.status === 401
         ? "نشست کاربری شما منقضی شده یا وارد نشده‌اید. لطفاً وارد شوید."
         : response.status === 403

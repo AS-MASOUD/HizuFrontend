@@ -70,9 +70,16 @@ export default function CartPage() {
                   )}
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-[10px] text-[#0284c7] font-bold">{item.sku}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] text-[#0284c7] font-bold">{item.sku}</span>
+                    {item.courseId && (
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200">
+                        دوره آموزشی
+                      </span>
+                    )}
+                  </div>
                   <Link
-                    href={`/product/${item.productSlug}`}
+                    href={item.courseId ? `/courses/${item.productSlug}` : `/product/${item.productSlug}`}
                     className="font-bold text-sm text-[#161A1D] hover:text-[#082719] transition-colors"
                   >
                     {item.productName}
@@ -85,25 +92,31 @@ export default function CartPage() {
 
               {/* Controls */}
               <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 border-[#1c211b]/10 pt-3 sm:pt-0">
-                <div className="flex items-center border border-[#1c211b]/20 rounded-full bg-[#FAF7F0] p-1">
-                  <button
-                    disabled={loading}
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs hover:bg-white transition-colors"
-                  >
-                    -
-                  </button>
-                  <span className="font-mono text-xs font-bold w-8 text-center">
-                    {toPersianDigits(item.quantity)}
+                {item.courseId ? (
+                  <span className="text-xs font-mono text-[#5A626A] bg-[#FAF7F0] px-3 py-1 rounded-full border border-[#1c211b]/10">
+                    تعداد: ۱ دوره
                   </span>
-                  <button
-                    disabled={loading || item.quantity >= item.availableStock}
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs hover:bg-white transition-colors disabled:opacity-30"
-                  >
-                    +
-                  </button>
-                </div>
+                ) : (
+                  <div className="flex items-center border border-[#1c211b]/20 rounded-full bg-[#FAF7F0] p-1">
+                    <button
+                      disabled={loading}
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs hover:bg-white transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="font-mono text-xs font-bold w-8 text-center">
+                      {toPersianDigits(item.quantity)}
+                    </span>
+                    <button
+                      disabled={loading || item.quantity >= item.availableStock}
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs hover:bg-white transition-colors disabled:opacity-30"
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
 
                 <div className="text-left font-mono font-bold text-sm text-[#082719] min-w-[120px]">
                   {formatPrice(item.totalPrice)}

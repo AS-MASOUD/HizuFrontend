@@ -2,6 +2,8 @@ import React from "react";
 import Link from "next/link";
 import { productsApi } from "@/lib/api/products";
 import ProductCard from "@/components/product/ProductCard";
+import HeroSlideshow from "@/components/home/HeroSlideshow";
+import Accordion from "@/components/ui/Accordion";
 import {
   ArrowLeft,
   Wrench,
@@ -13,9 +15,7 @@ import {
   CheckCircle2,
   Award,
   Maximize2,
-  FileText,
-  Sliders,
-  Cpu,
+  HelpCircle,
 } from "lucide-react";
 
 export const revalidate = 60; // ISR revalidation every 60 seconds
@@ -74,13 +74,83 @@ export default async function HomePage() {
     { num: "05", title: "تست کیفیت و تحویل", desc: "اندازه‌گیری میکرومتری، کنترل کیفیت نهایی و بسته‌بندی ایمن." },
   ];
 
+  const faqItems = [
+    {
+      id: "faq-1",
+      title: "چه فرمت‌های فایلی برای بررسی DFM و استعلام ساخت در هیزو پذیرفته می‌شود؟",
+      badge: "CAD / CAM / VECTOR",
+      content: (
+        <div className="flex flex-col gap-2">
+          <p>
+            ما تمامی فایل‌های استاندارد طراحی سه‌بعدی و مهندسی را در سامانه هیزو پردازش و بررسی می‌کنیم:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1 font-mono text-xs">
+            <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08">
+              <span className="font-bold text-[#082719]">مدل‌های سه‌بعدی و قالب:</span> .STEP, .STP, .IGES, .SLDPRT, .X_T
+            </div>
+            <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08">
+              <span className="font-bold text-[#082719]">پرینت ۳بعدی صنعتی:</span> .STL, .OBJ, .3MF (Mesh High-Poly)
+            </div>
+            <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08">
+              <span className="font-bold text-[#082719]">برش لیزر و CNC تختی:</span> .DXF, .DWG, .AI, .SVG
+            </div>
+            <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08">
+              <span className="font-bold text-[#082719]">نقشه‌های مهندسی ساخت:</span> فایل‌های نقشه‌کشی PDF با مشخصات تلورانسی GD&amp;T
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "faq-2",
+      title: "تلورانس ابعادی و دقت ماشین‌کاری CNC و پرینت در هیزو چگونه تضمین می‌شود؟",
+      badge: "ISO 2768-m",
+      content: (
+        <p>
+          در فرآیند فرزکاری ۵ محوره CNC، تلورانس هندسی و ابعادی قطعات تا محدوده <strong>±0.01 میلی‌متر</strong> (مطابق استاندارد بین‌المللی ISO 2768-Fine) تضمین می‌گردد. در پرینت سه‌بعدی صنعتی با روش‌های SLS و رزین مهندسی SLA، دقت ابعادی در بازه ±0.05 میلی‌متر قرار دارد. کلیه قطعات حساس صنعتی همراه با گزارش اندازه‌گیری ابعادی CMM و برگه کنترل کیفیت نهایی تحویل می‌گردند.
+        </p>
+      ),
+    },
+    {
+      id: "faq-3",
+      title: "زمان‌بندی تحویل سفارش‌های ساخت فوری و نمونه‌های اولیه (Prototype) چقدر است؟",
+      badge: "FAST TURNAROUND",
+      content: (
+        <p>
+          برای قطعات پرینت سه‌بعدی و برش لیزر فوری، تحویل نمونه اولیه بین <strong>۲۴ الی ۴۸ ساعت</strong> کاری انجام می‌شود. سفارش‌های ماشین‌کاری دقیق CNC بسته به پیچیدگی سطوح ۵ محوره، نوع آلیاژ و عملیات حرارتی بین ۳ الی ۶ روز کاری زمان‌بندی خواهند شد.
+        </p>
+      ),
+    },
+    {
+      id: "faq-4",
+      title: "آیا امکان سفارش تیراژ محدود (Low-Volume Manufacturing) یا نمونه تک وجود دارد؟",
+      badge: "PROTOTYPE TO BATCH",
+      content: (
+        <p>
+          بله؛ ساختار کارگاه و خطوط ساخت هیزو بر پایه تولید انعطاف‌پذیر (Agile Fabrication) طراحی شده‌اند. شما می‌توانید از ۱ قطعه نمونه اولیه تکی تا تیراژهای ۵۰۰ الی ۱۰,۰۰۰ عددی را با هزینه بهینه ابزارسازی و بدون نیاز به هزینه‌های سنگین قالب‌سازی سفارش دهید.
+        </p>
+      ),
+    },
+    {
+      id: "faq-5",
+      title: "چه متریال‌ها و پرداخت‌های سطحی (Surface Finishing) در کارگاه اجرا می‌شود؟",
+      badge: "FINISHING LAB",
+      content: (
+        <p>
+          متریال‌های قابل پردازش در هیزو شامل آلیاژهای آلومینیوم سری ۶۰۰۰ و ۷۰۷۵، برنج صنعتی، فولادهای زنگ‌نزن ۳۰۴ و ۳۱۶، تیتانیوم، تفلون صنعتی POM، پلیمرهای کربنی و چوب‌های سخت عمل‌آوری شده است. خدمات تکمیلی شامل آنودایز مات و رنگی، سندبلاست شیشه‌ای، پوشش‌های ضدسایش، پولیش مکانیکی و حکاکی نوری مشخصات فنی با لیزر می‌باشد.
+        </p>
+      ),
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-24 sm:gap-32 pb-16">
-      {/* 1. Hero Section */}
+      {/* 1. Hero Section with Auto-change Slideshow & Micro-Animations */}
       <section className="relative w-full max-w-7xl mx-auto px-6 sm:px-8 pt-8 sm:pt-12 hero-glow">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           <div className="lg:col-span-6 flex flex-col gap-6 order-2 lg:order-1">
-            <div className="inline-flex items-center gap-2.5 self-start bg-[#FFFFFF] border border-[#1c211b]/12 rounded-full px-4 py-1.5 text-xs font-mono font-semibold text-[#161A1D] shadow-[0_2px_10px_rgba(28,33,27,0.06)]">
+            {/* High-tech protocol badge with glaze sheen and subtle float */}
+            <div className="inline-flex items-center gap-2.5 self-start bg-[#FFFFFF] border border-[#1c211b]/12 rounded-full px-4 py-1.5 text-xs font-mono font-semibold text-[#161A1D] shadow-[0_2px_10px_rgba(28,33,27,0.06)] glaze-shimmer animate-subtle-float">
               <span className="w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981] animate-pulse" />
               <span className="tracking-wide text-[#333C44]">HIZU FABRICATION LAB // PROTOCOL 2026</span>
               <span className="text-[#0284c7] text-[10px] pr-2 border-r border-[#1c211b]/15 dir-ltr font-mono">
@@ -100,17 +170,18 @@ export default async function HomePage() {
               از یک قطعه ساده تا یک ماشین کامل؛ پیوند میان مهندسی دیجیتال، تلرانس دقیق و متریال ناب در قلب کارگاه تهران. ساخت بدون محدودیت در هیزو.
             </p>
 
+            {/* Tactile bumping CTA buttons with glaze hover */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-2.5 bg-[#082719] hover:bg-[#16191d] text-[#ffffff] font-bold text-sm px-7 py-3.5 rounded-full transition-all hover:scale-[1.02] shadow-md border border-[#082719]/20"
+                className="inline-flex items-center gap-2.5 bg-[#082719] hover:bg-[#16191d] text-[#ffffff] font-bold text-sm px-7 py-3.5 rounded-full shadow-md border border-[#082719]/20 interactive-bump glaze-hover"
               >
                 <span>مشاهده محصولات و کاتالوگ</span>
                 <ArrowLeft className="w-4 h-4 text-[#dfc79b]" />
               </Link>
               <Link
                 href="/special-orders"
-                className="inline-flex items-center gap-2.5 glass-btn-machined text-[#161A1D] font-semibold text-sm px-7 py-3.5 rounded-full transition-all relative group shadow-md"
+                className="inline-flex items-center gap-2.5 glass-btn-machined text-[#161A1D] font-semibold text-sm px-7 py-3.5 rounded-full relative group shadow-md interactive-bump glaze-hover"
               >
                 <Wrench className="w-4 h-4 text-[#0284c7]" />
                 <span>سفارش ساخت فوری</span>
@@ -118,35 +189,20 @@ export default async function HomePage() {
             </div>
           </div>
 
+          {/* Hero Slideshow: Auto-advancing with Ken Burns zoom & public/slideshow folder */}
           <div className="lg:col-span-6 relative order-1 lg:order-2">
-            <div className="relative w-full rounded-2xl p-2.5 card-popup border border-[#1c211b]/12 shadow-[0_18px_45px_-10px_rgba(28,33,27,0.15)]">
-              {/* Corner calipers */}
-              <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-[#b5924d] z-20" />
-              <div className="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-[#b5924d] z-20" />
-              <div className="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-[#b5924d] z-20" />
-              <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-[#b5924d] z-20" />
-              <div className="hidden sm:block absolute top-6 bottom-6 -left-3 w-2 technical-ruler-v z-20 opacity-80" />
-
-              <div className="relative w-full h-[360px] sm:h-[460px] rounded-xl overflow-hidden bg-[#16191d]">
-                <img
-                  src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
-                  alt="کارگاه ساخت پیشرفته هیزو"
-                  className="w-full h-full object-cover filter contrast-[1.08] brightness-[0.95] saturate-[0.9]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121417]/80 via-transparent to-[#121417]/30 pointer-events-none" />
-              </div>
-            </div>
+            <HeroSlideshow />
           </div>
         </div>
 
-        {/* Verified Metrics Bar */}
+        {/* Verified Metrics Bar with tactile micro-bumps */}
         <div className="mt-12 w-full card-popup rounded-2xl p-5 sm:p-6 shadow-[0_14px_34px_-6px_rgba(28,33,27,0.1),0_4px_12px_rgba(0,0,0,0.03)] relative border border-[#1c211b]/10 bg-white">
           <div className="absolute top-2 left-4 font-mono text-[9px] text-[#5A626A] uppercase tracking-widest hidden md:block">
             SPEC // VERIFIED METRICS
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-[#1c211b]/10">
-            <div className="flex items-center gap-4 pt-4 md:pt-0">
-              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#8f6d2f] shrink-0">
+            <div className="flex items-center gap-4 pt-4 md:pt-0 group/metric cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#8f6d2f] shrink-0 group-hover/metric:scale-110 group-hover/metric:-rotate-3 transition-transform">
                 <Award className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -154,8 +210,8 @@ export default async function HomePage() {
                 <span className="text-xs text-[#5A626A] font-medium">تجربه ساخت و مهندسی</span>
               </div>
             </div>
-            <div className="flex items-center gap-4 pt-4 md:pt-0 md:pr-6">
-              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#0284c7] shrink-0">
+            <div className="flex items-center gap-4 pt-4 md:pt-0 md:pr-6 group/metric cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#0284c7] shrink-0 group-hover/metric:scale-110 group-hover/metric:-rotate-3 transition-transform">
                 <Wrench className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -163,8 +219,8 @@ export default async function HomePage() {
                 <span className="text-xs text-[#5A626A] font-medium">پروژه موفق و تحویلی</span>
               </div>
             </div>
-            <div className="flex items-center gap-4 pt-4 md:pt-0 md:pr-6">
-              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#10b981] shrink-0">
+            <div className="flex items-center gap-4 pt-4 md:pt-0 md:pr-6 group/metric cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#10b981] shrink-0 group-hover/metric:scale-110 group-hover/metric:-rotate-3 transition-transform">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -172,8 +228,8 @@ export default async function HomePage() {
                 <span className="text-xs text-[#5A626A] font-medium">رضایت مشتریان صنعتی</span>
               </div>
             </div>
-            <div className="flex items-center gap-4 pt-4 md:pt-0 md:pr-6">
-              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#8f6d2f] shrink-0">
+            <div className="flex items-center gap-4 pt-4 md:pt-0 md:pr-6 group/metric cursor-default">
+              <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#8f6d2f] shrink-0 group-hover/metric:scale-110 group-hover/metric:-rotate-3 transition-transform">
                 <Maximize2 className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -185,7 +241,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. Services Section */}
+      {/* 2. Services Section with bumping and glaze cards */}
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-4 flex flex-col gap-4">
@@ -203,7 +259,7 @@ export default async function HomePage() {
             <div className="pt-2">
               <Link
                 href="/special-orders"
-                className="inline-flex items-center gap-2 glass-btn-machined text-[#161A1D] hover:text-[#082719] px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm group"
+                className="inline-flex items-center gap-2 glass-btn-machined text-[#161A1D] hover:text-[#082719] px-5 py-2.5 rounded-full text-xs font-bold shadow-sm group interactive-bump glaze-hover"
               >
                 <span>استعلام ساخت پروژه</span>
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
@@ -215,11 +271,11 @@ export default async function HomePage() {
             {services.map((s, idx) => (
               <div
                 key={idx}
-                className="card-popup card-popup-hover rounded-2xl p-5 flex flex-col justify-between group relative overflow-hidden bg-white"
+                className="card-popup card-popup-hover rounded-2xl p-5 flex flex-col justify-between group relative overflow-hidden bg-white interactive-bump glaze-hover"
               >
                 <div className="absolute top-2 left-2 text-[9px] font-mono text-[#0284c7]">{s.coord}</div>
                 <div className="flex flex-col gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#F3EFE6] border border-[#1c211b]/10 flex items-center justify-center text-[#161A1D] group-hover:bg-[#082719] group-hover:text-[#FFFFFF] transition-colors shadow-xs">
+                  <div className="w-12 h-12 rounded-xl bg-[#F3EFE6] border border-[#1c211b]/10 flex items-center justify-center text-[#161A1D] group-hover:bg-[#082719] group-hover:text-[#FFFFFF] transition-all shadow-xs group-hover:scale-110 group-hover:-translate-y-1">
                     {s.icon}
                   </div>
                   <div>
@@ -231,7 +287,7 @@ export default async function HomePage() {
                   <span className="font-mono text-[10px] bg-[#EDE8DC] text-[#333C44] px-1.5 py-0.5 rounded border border-[#1c211b]/15 font-bold">
                     {s.badge}
                   </span>
-                  <ArrowLeft className="w-4 h-4 text-[#5A626A] group-hover:text-[#161A1D] transition-colors" />
+                  <ArrowLeft className="w-4 h-4 text-[#5A626A] group-hover:text-[#161A1D] group-hover:-translate-x-1 transition-transform" />
                 </div>
               </div>
             ))}
@@ -252,7 +308,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 glass-btn-machined text-[#161A1D] hover:text-[#082719] px-5 py-2 rounded-full text-xs font-bold transition-all self-start sm:self-auto shadow-sm"
+            className="inline-flex items-center gap-2 glass-btn-machined text-[#161A1D] hover:text-[#082719] px-5 py-2 rounded-full text-xs font-bold self-start sm:self-auto shadow-sm interactive-bump glaze-hover"
           >
             <span>مشاهده همه محصولات</span>
             <ArrowLeft className="w-4 h-4" />
@@ -274,7 +330,7 @@ export default async function HomePage() {
 
       {/* 4. Engineering Process */}
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
-        <div className="card-popup rounded-2xl p-8 sm:p-10 shadow-[0_14px_34px_-6px_rgba(28,33,27,0.1),0_4px_12px_rgba(0,0,0,0.03)] relative border border-[#1c211b]/10 bg-white">
+        <div className="card-popup rounded-2xl p-8 sm:p-10 shadow-[0_14px_34px_-6px_rgba(28,33,27,0.1),0_4px_12px_rgba(0,0,0,0.03)] relative border border-[#1c211b]/10 bg-white glaze-hover">
           <div className="mb-10 text-center sm:text-right">
             <span className="font-mono text-xs font-bold text-[#8f6d2f] uppercase tracking-wider">
               [ OUR PROCESS ]
@@ -286,9 +342,9 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative">
             {processSteps.map((step) => (
-              <div key={step.num} className="flex flex-col items-center sm:items-start text-center sm:text-right gap-3">
+              <div key={step.num} className="flex flex-col items-center sm:items-start text-center sm:text-right gap-3 group/step">
                 <div className="flex items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border-2 border-[#1c211b]/20 text-[#161A1D] flex items-center justify-center font-mono font-black text-sm shadow-sm">
+                  <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border-2 border-[#1c211b]/20 text-[#161A1D] flex items-center justify-center font-mono font-black text-sm shadow-sm group-hover/step:border-[#082719] group-hover/step:scale-110 transition-transform">
                     {step.num}
                   </div>
                   <span className="font-mono text-xs font-bold text-[#0284c7] bg-[#EDE8DC] px-2 py-0.5 rounded border border-[#1c211b]/10">
@@ -305,9 +361,34 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. Quote / Atelier Manifest */}
+      {/* 5. Interactive Technical FAQ Accordion Section */}
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
-        <div className="relative w-full rounded-2xl overflow-hidden card-popup p-8 sm:p-12 shadow-[0_14px_34px_-6px_rgba(28,33,27,0.1)] border border-[#1c211b]/10 bg-white">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <span className="font-mono text-xs font-bold text-[#8f6d2f] bg-[#EDE8DC] border border-[#1c211b]/10 px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
+                [ TECHNICAL PROTOCOLS &amp; FAQ ]
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-[#161A1D]">
+                پرسش‌های متداول و الزامات فنی ساخت
+              </h2>
+            </div>
+            <span className="text-xs text-[#5A626A] font-mono">
+              VERIFIED // FABRICATION FAQ
+            </span>
+          </div>
+
+          <Accordion
+            items={faqItems}
+            defaultOpenId="faq-1"
+            className="w-full"
+          />
+        </div>
+      </section>
+
+      {/* 6. Quote / Atelier Manifest */}
+      <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
+        <div className="relative w-full rounded-2xl overflow-hidden card-popup p-8 sm:p-12 shadow-[0_14px_34px_-6px_rgba(28,33,27,0.1)] border border-[#1c211b]/10 bg-white interactive-bump glaze-hover">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 flex flex-col gap-4">
               <span className="text-6xl text-[#b5924d]/40 font-serif leading-none select-none">“</span>
@@ -333,9 +414,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. High-Impact Fabrication CTA */}
+      {/* 7. High-Impact Fabrication CTA with Glaze Sheen */}
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
-        <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#082719] via-[#103825] to-[#1f3d2e] p-8 sm:p-12 text-[#ffffff] shadow-2xl border border-[#1f3d2e]/40">
+        <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#082719] via-[#103825] to-[#1f3d2e] p-8 sm:p-12 text-[#ffffff] shadow-2xl border border-[#1f3d2e]/40 glaze-shimmer">
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="flex flex-col gap-2 text-center lg:text-right">
               <span className="font-mono text-xs font-bold text-[#a7f3d0] uppercase tracking-wider">
@@ -351,7 +432,7 @@ export default async function HomePage() {
             <div className="shrink-0">
               <Link
                 href="/special-orders"
-                className="inline-flex items-center gap-3 glass-btn-primary font-extrabold text-sm sm:text-base px-8 py-4 rounded-full transition-all hover:scale-105 shadow-xl text-[#121417]"
+                className="inline-flex items-center gap-3 glass-btn-primary font-extrabold text-sm sm:text-base px-8 py-4 rounded-full shadow-xl text-[#121417] interactive-bump"
               >
                 <span>شروع پروژه و استعلام قیمت</span>
                 <ArrowLeft className="w-5 h-5 text-[#121417]" />

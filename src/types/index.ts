@@ -93,7 +93,9 @@ export interface ProductDto {
 
 export interface CartItem {
   id: string;
-  productId: string;
+  productId?: string;
+  courseId?: string;
+  itemType?: "Product" | "Course";
   productName: string;
   productSlug: string;
   sku: string;
@@ -208,4 +210,188 @@ export interface PagedResult<T> {
   totalPages: number;
   hasPreviousPage: boolean;
   hasNextPage: boolean;
+}
+
+export interface CompareItem {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  price: number;
+  compareAtPrice?: number;
+  stockQuantity: number;
+  imageUrl?: string;
+  material?: string;
+  technique?: string;
+  tolerance?: string;
+  dimensions?: string;
+  weight?: string;
+  color?: string;
+  categoryName?: string;
+  description?: string;
+}
+
+export interface RadarMetric {
+  key: string;
+  label: string;
+  fullMark: number;
+}
+
+export interface ProductAnalysis {
+  productId: string;
+  metrics: { [key: string]: number }; // score 0 to 10
+  goodPoints: string[];
+  drawbacks: string[];
+  totalScore: number;
+}
+
+export interface FeatureSectionComparison {
+  key: string;
+  title: string;
+  description: string;
+  scores: { [productId: string]: number }; // score 0 to 10
+  values: { [productId: string]: string };
+  winnerId: string | null; // null if tie
+  winnerReason: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  content: string; // rich markdown / HTML formatted content
+  coverImage: string;
+  category: string; // e.g., "پرینت ۳بعدی", "متریال و فیلامنت", "طراحی محصول", "تکنولوژی و اخبار"
+  tags: string[];
+  author: string;
+  authorRole?: string;
+  readTimeMinutes: number;
+  isPublished: boolean;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+  viewsCount: number;
+}
+
+export interface CreateArticleDto {
+  title: string;
+  slug?: string;
+  summary: string;
+  content: string;
+  coverImage: string;
+  category: string;
+  tags?: string[];
+  author?: string;
+  authorRole?: string;
+  readTimeMinutes?: number;
+  isPublished?: boolean;
+}
+
+export interface UpdateArticleDto {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  content: string;
+  coverImage: string;
+  category: string;
+  tags?: string[];
+  author?: string;
+  authorRole?: string;
+  readTimeMinutes?: number;
+  isPublished: boolean;
+}
+
+export interface ProductComment {
+  id: string;
+  productId: string;
+  productName?: string;
+  authorName: string;
+  authorEmail?: string;
+  content: string;
+  rating: number;
+  isApproved: boolean;
+  adminReply?: string;
+  adminRepliedAt?: string;
+  createdAt: string;
+}
+
+export interface ProductCommentSummary {
+  averageRating: number;
+  totalComments: number;
+  comments: ProductComment[];
+}
+
+export interface CreateCommentPayload {
+  authorName: string;
+  authorEmail?: string;
+  content: string;
+  rating: number;
+}
+
+export type CourseLevel = 1 | 2 | 3 | 4;
+
+export interface CourseEpisode {
+  id: string;
+  sectionId?: string;
+  title: string;
+  description?: string;
+  durationMinutes: number;
+  durationText?: string;
+  videoUrl?: string;
+  fileServerUrl?: string;
+  attachmentUrl?: string;
+  attachmentName?: string;
+  attachmentSizeBytes?: number;
+  isFreePreview: boolean;
+  displayOrder: number;
+}
+
+export interface CourseSection {
+  id: string;
+  title: string;
+  description?: string;
+  displayOrder: number;
+  episodes: CourseEpisode[];
+}
+
+export interface CourseListDto {
+  id: string;
+  title: string;
+  slug: string;
+  subtitle?: string;
+  price: number;
+  compareAtPrice?: number;
+  coverImageUrl?: string;
+  introVideoUrl?: string;
+  durationMinutes: number;
+  durationText?: string;
+  level: CourseLevel;
+  levelTitle: string;
+  instructorName: string;
+  totalEpisodesCount: number;
+  averageRating: number;
+  ratingCount: number;
+  studentsCount: number;
+  isFeatured: boolean;
+}
+
+export interface Course extends CourseListDto {
+  description: string;
+  fileServerBaseUrl?: string;
+  storagePath?: string;
+  downloadableFilesUrl?: string;
+  language: string;
+  downloadableResourcesCount: number;
+  includesCertificate: boolean;
+  hasLifetimeAccess: boolean;
+  instructorTitle?: string;
+  instructorBio?: string;
+  instructorAvatarUrl?: string;
+  whatYouWillLearnList: string[];
+  requirementsList: string[];
+  targetAudienceList: string[];
+  sections: CourseSection[];
+  sampleEpisodes: CourseEpisode[];
 }

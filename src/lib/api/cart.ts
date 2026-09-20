@@ -1,6 +1,12 @@
 import { apiClient } from "./client";
 import { Cart } from "@/types";
 
+export interface AddCartItemParams {
+  productId?: string;
+  courseId?: string;
+  quantity?: number;
+}
+
 export const cartApi = {
   async getCart(): Promise<Cart> {
     return apiClient<Cart>("/api/cart");
@@ -10,6 +16,20 @@ export const cartApi = {
     return apiClient<Cart>("/api/cart/items", {
       method: "POST",
       body: JSON.stringify({ productId, quantity }),
+    });
+  },
+
+  async addCourseItem(courseId: string): Promise<Cart> {
+    return apiClient<Cart>("/api/cart/items", {
+      method: "POST",
+      body: JSON.stringify({ courseId, quantity: 1 }),
+    });
+  },
+
+  async addCustomItem(params: AddCartItemParams): Promise<Cart> {
+    return apiClient<Cart>("/api/cart/items", {
+      method: "POST",
+      body: JSON.stringify(params),
     });
   },
 

@@ -5,6 +5,8 @@ import Footer from "@/components/layout/Footer";
 import { ToastProvider } from "@/providers/ToastProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { CartProvider } from "@/providers/CartProvider";
+import { CompareProvider } from "@/providers/CompareProvider";
+import FloatingCompareBar from "@/components/compare/FloatingCompareBar";
 
 export const metadata: Metadata = {
   title: "هیزو | استودیو طراحی و ساخت دیجیتال",
@@ -25,9 +27,12 @@ export default function RootLayout({
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
-              <Header />
-              <main className="pt-20 flex-1">{children}</main>
-              <Footer />
+              <CompareProvider>
+                <Header />
+                <main className="pt-16 lg:pt-[108px] flex-1">{children}</main>
+                <Footer />
+                <FloatingCompareBar />
+              </CompareProvider>
             </CartProvider>
           </AuthProvider>
         </ToastProvider>

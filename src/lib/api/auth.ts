@@ -2,11 +2,12 @@ import { apiClient, setAuthToken } from "./client";
 import { AuthResponse, User, Address } from "@/types";
 
 export interface RegisterPayload {
-  email: string;
-  password: string;
+  email?: string;
+  password?: string;
   firstName: string;
   lastName: string;
   phoneNumber?: string;
+  otpCode?: string;
   address?: Address;
 }
 
@@ -15,7 +16,38 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface OtpSendResult {
+  success: boolean;
+  message: string;
+  expiresInSeconds: number;
+  resendCooldownSeconds?: number;
+}
+
+export interface VerifyOtpLoginPayload {
+  recipient: string;
+  code: string;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+}
+
 export const authApi = {
+  async sendOtp(recipient: string, purpose: string = "login"): Promise<OtpSendResult> {
+    return apiClient<OtpSendResult>("/api/auth/send-otp", {
+      method: "POST",
+      body: JSON.stringify({ recipient, purpose }),
+    });
+  },
+
+  async verifyOtpLogin(payload: VerifyOtpLoginPayload): Promise<AuthResponse> {
+    const res = await apiClient<AuthResponse>("/api/auth/verify-otp-login", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    setAuthToken(res.token);
+    return res;
+  },
+
   async register(payload: RegisterPayload): Promise<AuthResponse> {
     const res = await apiClient<AuthResponse>("/api/auth/register", {
       method: "POST",

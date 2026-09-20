@@ -1,5 +1,12 @@
 import { apiClient } from "./client";
-import { AdminDashboardStats, AdminUser, Order, SpecialOrder, PagedResult } from "@/types";
+import {
+  AdminDashboardStats,
+  AdminUser,
+  Order,
+  SpecialOrder,
+  PagedResult,
+  ProductComment,
+} from "@/types";
 
 export const adminApi = {
   async getStats(): Promise<AdminDashboardStats> {
@@ -54,6 +61,39 @@ export const adminApi = {
     return apiClient<void>(`/api/admin/users/${userId}/roles`, {
       method: "PUT",
       body: JSON.stringify({ roles }),
+    });
+  },
+
+  async getComments(
+    isApproved?: boolean,
+    page = 1,
+    pageSize = 50
+  ): Promise<PagedResult<ProductComment>> {
+    const query = new URLSearchParams({
+      page: page.toString(),
+      pageSize: pageSize.toString(),
+    });
+    if (isApproved !== undefined) query.append("isApproved", isApproved.toString());
+    return apiClient<PagedResult<ProductComment>>(`/api/admin/comments?${query.toString()}`);
+  },
+
+  async toggleCommentApproval(id: string, isApproved: boolean): Promise<void> {
+    return apiClient<void>(`/api/admin/comments/${id}/approval`, {
+      method: "PATCH",
+      body: JSON.stringify({ isApproved }),
+    });
+  },
+
+  async replyComment(id: string, replyText: string): Promise<ProductComment> {
+    return apiClient<ProductComment>(`/api/admin/comments/${id}/reply`, {
+      method: "POST",
+      body: JSON.stringify({ replyText }),
+    });
+  },
+
+  async deleteComment(id: string): Promise<void> {
+    return apiClient<void>(`/api/admin/comments/${id}`, {
+      method: "DELETE",
     });
   },
 };
