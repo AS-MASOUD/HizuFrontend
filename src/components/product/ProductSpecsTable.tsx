@@ -1,5 +1,6 @@
 import React from "react";
 import { ProductDto } from "@/types";
+import { toEnglishDigits } from "@/lib/utils/formatters";
 
 interface ProductSpecsTableProps {
   product: ProductDto;
@@ -39,7 +40,7 @@ export default function ProductSpecsTable({ product }: ProductSpecsTableProps) {
                 item.isMono ? "font-mono dir-ltr text-right" : ""
               }`}
             >
-              {item.value}
+              {toEnglishDigits(item.value)}
             </span>
           </div>
         ))}

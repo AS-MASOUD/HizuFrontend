@@ -375,7 +375,7 @@ export default function AdminDashboardPage() {
               <span>HIZU CONTROL PANEL // ADMIN (مدیر سیستم)</span>
             </div>
           )}
-          <h1 className="text-3xl font-black text-[#161A1D]">پنل مدیریت و کارگاه هیزو</h1>
+          <h1 className="text-3xl font-black text-[#161A1D]">پنل مدیریت هیزو</h1>
         </div>
       </div>
 

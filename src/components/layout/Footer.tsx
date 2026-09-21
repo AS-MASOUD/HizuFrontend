@@ -61,7 +61,7 @@ export default function Footer() {
                   درباره استودیو و آزمایشگاه هیزو
                 </h3>
                 <p className="text-xs text-[#5A626A] mt-0.5 line-clamp-1">
-                  آشنایی با تاریخچه، پارک ماشین‌آلات ۵ محوره CNC و پرینترهای ابعاد صنعتی
+                  آشنایی با تاریخچه، پارک ماشین‌آلات 5 محوره CNC و پرینترهای ابعاد صنعتی
                 </p>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function Footer() {
               <span className="font-extrabold text-xl text-[#161A1D]">استودیو هیزو</span>
             </div>
             <p className="text-xs sm:text-sm text-[#5A626A] leading-relaxed max-w-sm">
-              استودیو طراحی و ساخت دیجیتال هیزو؛ تخصص در ماشین‌کاری ۵ محوره CNC، پرینت سه‌بعدی ابعاد صنعتی، برش لیزر دقیق و توسعه سیستم‌های مکاترونیک.
+              استودیو طراحی و ساخت دیجیتال هیزو؛ تخصص در ماشین‌کاری 5 محوره CNC، پرینت سه‌بعدی ابعاد صنعتی، برش لیزر دقیق و توسعه سیستم‌های مکاترونیک.
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-2 font-mono text-[11px] text-[#161A1D]">
               <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">EST. 1400</span>
@@ -139,8 +139,8 @@ export default function Footer() {
           {/* Col 4: Capabilities */}
           <div className="flex flex-col gap-3">
             <span className="font-bold text-sm text-[#161A1D]">خدمات کارگاهی</span>
-            <Link href="/services#3d-print" className="text-xs hover:text-[#082719] transition-colors">پرینت ۳بعدی FDM / SLS صنعتی</Link>
-            <Link href="/services#cnc" className="text-xs hover:text-[#082719] transition-colors">فرزکاری ۵ محوره CNC</Link>
+            <Link href="/services#3d-print" className="text-xs hover:text-[#082719] transition-colors">پرینت 3بعدی FDM / SLS صنعتی</Link>
+            <Link href="/services#cnc" className="text-xs hover:text-[#082719] transition-colors">فرزکاری 5 محوره CNC</Link>
             <Link href="/services#laser" className="text-xs hover:text-[#082719] transition-colors">برش و حکاکی لیزر فایبر و CO2</Link>
             <Link href="/services#dfm" className="text-xs hover:text-[#082719] transition-colors">مهندسی معکوس و تحلیل DFM</Link>
             <Link href="/services#automation" className="text-xs hover:text-[#082719] transition-colors">ساخت و اسمبل مکاترونیک</Link>
@@ -151,11 +151,11 @@ export default function Footer() {
             <span className="font-bold text-sm text-[#161A1D]">ارتباط با کارگاه</span>
             <div className="flex items-center gap-2 text-xs">
               <Mail className="w-4 h-4 text-[#0284c7] shrink-0" />
-              <span className="font-mono dir-ltr text-[#333C44]">cad@hizustudio.ir</span>
+              <span className="font-mono dir-ltr text-[#333C44]">Hizud3print@gmail.com</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <Phone className="w-4 h-4 text-[#0284c7] shrink-0" />
-              <span className="font-mono dir-rtl text-[#333C44]">+98 (21) 8876 5432</span>
+              <span className="font-mono ![direction:ltr] text-[#333C44]">+98 990 613 5755</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <MapPin className="w-4 h-4 text-[#0284c7] shrink-0" />

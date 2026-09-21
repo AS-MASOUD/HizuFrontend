@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
@@ -15,8 +15,11 @@ import {
   RotateCcw,
   Sparkles,
   ShieldCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toPersianDigits } from "@/lib/utils/formatters";
+import { OtpInput } from "@/components/ui/OtpInput";
 
 function LoginForm() {
   const router = useRouter();
@@ -45,6 +48,7 @@ function LoginForm() {
   // Password State
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [pwdSubmitting, setPwdSubmitting] = useState(false);
 
   // Countdown timer for OTP resend
@@ -114,11 +118,15 @@ function LoginForm() {
     }
   };
 
+  const isVerifyingRef = useRef(false);
+
   // 3. Verify OTP and login
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpCode.trim() || otpCode.trim().length < 4) {
-      error("لطفاً کد تایید ۵ رقمی را کامل وارد نمایید.");
+  const handleVerifyOtp = async (e?: React.FormEvent, customCode?: string) => {
+    if (e) e.preventDefault();
+    const codeToVerify = (customCode !== undefined ? customCode : otpCode).trim();
+    if (!codeToVerify || codeToVerify.length < 5) {
+      error("لطفاً کد تایید 5 رقمی را کامل وارد نمایید.");
+      isVerifyingRef.current = false;
       return;
     }
 
@@ -126,7 +134,7 @@ function LoginForm() {
       setOtpSubmitting(true);
       const loggedUser = await loginWithOtp({
         recipient: recipient.trim(),
-        code: otpCode.trim(),
+        code: codeToVerify,
       });
       success("با موفقیت وارد حساب کاربری شدید.");
       const isUserAdmin = loggedUser?.roles?.includes("Admin") || loggedUser?.roles?.includes("SysManager");
@@ -139,7 +147,14 @@ function LoginForm() {
       error(err.message || "کد تایید وارد شده نامعتبر است.");
     } finally {
       setOtpSubmitting(false);
+      isVerifyingRef.current = false;
     }
+  };
+
+  const handleAutoVerify = (code: string) => {
+    if (otpSubmitting || isVerifyingRef.current) return;
+    isVerifyingRef.current = true;
+    handleVerifyOtp(undefined, code);
   };
 
   // 4. Password login
@@ -226,7 +241,7 @@ function LoginForm() {
                     <Phone className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
                   </div>
                   <span className="text-[11px] text-[#5A626A]">
-                    کد تایید ۵ رقمی به این شماره یا ایمیل ارسال خواهد شد.
+                    کد تایید 5 رقمی به این شماره یا ایمیل ارسال خواهد شد.
                   </span>
                 </div>
 
@@ -260,26 +275,27 @@ function LoginForm() {
                   </button>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-[#161A1D]">
-                    کد تایید ۵ رقمی
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      type="text"
-                      maxLength={6}
-                      required
-                      autoFocus
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      placeholder="• • • • •"
-                      className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-3 text-center text-lg tracking-[0.5em] font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
-                    />
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-[#161A1D]">
+                      کد تایید 5 رقمی
+                    </label>
+                    <span className="text-[11px] text-[#5A626A] font-mono">
+                      5 رقم
+                    </span>
                   </div>
+                  <OtpInput
+                    value={otpCode}
+                    onChange={setOtpCode}
+                    onComplete={handleAutoVerify}
+                    length={5}
+                    disabled={otpSubmitting}
+                    autoFocus
+                  />
                 </div>
 
                 {/* Resend OTP & Countdown */}
-                <div className="flex items-center justify-between text-xs text-[#5A626A]">
+                <div className="flex items-center justify-between text-xs text-[#5A626A] mt-1">
                   {countdown > 0 ? (
                     <span className="flex items-center gap-1 font-mono">
                       ارسال مجدد تا {formatTimer(countdown)}
@@ -299,8 +315,8 @@ function LoginForm() {
 
                 <button
                   type="submit"
-                  disabled={otpSubmitting || otpCode.trim().length < 4}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white py-3 rounded-full text-xs font-bold shadow-md transition-all mt-1 disabled:opacity-50"
+                  disabled={otpSubmitting || otpCode.trim().length < 5}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white py-3 rounded-full text-xs font-bold shadow-md transition-all mt-1 disabled:opacity-50 interactive-bump"
                 >
                   <span>{otpSubmitting ? "در حال اعتبارسنجی..." : "تایید و ورود به حساب"}</span>
                   <ArrowLeft className="w-4 h-4 text-[#dfc79b]" />
@@ -334,14 +350,27 @@ function LoginForm() {
               <label className="text-xs font-semibold text-[#161A1D]">کلمه عبور</label>
               <div className="relative flex items-center">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 pl-10 text-xs font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
+                  className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 pl-10 pr-10 text-xs font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
                 />
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 text-gray-400 hover:text-[#161A1D] transition-colors p-1 flex items-center justify-center focus:outline-none"
+                  title={showPassword ? "مخفی کردن کلمه عبور" : "نمایش کلمه عبور"}
+                  aria-label={showPassword ? "مخفی کردن کلمه عبور" : "نمایش کلمه عبور"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 text-gray-600" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
               </div>
             </div>
 

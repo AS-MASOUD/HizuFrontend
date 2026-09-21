@@ -122,7 +122,7 @@ export default function CoursesPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="جستجوی دوره (مثلاً Fusion 360، پرینت ۳بعدی، CNC)..."
+              placeholder="جستجوی دوره (مثلاً Fusion 360، پرینت 3بعدی، CNC)..."
               className="w-full pl-4 pr-10 py-2.5 bg-[#FAF7F0] border border-[#1c211b]/12 rounded-xl text-xs text-[#161A1D] placeholder-[#5A626A]/70 focus:outline-none focus:border-[#082719] focus:ring-1 focus:ring-[#082719]"
             />
           </div>

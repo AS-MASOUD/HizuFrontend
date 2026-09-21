@@ -164,7 +164,7 @@ export default function RadarChart({ products, mode = "overlay", activeProductId
                             fontWeight="bold"
                             fontFamily="monospace"
                           >
-                            {toPersianDigits(score)} / ۱۰
+                            {toPersianDigits(score)} / 10
                           </text>
                         </g>
                       )}

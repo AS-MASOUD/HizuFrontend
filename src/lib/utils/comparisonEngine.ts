@@ -121,13 +121,13 @@ export function analyzeProduct(item: CompareItem): ProductAnalysis {
   }
 
   if (mat.includes("titanium") || mat.includes("تیتانیوم")) {
-    goodPoints.push("استفاده از آلیاژ خالص تیتانیوم گرید ۵ با مقاومت در برابر سایش و خوردگی شیمیایی");
+    goodPoints.push("استفاده از آلیاژ خالص تیتانیوم گرید 5 با مقاومت در برابر سایش و خوردگی شیمیایی");
   } else if (mat.includes("7075") || mat.includes("aerospace")) {
     goodPoints.push("آلیاژ آلومینیوم فوق‌مقاوم 7075-T6 با بهینه‌سازی توپولوژیک وزن و ممان اینرسی");
   } else if (mat.includes("brass") || mat.includes("برنج")) {
     goodPoints.push("شمش برنجی سنگین و یکپارچه C360 با آکوستیک بی‌نظیر و پرداخت دستی لوکس");
   } else if (mat.includes("carbon") || mat.includes("pa12")) {
-    goodPoints.push("پلیمر مهندسی تقویت‌شده با فیبرکربن با خاصیت خود‌روان‌کنندگی و مقاومت حرارتی ۱۶۰ درجه");
+    goodPoints.push("پلیمر مهندسی تقویت‌شده با فیبرکربن با خاصیت خود‌روان‌کنندگی و مقاومت حرارتی 160 درجه");
   } else if (mat.includes("oak") || mat.includes("walnut")) {
     goodPoints.push("چوب طبیعی اشباع‌شده با روغن‌های ارگانیک و اتصالات پنهان و مقاوم");
   }
@@ -162,7 +162,7 @@ export function analyzeProduct(item: CompareItem): ProductAnalysis {
   }
 
   if (tolVal !== null && tolVal >= 0.05) {
-    drawbacks.push(`تلرانس ساخت آزادتر نسبت به قطعات میکرونی فرز ۵ محوره (${item.tolerance})`);
+    drawbacks.push(`تلرانس ساخت آزادتر نسبت به قطعات میکرونی فرز 5 محوره (${item.tolerance})`);
   }
 
   if (!item.tolerance) {
@@ -331,7 +331,7 @@ export function determineOverallWinner(items: CompareItem[]): {
   if (isTie) {
     summary = "محصولات انتخابی از نظر مجموع امتیازات فنی و اقتصادی در رده مساوی قرار گرفته‌اند. انتخاب نهایی به اولویت خاص پروژه شما (نظیر دقت میکرونی یا وزن کمتر) بستگی دارد.";
   } else if (winnerItem) {
-    summary = `«${winnerItem.name}» با کسب بالاترین مجموع امتیاز (${highestTotal} از ۶۰)، به عنوان محصول برتر این مقایسه شناخته شد. این قطعه به دلیل توازن عالی میان متریال، فرآیند ساخت و ارزش خرید، بهترین راندمان را ارائه می‌دهد.`;
+    summary = `«${winnerItem.name}» با کسب بالاترین مجموع امتیاز (${highestTotal} از 60)، به عنوان محصول برتر این مقایسه شناخته شد. این قطعه به دلیل توازن عالی میان متریال، فرآیند ساخت و ارزش خرید، بهترین راندمان را ارائه می‌دهد.`;
   }
 
   return {

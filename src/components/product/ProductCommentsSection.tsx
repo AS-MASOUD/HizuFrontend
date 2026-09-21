@@ -125,7 +125,7 @@ export default function ProductCommentsSection({
               ))}
             </div>
             <span className="font-mono font-bold text-sm text-[#082719]">
-              {toPersianDigits(avgRating)} از ۵
+              {toPersianDigits(avgRating)} از 5
             </span>
             <span className="text-[11px] text-[#5A626A]">
               ({toPersianDigits(totalComments)} دیدگاه ثبت‌شده)

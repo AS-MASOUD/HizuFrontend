@@ -70,7 +70,7 @@ export default function Header() {
   const shopCategories = [
     {
       icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
-      title: "پرینت ۳بعدی صنعتی",
+      title: "پرینت 3بعدی صنعتی",
       desc: "فیلامنت‌های مهندسی، نایلون کربن و رزین",
       slug: "3d-printing",
     },
@@ -103,11 +103,10 @@ export default function Header() {
   const standardNavLinks = [
     { href: "/", label: "خانه" },
     { href: "/courses", label: "دوره های آموزشی" },
-    { href: "/services", label: "خدمات کارگاه" },
+    { href: "/services", label: "خدمات هیزو" },
     { href: "/articles", label: "مقالات و تکنولوژی" },
-    { href: "/compare", label: "میز مقایسه" },
     { href: "/about", label: "درباره هیزو" },
-    { href: "/contact", label: "تماس با کارگاه" },
+    { href: "/contact", label: "تماس با ما" },
   ];
 
   return (
@@ -307,7 +306,6 @@ export default function Header() {
                     onClick={() => {
                       setUserMenuOpen(false);
                       logout();
-                      router.push('/');
                     }}
                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-700 hover:bg-rose-50 transition-colors text-right"
                   >
@@ -377,7 +375,7 @@ export default function Header() {
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5 text-[#082719]" />
-                <span>فروشگاه</span>
+                <span>محصولات</span>
                 <ChevronDown className="w-3.5 h-3.5 text-[#5A626A] transition-transform duration-300 group-hover/nav:rotate-180" />
               </button>
 
@@ -423,7 +421,7 @@ export default function Header() {
                       href="/shop"
                       className="inline-flex items-center justify-center gap-2 w-full py-2 bg-[#082719] text-white rounded-xl text-xs font-bold hover:bg-[#16191d] transition-colors shadow-xs"
                     >
-                      <span>مشاهده همه محصولات فروشگاه</span>
+                      <span>مشاهده همه محصولات هیزو</span>
                       <ArrowLeft className="w-3.5 h-3.5 text-[#dfc79b]" />
                     </Link>
                   </div>

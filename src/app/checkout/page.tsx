@@ -119,12 +119,12 @@ export default function CheckoutPage() {
               value={shippingAddress.street}
               onChange={(e) => setShippingAddress({ ...shippingAddress, street: e.target.value })}
               className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D] focus:outline-none focus:border-[#082719]"
-              placeholder="مثال: خیابان آزادی، ناحیه نوآوری شریف، ساختمان کارگاه هیزو، طبقه ۲"
+              placeholder="مثال: خیابان آزادی، ناحیه نوآوری شریف، ساختمان کارگاه هیزو، طبقه 2"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#161A1D]">کد پستی ۱۰ رقمی</label>
+            <label className="text-xs font-semibold text-[#161A1D]">کد پستی 10 رقمی</label>
             <input
               type="text"
               value={shippingAddress.zipCode}

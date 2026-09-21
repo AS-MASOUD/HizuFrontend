@@ -196,8 +196,8 @@ export default function SpecialOrdersPage() {
               onChange={(e) => setCategory(e.target.value)}
               className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D] focus:outline-none focus:border-[#082719] cursor-pointer"
             >
-              <option value="ماشین‌کاری CNC">فرزکاری و ماشین‌کاری ۵ محوره CNC</option>
-              <option value="پرینت ۳بعدی صنعتی">پرینت ۳بعدی صنعتی (FDM / SLA / SLS)</option>
+              <option value="ماشین‌کاری CNC">فرزکاری و ماشین‌کاری 5 محوره CNC</option>
+              <option value="پرینت ۳بعدی صنعتی">پرینت 3بعدی صنعتی (FDM / SLA / SLS)</option>
               <option value="برش و حکاکی لیزر">برش لیزر فایبر / CO2 دقیق</option>
               <option value="ساخت ماشین‌آلات">طراحی و ساخت مکاترونیک و ماشین‌آلات</option>
               <option value="مهندسی معکوس">مهندسی معکوس، اسکن نوری و مدلسازی DFM</option>
@@ -257,7 +257,7 @@ export default function SpecialOrdersPage() {
               {uploading ? "در حال بارگذاری فایل روی سرور..." : "انتخاب یا کشیدن فایل به این قسمت"}
             </span>
             <span className="font-mono text-[10px] text-[#5A626A]">
-              حداکثر حجم مجاز: ۵۰ مگابایت
+              حداکثر حجم مجاز: 50 مگابایت
             </span>
             <input
               type="file"

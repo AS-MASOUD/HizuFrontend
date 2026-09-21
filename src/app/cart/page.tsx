@@ -94,7 +94,7 @@ export default function CartPage() {
               <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 border-[#1c211b]/10 pt-3 sm:pt-0">
                 {item.courseId ? (
                   <span className="text-xs font-mono text-[#5A626A] bg-[#FAF7F0] px-3 py-1 rounded-full border border-[#1c211b]/10">
-                    تعداد: ۱ دوره
+                    تعداد: 1 دوره
                   </span>
                 ) : (
                   <div className="flex items-center border border-[#1c211b]/20 rounded-full bg-[#FAF7F0] p-1">
@@ -148,7 +148,7 @@ export default function CartPage() {
             <div className="flex items-center justify-between">
               <span className="text-[#5A626A]">هزینه بسته‌بندی و ارسال:</span>
               <span className="font-mono font-bold text-[#161A1D]">
-                {cart.shippingCost === 0 ? "رایگان (سفارش بالای ۱.۵ میلیون)" : formatPrice(cart.shippingCost)}
+                {cart.shippingCost === 0 ? "رایگان (سفارش بالای 1.5 میلیون)" : formatPrice(cart.shippingCost)}
               </span>
             </div>
             <div className="pt-3 border-t border-[#1c211b]/10 flex items-center justify-between font-bold text-sm">

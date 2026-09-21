@@ -33,7 +33,7 @@ export default async function HomePage() {
       icon: <Layers className="w-6 h-6 text-[#0284c7]" />,
       badge: "FDM / SLS",
       coord: "15mm",
-      title: "پرینت ۳بعدی صنعتی",
+      title: "پرینت 3بعدی صنعتی",
       desc: "تولید نمونه اولیه دقیق و قطعات نهایی با پلیمرهای مهندسی FDM/SLA/SLS و نایلون کربن.",
     },
     {
@@ -41,7 +41,7 @@ export default async function HomePage() {
       badge: "5-AXIS MILL",
       coord: "±0.01",
       title: "ماشین‌کاری CNC",
-      desc: "فرزکاری ۵ محوره فلزات سبک، برنج، چوب و ساخت قالب‌های مستحکم با تلورانس ابعادی میکرونی.",
+      desc: "فرزکاری 5 محوره فلزات سبک، برنج، چوب و ساخت قالب‌های مستحکم با تلورانس ابعادی میکرونی.",
     },
     {
       icon: <Sparkles className="w-6 h-6 text-[#0284c7]" />,
@@ -89,7 +89,7 @@ export default async function HomePage() {
               <span className="font-bold text-[#082719]">مدل‌های سه‌بعدی و قالب:</span> .STEP, .STP, .IGES, .SLDPRT, .X_T
             </div>
             <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08">
-              <span className="font-bold text-[#082719]">پرینت ۳بعدی صنعتی:</span> .STL, .OBJ, .3MF (Mesh High-Poly)
+              <span className="font-bold text-[#082719]">پرینت 3بعدی صنعتی:</span> .STL, .OBJ, .3MF (Mesh High-Poly)
             </div>
             <div className="p-2.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08">
               <span className="font-bold text-[#082719]">برش لیزر و CNC تختی:</span> .DXF, .DWG, .AI, .SVG
@@ -107,7 +107,7 @@ export default async function HomePage() {
       badge: "ISO 2768-m",
       content: (
         <p>
-          در فرآیند فرزکاری ۵ محوره CNC، تلورانس هندسی و ابعادی قطعات تا محدوده <strong>±0.01 میلی‌متر</strong> (مطابق استاندارد بین‌المللی ISO 2768-Fine) تضمین می‌گردد. در پرینت سه‌بعدی صنعتی با روش‌های SLS و رزین مهندسی SLA، دقت ابعادی در بازه ±0.05 میلی‌متر قرار دارد. کلیه قطعات حساس صنعتی همراه با گزارش اندازه‌گیری ابعادی CMM و برگه کنترل کیفیت نهایی تحویل می‌گردند.
+          در فرآیند فرزکاری 5 محوره CNC، تلورانس هندسی و ابعادی قطعات تا محدوده <strong>±0.01 میلی‌متر</strong> (مطابق استاندارد بین‌المللی ISO 2768-Fine) تضمین می‌گردد. در پرینت سه‌بعدی صنعتی با روش‌های SLS و رزین مهندسی SLA، دقت ابعادی در بازه ±0.05 میلی‌متر قرار دارد. کلیه قطعات حساس صنعتی همراه با گزارش اندازه‌گیری ابعادی CMM و برگه کنترل کیفیت نهایی تحویل می‌گردند.
         </p>
       ),
     },
@@ -117,7 +117,7 @@ export default async function HomePage() {
       badge: "FAST TURNAROUND",
       content: (
         <p>
-          برای قطعات پرینت سه‌بعدی و برش لیزر فوری، تحویل نمونه اولیه بین <strong>۲۴ الی ۴۸ ساعت</strong> کاری انجام می‌شود. سفارش‌های ماشین‌کاری دقیق CNC بسته به پیچیدگی سطوح ۵ محوره، نوع آلیاژ و عملیات حرارتی بین ۳ الی ۶ روز کاری زمان‌بندی خواهند شد.
+          برای قطعات پرینت سه‌بعدی و برش لیزر فوری، تحویل نمونه اولیه بین <strong>24 الی 48 ساعت</strong> کاری انجام می‌شود. سفارش‌های ماشین‌کاری دقیق CNC بسته به پیچیدگی سطوح 5 محوره، نوع آلیاژ و عملیات حرارتی بین 3 الی 6 روز کاری زمان‌بندی خواهند شد.
         </p>
       ),
     },
@@ -127,7 +127,7 @@ export default async function HomePage() {
       badge: "PROTOTYPE TO BATCH",
       content: (
         <p>
-          بله؛ ساختار کارگاه و خطوط ساخت هیزو بر پایه تولید انعطاف‌پذیر (Agile Fabrication) طراحی شده‌اند. شما می‌توانید از ۱ قطعه نمونه اولیه تکی تا تیراژهای ۵۰۰ الی ۱۰,۰۰۰ عددی را با هزینه بهینه ابزارسازی و بدون نیاز به هزینه‌های سنگین قالب‌سازی سفارش دهید.
+          بله؛ ساختار کارگاه و خطوط ساخت هیزو بر پایه تولید انعطاف‌پذیر (Agile Fabrication) طراحی شده‌اند. شما می‌توانید از 1 قطعه نمونه اولیه تکی تا تیراژهای 500 الی 10,000 عددی را با هزینه بهینه ابزارسازی و بدون نیاز به هزینه‌های سنگین قالب‌سازی سفارش دهید.
         </p>
       ),
     },
@@ -137,7 +137,7 @@ export default async function HomePage() {
       badge: "FINISHING LAB",
       content: (
         <p>
-          متریال‌های قابل پردازش در هیزو شامل آلیاژهای آلومینیوم سری ۶۰۰۰ و ۷۰۷۵، برنج صنعتی، فولادهای زنگ‌نزن ۳۰۴ و ۳۱۶، تیتانیوم، تفلون صنعتی POM، پلیمرهای کربنی و چوب‌های سخت عمل‌آوری شده است. خدمات تکمیلی شامل آنودایز مات و رنگی، سندبلاست شیشه‌ای، پوشش‌های ضدسایش، پولیش مکانیکی و حکاکی نوری مشخصات فنی با لیزر می‌باشد.
+          متریال‌های قابل پردازش در هیزو شامل آلیاژهای آلومینیوم سری 6000 و 7075، برنج صنعتی، فولادهای زنگ‌نزن 304 و 316، تیتانیوم، تفلون صنعتی POM، پلیمرهای کربنی و چوب‌های سخت عمل‌آوری شده است. خدمات تکمیلی شامل آنودایز مات و رنگی، سندبلاست شیشه‌ای، پوشش‌های ضدسایش، پولیش مکانیکی و حکاکی نوری مشخصات فنی با لیزر می‌باشد.
         </p>
       ),
     },
@@ -206,7 +206,7 @@ export default async function HomePage() {
                 <Award className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
-                <span className="font-mono text-2xl font-black text-[#161A1D]">+۸ سال</span>
+                <span className="font-mono text-2xl font-black text-[#161A1D]">+8 سال</span>
                 <span className="text-xs text-[#5A626A] font-medium">تجربه ساخت و مهندسی</span>
               </div>
             </div>
@@ -215,7 +215,7 @@ export default async function HomePage() {
                 <Wrench className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
-                <span className="font-mono text-2xl font-black text-[#161A1D]">+۲۵۰</span>
+                <span className="font-mono text-2xl font-black text-[#161A1D]">+250</span>
                 <span className="text-xs text-[#5A626A] font-medium">پروژه موفق و تحویلی</span>
               </div>
             </div>
@@ -224,7 +224,7 @@ export default async function HomePage() {
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
-                <span className="font-mono text-2xl font-black text-[#161A1D]">۱۰۰٪</span>
+                <span className="font-mono text-2xl font-black text-[#161A1D]">100%</span>
                 <span className="text-xs text-[#5A626A] font-medium">رضایت مشتریان صنعتی</span>
               </div>
             </div>
@@ -336,7 +336,7 @@ export default async function HomePage() {
               [ OUR PROCESS ]
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-[#161A1D] mt-1">
-              ایده تا تحویل: فرآیند ۵ مرحله‌ای مهندسی در هیزو
+              ایده تا تحویل: فرآیند 5 مرحله‌ای مهندسی در هیزو
             </h2>
           </div>
 

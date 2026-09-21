@@ -131,6 +131,24 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     [removeToast]
   );
 
+  // Check for persistent flash toast messages across page reloads (e.g. after logout)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const flash = sessionStorage.getItem("hizu_flash_toast");
+      if (flash) {
+        sessionStorage.removeItem("hizu_flash_toast");
+        const parsed = JSON.parse(flash);
+        if (parsed && parsed.message) {
+          const timer = setTimeout(() => {
+            showToast(parsed.message, parsed.type || "success", parsed.title);
+          }, 150);
+          return () => clearTimeout(timer);
+        }
+      }
+    } catch {}
+  }, [showToast]);
+
   const success = useCallback(
     (msg: string, title?: string) => showToast(msg, "success", title),
     [showToast]

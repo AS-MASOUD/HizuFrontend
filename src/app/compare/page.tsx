@@ -134,7 +134,7 @@ function CompareContent() {
               {compareCount === 0 ? "هیچ محصولی در لیست مقایسه نیست" : "یک محصول دیگر برای مقایسه اضافه کنید"}
             </h1>
             <p className="text-xs sm:text-sm text-[#5A626A] leading-relaxed">
-              برای رسم نمودار چندضلعی، تحلیل نقاط قوت و ضعف و امتیازدهی بخش‌های فنی، لطفاً حداقل ۲ محصول (و حداکثر ۳ محصول) را انتخاب کنید.
+              برای رسم نمودار چندضلعی، تحلیل نقاط قوت و ضعف و امتیازدهی بخش‌های فنی، لطفاً حداقل 2 محصول (و حداکثر 3 محصول) را انتخاب کنید.
             </p>
           </div>
 
@@ -406,7 +406,7 @@ function CompareContent() {
               </h2>
             </div>
             <p className="text-xs text-[#5A626A]">
-              تحلیل هندسی ۶ بعدی شامل دقت ابعادی، استحکام، ارزش خرید، سبکی، فناوری تولید و موجودی آماده.
+              تحلیل هندسی 6 بعدی شامل دقت ابعادی، استحکام، ارزش خرید، سبکی، فناوری تولید و موجودی آماده.
             </p>
           </div>
 
@@ -451,7 +451,7 @@ function CompareContent() {
                     <div className="flex items-center justify-between border-b border-[#1c211b]/08 pb-2">
                       <span className="font-bold text-xs text-[#161A1D] truncate">{item.name}</span>
                       <span className="font-mono text-xs font-bold text-[#082719]">
-                        امتیاز کلی: {toPersianDigits(a.totalScore)} / ۶۰
+                        امتیاز کلی: {toPersianDigits(a.totalScore)} / 60
                       </span>
                     </div>
 
@@ -498,7 +498,7 @@ function CompareContent() {
                   <div className="w-full flex items-center justify-between border-b border-[#1c211b]/08 pb-2">
                     <span className="font-bold text-xs text-[#161A1D] truncate">{item.name}</span>
                     <span className="font-mono text-xs font-bold text-[#082719] bg-white px-2 py-0.5 rounded border border-[#1c211b]/10">
-                      {toPersianDigits(a.totalScore)} / ۶۰
+                      {toPersianDigits(a.totalScore)} / 60
                     </span>
                   </div>
 
@@ -549,7 +549,7 @@ function CompareContent() {
             </h2>
           </div>
           <p className="text-xs text-[#5A626A]">
-            در هر بخش، مشخصات فنی مقایسه شده و امتیازی بین ۱ تا ۱۰ به هر محصول اختصاص یافته است. محصول حائز رتبه برتر با نشان طلایی برنده مشخص شده است.
+            در هر بخش، مشخصات فنی مقایسه شده و امتیازی بین 1 تا 10 به هر محصول اختصاص یافته است. محصول حائز رتبه برتر با نشان طلایی برنده مشخص شده است.
           </p>
         </div>
 
@@ -605,7 +605,7 @@ function CompareContent() {
                               : "bg-gray-100 text-[#5A626A]"
                           }`}
                         >
-                          امتیاز: {toPersianDigits(score)} / ۱۰
+                          امتیاز: {toPersianDigits(score)} / 10
                         </span>
                       </div>
 
@@ -629,7 +629,7 @@ function CompareContent() {
       </section>
 
       {/* 4. Overall Winner Banner */}
-      <section className="card-popup rounded-2xl bg-gradient-to-br from-[#082719] to-[#16191d] text-white p-6 sm:p-8 border border-[#1c211b]/20 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+      <section className="rounded-2xl bg-gradient-to-br from-[#082719] to-[#16191d] text-white p-6 sm:p-8 border border-[#1c211b]/20 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
         <div className="flex items-start gap-4">
           <div className="w-14 h-14 rounded-2xl bg-[#dfc79b]/20 border border-[#dfc79b]/40 flex items-center justify-center text-[#dfc79b] shrink-0">
             <Trophy className="w-8 h-8" />
@@ -663,7 +663,7 @@ function CompareContent() {
                     }`}
                   >
                     <span>{item.name}:</span>
-                    <span>{toPersianDigits(a.totalScore)} / ۶۰</span>
+                    <span>{toPersianDigits(a.totalScore)} / 60</span>
                   </div>
                 );
               })}

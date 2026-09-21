@@ -13,13 +13,13 @@ export interface SlideItem {
 const DEFAULT_SLIDES: SlideItem[] = [
   {
     src: "/slideshow/slide-1.jpg",
-    title: "کارگاه ماشین‌کاری پیشرفته ۵ محوره CNC",
+    title: "کارگاه ماشین‌کاری پیشرفته 5 محوره CNC",
     subtitle: "CAM 01 // CNC MILLING & PROTOTYPING",
     badge: "TOLERANCE ±0.01mm",
   },
   {
     src: "/slideshow/slide-2.jpg",
-    title: "پرینت ۳بعدی صنعتی ابعاد بزرگ",
+    title: "پرینت 3بعدی صنعتی ابعاد بزرگ",
     subtitle: "ADDITIVE 02 // INDUSTRIAL SLS & FDM",
     badge: "PA12 CARBON / RESIN",
   },

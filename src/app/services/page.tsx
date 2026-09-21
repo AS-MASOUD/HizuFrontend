@@ -20,6 +20,7 @@ import {
   Settings,
   Flame,
 } from "lucide-react";
+import { toEnglishDigits } from "@/lib/utils/formatters";
 
 export default function ServicesPage() {
   const [revealedCards, setRevealedCards] = useState<Record<string, boolean>>({});
@@ -37,10 +38,7 @@ export default function ServicesPage() {
           }
         });
       },
-      {
-        threshold: 0.15,
-        rootMargin: "0px 0px -50px 0px",
-      }
+      { threshold: 0.15 }
     );
 
     Object.values(cardRefs.current).forEach((el) => {
@@ -56,16 +54,16 @@ export default function ServicesPage() {
       serviceParam: "3d-print",
       code: "PROTOCOL 01",
       badge: "FDM / SLS / SLA | PA12-CF",
-      title: "پرینت ۳بعدی صنعتی و نمونه‌سازی سریع",
+      title: "پرینت 3بعدی صنعتی و نمونه‌سازی سریع",
       subtitle: "LARGE-FORMAT INDUSTRIAL 3D PRINTING & RAPID TOOLING",
       desc: "تولید نمونه‌های دقیق مهندسی، جیگ و فیکسچرهای سبک، پوسته‌های محافظ و قطعات تیراژ با مجهزترین پرینترهای ابعاد صنعتی. هیزو با تکیه بر تکنولوژی‌های FDM با محفظه حرارتی فعال و SLS نوری، قابلیت تزریق و پرینت پلیمرهای مقاوم در برابر ضربه، سایش و حرارت‌های بالا را فراهم کرده است.",
       image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
       icon: Layers,
       specs: [
         { label: "تلورانس ابعادی", value: "±0.05 میلی‌متر مطابق استاندارد" },
-        { label: "حداکثر ابعاد ساخت یکپارچه", value: "۵۰۰×۵۰۰×۶۰۰ میلی‌متر" },
-        { label: "رزولوشن لایه‌گذاری", value: "۲۰ تا ۲۰۰ میکرون قابل انتخاب" },
-        { label: "مقاومت حرارتی پلیمرها", value: "تا ۱۸۰ درجه سانتی‌گراد نسوز" },
+        { label: "حداکثر ابعاد ساخت یکپارچه", value: "500×500×600 میلی‌متر" },
+        { label: "رزولوشن لایه‌گذاری", value: "20 تا 200 میکرون قابل انتخاب" },
+        { label: "مقاومت حرارتی پلیمرها", value: "تا 180 درجه سانتی‌گراد نسوز" },
       ],
       materials: ["نایلون فیبر کربن PA12-CF", "پلی‌کربنات نسوز (PC)", "رزین مهندسی Tough", "ABS-ESD آنتی‌استاتیک", "پلیمرهای انعطاف‌پذیر TPU"],
       applications: ["قطعات سبک پهپاد و هوافضا", "پوسته و فریم تجهیزات رباتیک", "قطعات تست کارگاهی و جایگزین آلومینیوم", "هوزینگ‌های ضدآب الکترونیک"],
@@ -76,20 +74,20 @@ export default function ServicesPage() {
       serviceParam: "cnc",
       code: "PROTOCOL 02",
       badge: "ISO 2768-FINE | ±0.01mm",
-      title: "ماشین‌کاری ۵ محوره همزمان CNC",
+      title: "ماشین‌کاری 5 محوره همزمان CNC",
       subtitle: "SIMULTANEOUS 5-AXIS PRECISION CNC MILLING",
-      desc: "فرزکاری فوق‌دقیق ۵ محوره همزمان برای قطعات با هندسه‌های پیچیده سه‌بعدی و سطوح آزاد (Freeform) بدون نیاز به بستن‌های چندباره و حذف خطای زوایای متقاطع. کارگاه هیزو با تجهیزات تخصصی و ابزارگیرهای صلب، قطعات حساس هوافضا، هیدرولیک و قالب‌های دقیق را از شمش‌های یکپارچه فلزی فرزکاری می‌کند.",
+      desc: "فرزکاری فوق‌دقیق 5 محوره همزمان برای قطعات با هندسه‌های پیچیده سه‌بعدی و سطوح آزاد (Freeform) بدون نیاز به بستن‌های چندباره و حذف خطای زوایای متقاطع. کارگاه هیزو با تجهیزات تخصصی و ابزارگیرهای صلب، قطعات حساس هوافضا، هیدرولیک و قالب‌های دقیق را از شمش‌های یکپارچه فلزی فرزکاری می‌کند.",
       image: "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?auto=format&fit=crop&w=1200&q=80",
       icon: Wrench,
       specs: [
         { label: "دقت موقعیت‌یابی و تکرارپذیری", value: "±0.008 میلی‌متر میکرونی" },
-        { label: "محدوده کارگیر ۵ محوره", value: "۸۰۰×۶۰۰×۵۰۰ میلی‌متر" },
-        { label: "زبری سطح پرداختی (Ra)", value: "تا ۰.۴ میکرومتر آینه‌ای" },
-        { label: "سرعت چرخش اسپیندل", value: "۲۴,۰۰۰ دور در دقیقه با کولانت" },
+        { label: "محدوده کارگیر 5 محوره", value: "800×600×500 میلی‌متر" },
+        { label: "زبری سطح پرداختی (Ra)", value: "تا 0.4 میکرومتر آینه‌ای" },
+        { label: "سرعت چرخش اسپیندل", value: "24,000 دور در دقیقه با کولانت" },
       ],
       materials: ["آلومینیوم 7075-T6 و 6061", "برنج آلیاژی شمش", "استیل نگیر 316 و 304", "فولاد ابزار SPK سخت‌کاری شده", "چوب‌های سخت متراکم صنعتی"],
       applications: ["پره‌های توربین و ایمپلرهای دینامیک", "پوسته‌های هیدرولیک و پنوماتیک", "براکت‌های حساس رباتیک و اتوماسیون", "قالب‌های فرم‌دهی و کشش دقیق"],
-      equipment: "مرکز فرزکاری ۵ محوره همزمان، سیستم پروب لیزری Renishaw و خنک‌کاری پیشرفته مایع تحت فشار",
+      equipment: "مرکز فرزکاری 5 محوره همزمان، سیستم پروب لیزری Renishaw و خنک‌کاری پیشرفته مایع تحت فشار",
     },
     {
       id: "laser",
@@ -98,18 +96,18 @@ export default function ServicesPage() {
       badge: "1064nm FIBER & CO2 HIGH-POWER",
       title: "برش فایبر نوری و حکاکی پرسرعت لیزر",
       subtitle: "ULTRA-FAST FIBER & CO2 LASER PROCESSING",
-      desc: "برش نوری بی‌نقص انواع ورق‌های فلزی سخت و متریال‌های غیرفلزی با حداقل منطقه متاثر از حرارت (HAZ). استفاده از لیزر فایبر با طول موج ۱۰۶۴ نانومتر و گازهای خلوص بالای نیتروژن و اکسیژن، لبه‌هایی کاملاً صیقلی، عمود و بدون اکسیداسیون یا پلیسه را تضمین می‌کند.",
+      desc: "برش نوری بی‌نقص انواع ورق‌های فلزی سخت و متریال‌های غیرفلزی با حداقل منطقه متاثر از حرارت (HAZ). استفاده از لیزر فایبر با طول موج 1064 نانومتر و گازهای خلوص بالای نیتروژن و اکسیژن، لبه‌هایی کاملاً صیقلی، عمود و بدون اکسیداسیون یا پلیسه را تضمین می‌کند.",
       image: "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80",
       icon: Sparkles,
       specs: [
-        { label: "حداکثر ضخامت برش فولاد", value: "تا ۲۰ میلی‌متر با نیتروژن خلوص ۹۹.۹۹٪" },
+        { label: "حداکثر ضخامت برش فولاد", value: "تا 20 میلی‌متر با نیتروژن خلوص 99.99%" },
         { label: "دقت پرتو و نقطه فوکوس", value: "±0.03 میلی‌متر روی کانون" },
-        { label: "توان سورس فایبر نوری", value: "۶۰۰۰ وات پیوسته صنعتی" },
+        { label: "توان سورس فایبر نوری", value: "6000 وات پیوسته صنعتی" },
         { label: "حکاکی نوری عمیق", value: "بارکد، شماره فنی، لوگو و درجه‌بندی" },
       ],
-      materials: ["ورق آهن St37 و St52", "ورق استنلس استیل ۳۰۴ و ۳۱۶", "ورق مس خالص و برنج فنری", "آلومینیوم سری ۵۰۰۰ و ۶۰۰۰", "چوب طبیعی، MDF و پلکسی گلاس"],
+      materials: ["ورق آهن St37 و St52", "ورق استنلس استیل 304 و 316", "ورق مس خالص و برنج فنری", "آلومینیوم سری 5000 و 6000", "چوب طبیعی، MDF و پلکسی گلاس"],
       applications: ["شاسی‌های مدولار الکترونیک", "پنل‌های رک و جعبه‌های مخابراتی", "فلنج‌ها و دیسک‌های ترمز صنعتی", "المان‌های مدرن معماری و مشبک"],
-      equipment: "میز برش فایبر ۳۰۰۰×۱۵۰۰ میلی‌متر با هد فوکوس اتوماتیک Precitec و سیستم تزریق گاز نیتروژن و اکسیژن",
+      equipment: "میز برش فایبر 3000×1500 میلی‌متر با هد فوکوس اتوماتیک Precitec و سیستم تزریق گاز نیتروژن و اکسیژن",
     },
     {
       id: "dfm",
@@ -122,13 +120,13 @@ export default function ServicesPage() {
       image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80",
       icon: Scan,
       specs: [
-        { label: "دقت اندازه‌گیری اسکنر", value: "۵ میکرومتر (گواهی کالیبراسیون Metrology)" },
+        { label: "دقت اندازه‌گیری اسکنر", value: "5 میکرومتر (گواهی کالیبراسیون Metrology)" },
         { label: "فرمت فایل‌های خروجی", value: "STEP, IGES, Parasolid, Native SolidWorks/NX" },
         { label: "تحلیل المان محدود (FEA)", value: "استاتیک، خستگی و توزیع تنش فون مایسز" },
         { label: "گزارش بازرسی ابعادی (Inspection)", value: "نقشه انحراف رنگی با تلورانس GD&T" },
       ],
       materials: ["اسکن کلیه قطعات فلزی، پلیمری و کامپوزیتی", "اسکن قطعات ریخته‌گری با سطوح نامنظم", "قالب‌های قدیمی و قطعات از رده خارج"],
-      applications: ["بازسازی قطعات نایاب خطوط تولید خارجی", "تحلیل عیوب و انحرافات ابعادی قطعه ساخته شده", "بهینه‌سازی توپولوژی و کاهش وزن تا ۴۰٪", "تبدیل نقشه‌های دوبعدی به مدل‌های سه‌بعدی"],
+      applications: ["بازسازی قطعات نایاب خطوط تولید خارجی", "تحلیل عیوب و انحرافات ابعادی قطعه ساخته شده", "بهینه‌سازی توپولوژی و کاهش وزن تا 40%", "تبدیل نقشه‌های دوبعدی به مدل‌های سه‌بعدی"],
       equipment: "اسکنر نوری سه‌بعدی نور آبی (Blue Light Optical Scanner) و ایستگاه‌های پردازش محاسباتی Geomagic Control X",
     },
     {
@@ -165,7 +163,7 @@ export default function ServicesPage() {
           فرآیندهای تولید دیجیتال، نمونه‌سازی و ماشین‌کاری دقیق
         </h1>
         <p className="text-sm sm:text-base text-[#5A626A] leading-relaxed max-w-2xl mx-auto">
-          زنجیره یکپارچه ساخت سخت‌افزار در کارگاه هیزو؛ تلاقی طراحی دقیق CAD، فرزکاری ۵ محوره CNC، پرینترهای ابعاد صنعتی و تست متولوژی با بالاترین استانداردهای مهندسی.
+          زنجیره یکپارچه ساخت سخت‌افزار در کارگاه هیزو؛ تلاقی طراحی دقیق CAD، فرزکاری 5 محوره CNC، پرینترهای ابعاد صنعتی و تست متولوژی با بالاترین استانداردهای مهندسی.
         </p>
 
         {/* Quick Anchor Navigation Pills */}
@@ -270,7 +268,7 @@ export default function ServicesPage() {
                           className="p-3 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/08 flex flex-col gap-0.5"
                         >
                           <span className="text-[11px] text-[#5A626A] font-medium">{item.label}</span>
-                          <span className="text-xs font-bold text-[#161A1D] font-mono">{item.value}</span>
+                          <span className="text-xs font-bold text-[#161A1D] font-mono">{toEnglishDigits(item.value)}</span>
                         </div>
                       ))}
                     </div>
@@ -341,7 +339,7 @@ export default function ServicesPage() {
             </div>
             <h3 className="font-bold text-sm text-[#161A1D]">ارسال فایل CAD یا نقشه</h3>
             <p className="text-xs text-[#5A626A] leading-relaxed">
-              بارگذاری فایل ۳بعدی (STEP, IGES, STL) از طریق سامانه استعلام قیمت به همراه مشخصات متریال و تعداد.
+              بارگذاری فایل 3بعدی (STEP, IGES, STL) از طریق سامانه استعلام قیمت به همراه مشخصات متریال و تعداد.
             </p>
           </div>
 
@@ -361,7 +359,7 @@ export default function ServicesPage() {
             </div>
             <h3 className="font-bold text-sm text-[#161A1D]">ماشین‌کاری و ساخت در آتلیه</h3>
             <p className="text-xs text-[#5A626A] leading-relaxed">
-              اجرای برنامه ساخت روی ماشین‌های ۵ محوره CNC، پرینترهای SLS/FDM یا لیزر فایبر با نظارت مستمر مهندس فرآیند.
+              اجرای برنامه ساخت روی ماشین‌های 5 محوره CNC، پرینترهای SLS/FDM یا لیزر فایبر با نظارت مستمر مهندس فرآیند.
             </p>
           </div>
 
@@ -378,32 +376,41 @@ export default function ServicesPage() {
       </div>
 
       {/* Bottom CTA Banner */}
-      <div className="card-popup rounded-3xl p-8 sm:p-12 bg-[#082719] text-white border-2 border-[#082719] flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl">
-        <div className="flex flex-col gap-3 max-w-xl text-center md:text-right">
-          <span className="font-mono text-xs font-bold text-[#dfc79b] tracking-wider uppercase">
-            [ READY TO FABRICATE? ]
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-white">
+      <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-[#061e13] via-[#082719] to-[#0f3825] text-white border border-[#1f4a34] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 glaze-shimmer">
+        {/* Subtle decorative background ambient glow */}
+        <div className="absolute -left-20 -top-20 w-72 h-72 bg-[#dfc79b]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-20 -bottom-20 w-72 h-72 bg-[#1f4a34]/30 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col gap-3.5 max-w-xl text-center md:text-right">
+          <div className="inline-flex items-center gap-2 self-center md:self-start px-3 py-1 rounded-full bg-[#dfc79b]/15 border border-[#dfc79b]/30 w-fit">
+            <span className="w-2 h-2 rounded-full bg-[#dfc79b] animate-pulse" />
+            <span dir="ltr" className="font-mono text-xs font-bold text-[#dfc79b] tracking-wider uppercase">
+              READY TO FABRICATE?
+            </span>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
             پروژه یا فایل CAD خود را برای ساخت در هیزو آماده کرده‌اید؟
           </h2>
-          <p className="text-xs sm:text-sm text-[#FCF9F1]/80 leading-relaxed">
+
+          <p className="text-sm sm:text-base text-[#e5ddce] leading-relaxed">
             فایل خود را در سامانه بارگذاری کنید یا جهت مشاوره حضوری و مشاهده نمونه‌قطعات در آتلیه تهران با ما در تماس باشید.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap justify-center shrink-0">
+        <div className="relative z-10 flex items-center gap-3.5 flex-wrap justify-center shrink-0">
           <Link
             href="/special-orders"
-            className="inline-flex items-center gap-2 bg-[#dfc79b] hover:bg-white text-[#082719] px-7 py-3.5 rounded-full text-xs font-bold shadow-lg transition-all interactive-bump"
+            className="inline-flex items-center justify-center gap-2.5 bg-[#dfc79b] hover:bg-[#ebd8b3] text-[#082719] px-7 py-3.5 rounded-full text-xs sm:text-sm font-bold shadow-lg hover:shadow-xl transition-all interactive-bump"
           >
             <span>شروع استعلام ساخت</span>
             <ArrowLeft className="w-4 h-4 text-[#082719]" />
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3.5 rounded-full text-xs font-bold border border-white/20 transition-all"
+            className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-[#FCF9F1] hover:text-white px-6 py-3.5 rounded-full text-xs sm:text-sm font-bold border border-white/25 hover:border-white/40 backdrop-blur-xs transition-all"
           >
-            <span>تماس با آتلیه</span>
+            <span>تماس با آتلیه تهران</span>
           </Link>
         </div>
       </div>

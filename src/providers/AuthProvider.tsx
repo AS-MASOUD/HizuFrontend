@@ -73,6 +73,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     authApi.logout();
     setUser(null);
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem(
+          "hizu_flash_toast",
+          JSON.stringify({
+            type: "success",
+            message: "شما با موفقیت از حساب کاربری خارج شدید.",
+            title: "خروج از حساب",
+          })
+        );
+      } catch {}
+      window.location.reload();
+    }
   };
 
   const updateProfile = async (payload: {

@@ -43,7 +43,7 @@ export default function ContactPage() {
               <div>
                 <span className="text-xs text-[#5A626A]">ایمیل فنی و دریافت فایل‌های CAD:</span>
                 <p className="font-mono font-bold text-sm text-[#161A1D] dir-ltr text-right mt-0.5">
-                  cad@hizustudio.ir
+                  Hizu3dprint@gmail.com
                 </p>
               </div>
             </div>
@@ -54,8 +54,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <span className="text-xs text-[#5A626A]">تلفن آتلیه و هماهنگی کارگاهی:</span>
-                <p className="font-mono font-bold text-sm text-[#161A1D] dir-ltr text-right mt-0.5">
-                  +98 (21) 8876 5432
+                <p className="font-mono font-bold text-sm text-[#161A1D] ![direction:ltr] text-right mt-0.5">
+                  +98 990 613 5755
                 </p>
               </div>
             </div>
@@ -79,7 +79,7 @@ export default function ContactPage() {
               <div>
                 <span className="text-xs text-[#5A626A]">ساعات فعالیت کارگاه:</span>
                 <p className="text-xs font-semibold text-[#161A1D] mt-0.5">
-                  شنبه تا چهارشنبه: ۸:۳۰ الی ۱۸:۰۰ • پنج‌شنبه: ۸:۳۰ الی ۱۴:۰۰
+                  شنبه تا چهارشنبه: 8:30 الی 18:00 • پنج‌شنبه: 8:30 الی 14:00
                 </p>
               </div>
             </div>

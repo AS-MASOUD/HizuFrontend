@@ -88,8 +88,6 @@ export default function AccountPage() {
 
   const handleLogout = () => {
     logout();
-    success("از حساب کاربری خارج شدید.");
-    router.push("/");
   };
 
   if (authLoading) {

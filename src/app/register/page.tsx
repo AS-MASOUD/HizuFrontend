@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
@@ -14,8 +14,11 @@ import {
   RotateCcw,
   Smartphone,
   CheckCircle2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toPersianDigits } from "@/lib/utils/formatters";
+import { OtpInput } from "@/components/ui/OtpInput";
 
 function RegisterForm() {
   const router = useRouter();
@@ -31,6 +34,7 @@ function RegisterForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // 2. OTP Verification Fields & State
   const [otpCode, setOtpCode] = useState("");
@@ -68,7 +72,7 @@ function RegisterForm() {
       return;
     }
     if (password.trim() && password.trim().length < 6) {
-      error("کلمه عبور در صورت تعیین باید حداقل ۶ کاراکتر باشد.");
+      error("کلمه عبور در صورت تعیین باید حداقل 6 کاراکتر باشد.");
       return;
     }
 
@@ -93,32 +97,40 @@ function RegisterForm() {
     }
   };
 
-  // Complete Registration Form Submit
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const isVerifyingRef = useRef(false);
+
+  // 3. Final Register Submission
+  const handleRegisterSubmit = async (e?: React.FormEvent, customCode?: string) => {
+    if (e) e.preventDefault();
 
     if (!firstName.trim() || !lastName.trim()) {
-      error("لطفاً نام و نام خانوادگی خود را وارد فرمایید.");
+      error("لطفاً نام و نام خانوادگی خود را کامل وارد نمایید.");
+      isVerifyingRef.current = false;
       return;
     }
 
     if (!phoneNumber.trim()) {
       error("لطفاً شماره موبایل خود را وارد نمایید.");
+      isVerifyingRef.current = false;
       return;
     }
 
     if (!codeSent) {
       error("لطفاً ابتدا دکمه «دریافت کد تایید» را انتخاب کنید.");
+      isVerifyingRef.current = false;
       return;
     }
 
-    if (!otpCode.trim() || otpCode.trim().length < 4) {
-      error("لطفاً کد تایید ۵ رقمی دریافتی را وارد فرمایید.");
+    const codeToVerify = (customCode !== undefined ? customCode : otpCode).trim();
+    if (!codeToVerify || codeToVerify.length < 5) {
+      error("لطفاً کد تایید 5 رقمی دریافتی را وارد فرمایید.");
+      isVerifyingRef.current = false;
       return;
     }
 
     if (password.trim() && password.trim().length < 6) {
-      error("کلمه عبور در صورت تعیین باید حداقل ۶ کاراکتر باشد.");
+      error("کلمه عبور در صورت تعیین باید حداقل 6 کاراکتر باشد.");
+      isVerifyingRef.current = false;
       return;
     }
 
@@ -130,7 +142,7 @@ function RegisterForm() {
         phoneNumber: phoneNumber.trim(),
         email: email.trim() || undefined,
         password: password.trim() || undefined,
-        otpCode: otpCode.trim(),
+        otpCode: codeToVerify,
       });
       success("حساب کاربری شما با موفقیت ایجاد گردید و وارد شدید.");
       router.push(redirectUrl);
@@ -138,8 +150,17 @@ function RegisterForm() {
       error(err.message || "کد تایید اشتباه یا منقضی شده است.");
     } finally {
       setSubmitting(false);
+      isVerifyingRef.current = false;
     }
   };
+
+  const handleAutoRegister = (code: string) => {
+    if (submitting || isVerifyingRef.current) return;
+    isVerifyingRef.current = true;
+    handleRegisterSubmit(undefined, code);
+  };
+
+  const handleSubmit = handleRegisterSubmit;
 
   return (
     <div className="max-w-md mx-auto px-6 py-16">
@@ -243,13 +264,26 @@ function RegisterForm() {
               </div>
               <div className="relative flex items-center">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="•••••••• (در صورت تمایل حداقل ۶ کاراکتر)"
-                  className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 pl-10 text-xs font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
+                  placeholder="•••••••• (در صورت تمایل حداقل 6 کاراکتر)"
+                  className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 pl-10 pr-10 text-xs font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
                 />
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 text-gray-400 hover:text-[#161A1D] transition-colors p-1 flex items-center justify-center focus:outline-none"
+                  title={showPassword ? "مخفی کردن کلمه عبور" : "نمایش کلمه عبور"}
+                  aria-label={showPassword ? "مخفی کردن کلمه عبور" : "نمایش کلمه عبور"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 text-gray-600" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
               </div>
               <p className="text-[11px] text-[#5A626A] leading-relaxed">
                 تعیین رمز عبور اختیاری است؛ شما همیشه می‌توانید با کد پیامکی یک‌بار مصرف وارد شوید.
@@ -297,29 +331,32 @@ function RegisterForm() {
 
             {/* ================= SECTION 3: RECIEVED CODE INPUT ================= */}
             {codeSent && (
-              <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-[#161A1D] flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#082719]" />
-                    <span>کد تایید ۵ رقمی دریافتی *</span>
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={6}
-                    required
-                    autoFocus
+              <div className="flex flex-col gap-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-[#161A1D] flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#082719]" />
+                      <span>کد تایید 5 رقمی دریافتی *</span>
+                    </label>
+                    <span className="text-[11px] text-[#5A626A] font-mono">
+                      5 رقم
+                    </span>
+                  </div>
+                  <OtpInput
                     value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="• • • • •"
-                    className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-center text-lg tracking-[0.4em] font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
+                    onChange={setOtpCode}
+                    onComplete={handleAutoRegister}
+                    length={5}
+                    disabled={submitting}
+                    autoFocus
                   />
                 </div>
 
                 {/* Submit button */}
                 <button
                   type="submit"
-                  disabled={submitting || otpCode.trim().length < 4}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white py-3.5 rounded-full text-xs font-bold shadow-md transition-all disabled:opacity-50"
+                  disabled={submitting || otpCode.trim().length < 5}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white py-3.5 rounded-full text-xs font-bold shadow-md transition-all disabled:opacity-50 interactive-bump"
                 >
                   <span>{submitting ? "در حال فعال‌سازی حساب..." : "تکمیل ثبت‌نام و ورود به هیزو"}</span>
                   <ArrowLeft className="w-4 h-4 text-[#dfc79b]" />
