@@ -77,7 +77,7 @@ export function calculateProductMetrics(item: CompareItem): { [key: string]: num
   // 5. Fabrication Technique
   const tech = (item.technique || "").toLowerCase();
   let techniqueScore = 7.5;
-  if (tech.includes("5-axis") || tech.includes("wire edm") || tech.includes("۵ محوره")) techniqueScore = 9.7;
+  if (tech.includes("5-axis") || tech.includes("wire edm") || tech.includes("5 محوره") || tech.includes("۵ محوره")) techniqueScore = 9.7;
   else if (tech.includes("sls") || tech.includes("high-speed cnc") || tech.includes("لیزر نانو")) techniqueScore = 9.3;
   else if (tech.includes("laser") || tech.includes("bending") || tech.includes("برش لیزر")) techniqueScore = 8.5;
   else if (tech.includes("parametric") || tech.includes("cnc")) techniqueScore = 8.8;

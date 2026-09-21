@@ -21,103 +21,155 @@ import {
   Briefcase,
 } from "lucide-react";
 
-export default function AboutPage() {
-  const teamMembers = [
-    {
-      name: "مهندس علیرضا رادمنش",
-      role: "بنیان‌گذار و مدیر ارشد مهندسی ساخت",
-      enRole: "CHIEF FABRICATION ENGINEER & CO-FOUNDER",
-      education: "کارشناسی ارشد مهندسی مکانیک - ساخت و تولید",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-      bio: "با بیش از 10 سال سابقه تخصصی در برنامه‌نویسی پیشرفته CAM، راه‌اندازی مراکز فرزکاری 5 محوره همزمان و طراحی سازه‌های دقیق هوافضا و رباتیک. علیرضا با هدف پل زدن میان ایده‌های بلندپروازانه مهندسی و واقعیت ماشین‌کاری صلب، استودیو هیزو را پایه‌گذاری کرد.",
-      specialties: ["فرزکاری همزمان 5 محوره", "برنامه‌نویسی Mastercam & Hypermill", "تلورانس‌گذاری هندسی (GD&T)", "متالورژی آلومینیوم 7075"],
-      email: "a.radmanesh@hizustudio.ir",
-    },
-    {
-      name: "مهندس سارا نیک‌پیام",
-      role: "مدیر طراحی محاسباتی و تحلیل DFM",
-      enRole: "COMPUTATIONAL DESIGN LEAD & DFM SPECIALIST",
-      education: "کارشناسی ارشد معماری دیجیتال و الگوریتم‌های ساخت",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80",
-      bio: "متخصص فرم‌یابی پارامتریک، شبیه‌سازی تنش المان محدود (FEA) و تبدیل طرح‌های آزاد مفهومی به مدل‌های بهینه‌سازی‌شده برای تولید صنعتی (DFM). سارا مسئول بازطراحی ساختاری قطعات با متد بهینه‌سازی توپولوژی جهت کاهش وزن و هزینه در کارگاه هیزو است.",
-      specialties: ["طراحی الگوریتمیک Rhino/Grasshopper", "بهینه‌سازی توپولوژی (Topology Opt)", "اسکن نوری سه‌بعدی و مهندسی معکوس", "پلیمرهای پیشرفته و SLS"],
-      email: "s.nikpayam@hizustudio.ir",
-    },
-    {
-      name: "مهندس پویا داوودی",
-      role: "سرپرست تحقیق و توسعه مکاترونیک و اتوماسیون",
-      enRole: "MECHATRONICS & EMBEDDED SYSTEMS LEAD",
-      education: "کارشناسی ارشد مهندسی مکاترونیک و کنترل صنعتی",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
-      bio: "طراح و معمار سیستم‌های حرکتی خودکار، استیج‌های تست لرزش و کنترلرهای فیدبک‌دار کارگاهی. پویا رهبری پروژه‌های ساخت ماشین‌آلات خاص، درایورهای سروموتور دقیق و سیستم‌های کنترل تعبیه‌شده (Embedded ARM) را در هیزو بر عهده دارد.",
-      specialties: ["کنترلرهای حرکت صنعتی (Motion Control)", "برنامه‌نویسی PLC زیمنس و دلتا", "طراحی بردهای صنعتی STM32", "طراحی مکانیزم‌های رباتیک"],
-      email: "p.davoodi@hizustudio.ir",
-    },
-    {
-      name: "مهندس کیان مهرداد",
-      role: "مدیر کنترل کیفیت (QC) و متریال صنعتی",
-      enRole: "QUALITY ASSURANCE & MATERIALS SPECIALIST",
-      education: "کارشناسی ارشد مهندسی مواد و متالورژی صنعتی",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
-      bio: "مسئول اعتبارسنجی ابعادی قطعات با ابزارهای دقیق متولوژی، آزمون‌های سایش، مقاومت کششی و نظارت مستقیم بر کنترل کیفیت تلورانسی ISO 2768-Fine. کیان با وسواس مهندسی تضمین می‌کند که هیچ قطعه‌ای بدون تاییدیه تست متالورژی از هیزو خارج نشود.",
-      specialties: ["کنترل ابعادی اپتیکال و CMM", "استاندارد تلورانس ISO 2768", "آنالیز ساختار پلیمرهای کربنی", "صدور گواهینامه‌های کیفی ساخت"],
-      email: "k.mehrdad@hizustudio.ir",
-    },
-  ];
+import { contentApi, AboutContent } from "@/lib/api/content";
 
-  const goals = [
-    {
-      id: "01",
-      title: "بومی‌سازی قطعات های‌تک و دقیق",
-      subtitle: "PRECISION LOCALIZATION",
-      desc: "تامین و ساخت قطعات فوق‌حساس مکانیکی با تلورانس‌های میکرونی در داخل کشور، بی‌نیاز کردن شرکت‌های دانش‌بنیان، تجهیزات پزشکی و رباتیک از واردات گران‌قیمت.",
-      icon: Cpu,
-    },
-    {
-      id: "02",
-      title: "نهادینه‌سازی فرهنگ DFM",
-      subtitle: "DESIGN FOR MANUFACTURING",
-      desc: "اصلاح و بهینه‌سازی مدل‌های سه‌بعدی پیش از برش یا فرزکاری، با هدف به صفر رساندن خطاهای تولیدی، کاهش وزن سازه و پایین آوردن هزینه‌های تمام‌شده.",
-      icon: Target,
-    },
-    {
-      id: "03",
-      title: "تولید با متریال ناب و اصیل",
-      subtitle: "MATERIAL INTEGRITY",
-      desc: "پرهیز قطعی از آلیاژهای ضایعاتی یا پلیمرهای بازیافتی؛ استفاده انحصاری از آلومینیوم 7075 گواهی‌دار، برنج شمش، فولادهای استاندارد و نایلون کربن مقاوم.",
-      icon: ShieldCheck,
-    },
-    {
-      id: "04",
-      title: "ترویج ساخت دیجیتال و آزمایشگاه باز",
-      subtitle: "OPEN FABRICATION LAB",
-      desc: "برگزاری دوره‌های تخصصی، انتقال تجربه ساخت به طراحان و مهندسان جوان و انتشار مقالات فنی برای ارتقای دانش ساخت در اکوسیستم سخت‌افزاری کشور.",
-      icon: Sparkles,
-    },
-  ];
+export const revalidate = 60; // ISR revalidation
 
-  const milestones = [
-    {
-      year: "1400",
-      title: "تاسیس استودیو ساخت هیزو",
-      desc: "تجهیز کارگاه اولیه در تهران با اولین ماشین‌های 3 محوره فرزکاری و پرینترهای ابعاد متوسط FDM.",
-    },
-    {
-      year: "1401",
-      title: "ورود تکنولوژی SLS و فیبر کربن",
-      desc: "راه‌اندازی خط پرینت پیشرفته با نایلون کربن PA12-CF و ثبت اولین قراردادهای تامین قطعات رباتیک صنعتی.",
-    },
-    {
-      year: "1402",
-      title: "ارتقا به ماشین‌کاری 5 محوره همزمان",
-      desc: "نصب سنتر 5 محوره همزمان CNC، اسکنر نوری 3بعدی متولوژی و دریافت گواهی انطباق استاندارد ISO 2768-Fine.",
-    },
-    {
-      year: "1403",
-      title: "توسعه دپارتمان مکاترونیک و پلتفرم آنلاین",
-      desc: "راه‌اندازی آزمایشگاه تست مکاترونیک، سامانه آنلاین استعلام فایل CAD و راه‌اندازی فروشگاه قطعات پیش‌ساخته هیزو.",
-    },
-  ];
+const GOAL_ICON_MAP: Record<string, any> = {
+  cpu: Cpu,
+  target: Target,
+  shieldcheck: ShieldCheck,
+  sparkles: Sparkles,
+};
+
+const DEFAULT_TEAM_MEMBERS = [
+  {
+    name: "مهندس علیرضا رادمنش",
+    role: "بنیان‌گذار و مدیر ارشد مهندسی ساخت",
+    enRole: "CHIEF FABRICATION ENGINEER & CO-FOUNDER",
+    education: "کارشناسی ارشد مهندسی مکانیک - ساخت و تولید",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+    bio: "با بیش از 10 سال سابقه تخصصی در برنامه‌نویسی پیشرفته CAM، راه‌اندازی مراکز فرزکاری 5 محوره همزمان و طراحی سازه‌های دقیق هوافضا و رباتیک. علیرضا با هدف پل زدن میان ایده‌های بلندپروازانه مهندسی و واقعیت ماشین‌کاری صلب، استودیو هیزو را پایه‌گذاری کرد.",
+    specialties: ["فرزکاری همزمان 5 محوره", "برنامه‌نویسی Mastercam & Hypermill", "تلورانس‌گذاری هندسی (GD&T)", "متالورژی آلومینیوم 7075"],
+    email: "a.radmanesh@hizustudio.ir",
+  },
+  {
+    name: "مهندس سارا نیک‌پیام",
+    role: "مدیر طراحی محاسباتی و تحلیل DFM",
+    enRole: "COMPUTATIONAL DESIGN LEAD & DFM SPECIALIST",
+    education: "کارشناسی ارشد معماری دیجیتال و الگوریتم‌های ساخت",
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80",
+    bio: "متخصص فرم‌یابی پارامتریک، شبیه‌سازی تنش المان محدود (FEA) و تبدیل طرح‌های آزاد مفهومی به مدل‌های بهینه‌سازی‌شده برای تولید صنعتی (DFM). سارا مسئول بازطراحی ساختاری قطعات با متد بهینه‌سازی توپولوژی جهت کاهش وزن و هزینه در کارگاه هیزو است.",
+    specialties: ["طراحی الگوریتمیک Rhino/Grasshopper", "بهینه‌سازی توپولوژی (Topology Opt)", "اسکن نوری سه‌بعدی و مهندسی معکوس", "پلیمرهای پیشرفته و SLS"],
+    email: "s.nikpayam@hizustudio.ir",
+  },
+  {
+    name: "مهندس پویا داوودی",
+    role: "سرپرست تحقیق و توسعه مکاترونیک و اتوماسیون",
+    enRole: "MECHATRONICS & EMBEDDED SYSTEMS LEAD",
+    education: "کارشناسی ارشد مهندسی مکاترونیک و کنترل صنعتی",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+    bio: "طراح و معمار سیستم‌های حرکتی خودکار، استیج‌های تست لرزش و کنترلرهای فیدبک‌دار کارگاهی. پویا رهبری پروژه‌های ساخت ماشین‌آلات خاص، درایورهای سروموتور دقیق و سیستم‌های کنترل تعبیه‌شده (Embedded ARM) را در هیزو بر عهده دارد.",
+    specialties: ["کنترلرهای حرکت صنعتی (Motion Control)", "برنامه‌نویسی PLC زیمنس و دلتا", "طراحی بردهای صنعتی STM32", "طراحی مکانیزم‌های رباتیک"],
+    email: "p.davoodi@hizustudio.ir",
+  },
+  {
+    name: "مهندس کیان مهرداد",
+    role: "مدیر کنترل کیفیت (QC) و متریال صنعتی",
+    enRole: "QUALITY ASSURANCE & MATERIALS SPECIALIST",
+    education: "کارشناسی ارشد مهندسی مواد و متالورژی صنعتی",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
+    bio: "مسئول اعتبارسنجی ابعادی قطعات با ابزارهای دقیق متولوژی، آزمون‌های سایش، مقاومت کششی و نظارت مستقیم بر کنترل کیفیت تلورانسی ISO 2768-Fine. کیان با وسواس مهندسی تضمین می‌کند که هیچ قطعه‌ای بدون تاییدیه تست متالورژی از هیزو خارج نشود.",
+    specialties: ["کنترل ابعادی اپتیکال و CMM", "استاندارد تلورانس ISO 2768", "آنالیز ساختار پلیمرهای کربنی", "صدور گواهینامه‌های کیفی ساخت"],
+    email: "k.mehrdad@hizustudio.ir",
+  },
+];
+
+const DEFAULT_GOALS = [
+  {
+    id: "01",
+    title: "بومی‌سازی قطعات های‌تک و دقیق",
+    subtitle: "PRECISION LOCALIZATION",
+    desc: "تامین و ساخت قطعات فوق‌حساس مکانیکی با تلورانس‌های میکرونی در داخل کشور، بی‌نیاز کردن شرکت‌های دانش‌بنیان، تجهیزات پزشکی و رباتیک از واردات گران‌قیمت.",
+    icon: Cpu,
+  },
+  {
+    id: "02",
+    title: "نهادینه‌سازی فرهنگ DFM",
+    subtitle: "DESIGN FOR MANUFACTURING",
+    desc: "اصلاح و بهینه‌سازی مدل‌های سه‌بعدی پیش از برش یا فرزکاری، با هدف به صفر رساندن خطاهای تولیدی، کاهش وزن سازه و پایین آوردن هزینه‌های تمام‌شده.",
+    icon: Target,
+  },
+  {
+    id: "03",
+    title: "تولید با متریال ناب و اصیل",
+    subtitle: "MATERIAL INTEGRITY",
+    desc: "پرهیز قطعی از آلیاژهای ضایعاتی یا پلیمرهای بازیافتی؛ استفاده انحصاری از آلومینیوم 7075 گواهی‌دار، برنج شمش، فولادهای استاندارد و نایلون کربن مقاوم.",
+    icon: ShieldCheck,
+  },
+  {
+    id: "04",
+    title: "ترویج ساخت دیجیتال و آزمایشگاه باز",
+    subtitle: "OPEN FABRICATION LAB",
+    desc: "برگزاری دوره‌های تخصصی، انتقال تجربه ساخت به طراحان و مهندسان جوان و انتشار مقالات فنی برای ارتقای دانش ساخت در اکوسیستم سخت‌افزاری کشور.",
+    icon: Sparkles,
+  },
+];
+
+const DEFAULT_MILESTONES = [
+  {
+    year: "1400",
+    title: "تاسیس استودیو ساخت هیزو",
+    desc: "تجهیز کارگاه اولیه در تهران با اولین ماشین‌های 3 محوره فرزکاری و پرینترهای ابعاد متوسط FDM.",
+  },
+  {
+    year: "1401",
+    title: "ورود تکنولوژی SLS و فیبر کربن",
+    desc: "راه‌اندازی خط پرینت پیشرفته با نایلون کربن PA12-CF و ثبت اولین قراردادهای تامین قطعات رباتیک صنعتی.",
+  },
+  {
+    year: "1402",
+    title: "ارتقا به ماشین‌کاری 5 محوره همزمان",
+    desc: "نصب سنتر 5 محوره همزمان CNC، اسکنر نوری 3بعدی متولوژی و دریافت گواهی انطباق استاندارد ISO 2768-Fine.",
+  },
+  {
+    year: "1403",
+    title: "توسعه دپارتمان مکاترونیک و پلتفرم آنلاین",
+    desc: "راه‌اندازی آزمایشگاه تست مکاترونیک، سامانه آنلاین استعلام فایل CAD و راه‌اندازی فروشگاه قطعات پیش‌ساخته هیزو.",
+  },
+];
+
+export default async function AboutPage() {
+  let aboutData: AboutContent | null = null;
+  try {
+    aboutData = await contentApi.getAboutContent();
+  } catch {
+    aboutData = null;
+  }
+
+  const teamMembers =
+    aboutData?.teamMembers && aboutData.teamMembers.length > 0
+      ? aboutData.teamMembers.map((m) => ({
+          name: m.name,
+          role: m.role,
+          enRole: m.englishRole,
+          education: m.education,
+          image: m.imageUrl,
+          bio: m.bio,
+          specialties: m.specialties,
+          email: m.email,
+        }))
+      : DEFAULT_TEAM_MEMBERS;
+
+  const goals =
+    aboutData?.goals && aboutData.goals.length > 0
+      ? aboutData.goals.map((g) => ({
+          id: g.goalNumber,
+          title: g.title,
+          subtitle: g.subtitle,
+          desc: g.description,
+          icon: GOAL_ICON_MAP[g.iconName?.toLowerCase()] || Cpu,
+        }))
+      : DEFAULT_GOALS;
+
+  const milestones =
+    aboutData?.milestones && aboutData.milestones.length > 0
+      ? aboutData.milestones.map((m) => ({
+          year: m.year,
+          title: m.title,
+          desc: m.description,
+        }))
+      : DEFAULT_MILESTONES;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 flex flex-col gap-16 sm:gap-24">

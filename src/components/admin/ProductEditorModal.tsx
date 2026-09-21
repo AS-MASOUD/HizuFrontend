@@ -18,6 +18,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils/formatters";
+import { getImageUrl } from "@/lib/utils/imageUrl";
 
 interface ProductEditorModalProps {
   isOpen: boolean;
@@ -446,7 +447,7 @@ export default function ProductEditorModal({
                   <span>گالری تصاویر محصول (پیوست فایل محلی)</span>
                 </h4>
                 <p className="text-[11px] text-[#5A626A]">
-                  تصاویر پیش از ارسال در مرورگر به ابعاد ۱۶۰۰ پیکسل و فرمت WebP فشرده می‌شوند تا حجم سرور و اینترنت بیهوده مصرف نشود.
+                  تصاویر پیش از ارسال در مرورگر به ابعاد 1600 پیکسل و فرمت WebP فشرده می‌شوند تا حجم سرور و اینترنت بیهوده مصرف نشود.
                 </p>
               </div>
 
@@ -494,9 +495,16 @@ export default function ProductEditorModal({
                     >
                       <div className="h-24 w-full overflow-hidden bg-gray-100 relative">
                         <img
-                          src={url}
+                          src={getImageUrl(url)}
                           alt={`Product preview ${idx + 1}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.currentTarget;
+                            if (!img.dataset.retried) {
+                              img.dataset.retried = "true";
+                              img.src = getImageUrl(url);
+                            }
+                          }}
                         />
                         {isPrimary && (
                           <span className="absolute top-1 right-1 bg-[#082719] text-[#dfc79b] text-[9px] font-bold px-1.5 py-0.5 rounded shadow">

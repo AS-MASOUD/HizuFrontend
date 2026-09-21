@@ -69,7 +69,9 @@ export default function ProductDetailPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 py-24 text-center">
         <div className="card-popup rounded-2xl p-12 bg-white flex flex-col items-center gap-4">
-          <h2 className="text-xl font-bold text-[#161A1D]">محصول مورد نظر یافت نشد</h2>
+          <h2 className="text-xl font-bold text-[#161A1D]">
+            محصول مورد نظر یافت نشد
+          </h2>
           <p className="text-xs text-[#5A626A]">{error}</p>
           <Link
             href="/shop"
@@ -91,15 +93,24 @@ export default function ProductDetailPage() {
     <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 flex flex-col gap-12">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs text-[#5A626A] border-b border-[#1c211b]/10 pb-4">
-        <Link href="/" className="hover:text-[#082719]">خانه</Link>
+        <Link href="/" className="hover:text-[#082719]">
+          خانه
+        </Link>
         <span>/</span>
-        <Link href="/shop" className="hover:text-[#082719]">فروشگاه</Link>
+        <Link href="/shop" className="hover:text-[#082719]">
+          فروشگاه
+        </Link>
         <span>/</span>
-        <Link href={`/shop?category=${product.categorySlug}`} className="hover:text-[#082719]">
+        <Link
+          href={`/shop?category=${product.categorySlug}`}
+          className="hover:text-[#082719]"
+        >
           {product.categoryName}
         </Link>
         <span>/</span>
-        <span className="text-[#161A1D] font-bold line-clamp-1">{product.name}</span>
+        <span className="text-[#161A1D] font-bold line-clamp-1">
+          {product.name}
+        </span>
       </nav>
 
       {/* Main Grid: Gallery Slider & Buy Box */}
@@ -121,11 +132,16 @@ export default function ProductDetailPage() {
               <span className="font-mono text-xs font-bold text-[#0284c7] bg-[#EDE8DC] px-2.5 py-0.5 rounded border border-[#1c211b]/10">
                 {product.sku}
               </span>
-              <span className="text-xs text-[#5A626A]">{product.categoryName}</span>
+              <span className="text-xs text-[#5A626A]">
+                {product.categoryName}
+              </span>
               {product.stockQuantity > 0 ? (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                   <Check className="w-3 h-3" />
-                  <span>موجود در انبار ({toPersianDigits(product.stockQuantity)} عدد)</span>
+                  <span>
+                    موجود در انبار ({toPersianDigits(product.stockQuantity)}{" "}
+                    عدد)
+                  </span>
                 </span>
               ) : (
                 <span className="text-[11px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
@@ -151,11 +167,12 @@ export default function ProductDetailPage() {
               <span className="text-2xl sm:text-3xl font-mono font-black text-[#082719]">
                 {formatPrice(product.price)}
               </span>
-              {product.compareAtPrice && product.compareAtPrice > product.price && (
-                <span className="text-sm font-mono text-gray-400 line-through">
-                  {formatPrice(product.compareAtPrice)}
-                </span>
-              )}
+              {product.compareAtPrice &&
+                product.compareAtPrice > product.price && (
+                  <span className="text-sm font-mono text-gray-400 line-through">
+                    {formatPrice(product.compareAtPrice)}
+                  </span>
+                )}
             </div>
 
             {/* Quantity, Add to Cart & Compare */}
@@ -171,7 +188,9 @@ export default function ProductDetailPage() {
                   {toPersianDigits(quantity)}
                 </span>
                 <button
-                  onClick={() => setQuantity(Math.min(product.stockQuantity, quantity + 1))}
+                  onClick={() =>
+                    setQuantity(Math.min(product.stockQuantity, quantity + 1))
+                  }
                   disabled={quantity >= product.stockQuantity}
                   className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-base hover:bg-white transition-colors disabled:opacity-40"
                 >
@@ -185,7 +204,11 @@ export default function ProductDetailPage() {
                 className="flex-1 w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#082719] hover:bg-[#16191d] text-white font-bold text-sm py-3.5 px-6 rounded-full transition-all shadow-md disabled:opacity-50"
               >
                 <ShoppingBag className="w-4 h-4 text-[#dfc79b]" />
-                <span>{product.stockQuantity === 0 ? "در حال حاضر ناموجود است" : "افزودن به سبد خرید"}</span>
+                <span>
+                  {product.stockQuantity === 0
+                    ? "در حال حاضر ناموجود است"
+                    : "افزودن به سبد خرید"}
+                </span>
               </button>
 
               <button
@@ -215,10 +238,16 @@ export default function ProductDetailPage() {
                     ? "bg-[#082719] text-[#dfc79b] border-[#082719] shadow-sm"
                     : "bg-[#FAF7F0] hover:bg-[#EDE8DC] text-[#161A1D] border-[#1c211b]/15"
                 }`}
-                title={isInCompare(product.id) ? "حذف از لیست مقایسه" : "افزودن به لیست مقایسه"}
+                title={
+                  isInCompare(product.id)
+                    ? "حذف از لیست مقایسه"
+                    : "افزودن به لیست مقایسه"
+                }
               >
                 <Scale className="w-4 h-4" />
-                <span>{isInCompare(product.id) ? "در لیست مقایسه" : "مقایسه قطعه"}</span>
+                <span>
+                  {isInCompare(product.id) ? "در لیست مقایسه" : "مقایسه"}
+                </span>
               </button>
             </div>
 
@@ -239,15 +268,21 @@ export default function ProductDetailPage() {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="p-3 bg-white border border-[#1c211b]/08 rounded-xl flex flex-col items-center gap-1">
               <ShieldCheck className="w-5 h-5 text-[#8f6d2f]" />
-              <span className="text-[11px] font-bold text-[#161A1D]">تضمین تلرانس ساخت</span>
+              <span className="text-[11px] font-bold text-[#161A1D]">
+                تضمین تلرانس ساخت
+              </span>
             </div>
             <div className="p-3 bg-white border border-[#1c211b]/08 rounded-xl flex flex-col items-center gap-1">
               <Truck className="w-5 h-5 text-[#0284c7]" />
-              <span className="text-[11px] font-bold text-[#161A1D]">ارسال مهندسی ایمن</span>
+              <span className="text-[11px] font-bold text-[#161A1D]">
+                ارسال مهندسی ایمن
+              </span>
             </div>
             <div className="p-3 bg-white border border-[#1c211b]/08 rounded-xl flex flex-col items-center gap-1">
               <RefreshCw className="w-5 h-5 text-[#10b981]" />
-              <span className="text-[11px] font-bold text-[#161A1D]">کنترل کیفیت ISO</span>
+              <span className="text-[11px] font-bold text-[#161A1D]">
+                کنترل کیفیت ISO
+              </span>
             </div>
           </div>
 
@@ -349,7 +384,10 @@ export default function ProductDetailPage() {
       </div>
 
       {/* SECTION 2: User Comments & Customer Feedback */}
-      <ProductCommentsSection productId={product.id} productName={product.name} />
+      <ProductCommentsSection
+        productId={product.id}
+        productName={product.name}
+      />
     </div>
   );
 }

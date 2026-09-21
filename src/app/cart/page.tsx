@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useCart } from "@/providers/CartProvider";
-import { formatPrice, toPersianDigits } from "@/lib/utils/formatters";
+import { formatPrice, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
 import { Trash2, ArrowLeft, ShoppingBag, ArrowRight } from "lucide-react";
 
 export default function CartPage() {
@@ -62,7 +62,7 @@ export default function CartPage() {
               <div className="flex items-center gap-4 w-full sm:w-auto">
                 <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#16191d] shrink-0">
                   {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                    <img src={getImageUrl(item.imageUrl)} alt={item.productName} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-[#5A626A]">
                       HIZU

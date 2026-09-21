@@ -7,10 +7,11 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import { CartProvider } from "@/providers/CartProvider";
 import { CompareProvider } from "@/providers/CompareProvider";
 import FloatingCompareBar from "@/components/compare/FloatingCompareBar";
+import ScrollRuler from "@/components/layout/ScrollRuler";
 
 export const metadata: Metadata = {
   title: "هیزو | استودیو طراحی و ساخت دیجیتال",
-  description: "طراحی، مهندسی دیجیتال، پرینت سه‌بعدی صنعتی، ماشین‌کاری ۵ محوره CNC و برش لیزر در قلب کارگاه تهران.",
+  description: "طراحی، مهندسی دیجیتال، پرینت سه‌بعدی صنعتی، ماشین‌کاری 5 محوره CNC و برش لیزر در قلب کارگاه تهران.",
   icons: {
     icon: "/favicon.svg",
   },
@@ -29,6 +30,7 @@ export default function RootLayout({
             <CartProvider>
               <CompareProvider>
                 <Header />
+                <ScrollRuler />
                 <main className="pt-16 lg:pt-[108px] flex-1">{children}</main>
                 <Footer />
                 <FloatingCompareBar />

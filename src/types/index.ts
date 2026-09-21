@@ -262,7 +262,7 @@ export interface Article {
   summary: string;
   content: string; // rich markdown / HTML formatted content
   coverImage: string;
-  category: string; // e.g., "پرینت ۳بعدی", "متریال و فیلامنت", "طراحی محصول", "تکنولوژی و اخبار"
+  category: string; // e.g., "پرینت 3بعدی", "متریال و فیلامنت", "طراحی محصول", "تکنولوژی و اخبار"
   tags: string[];
   author: string;
   authorRole?: string;

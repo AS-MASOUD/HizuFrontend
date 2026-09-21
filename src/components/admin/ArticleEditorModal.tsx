@@ -34,7 +34,7 @@ interface ArticleEditorModalProps {
 
 const PRESET_IMAGES = [
   {
-    label: "پرینتر ۳بعدی صنعتی",
+    label: "پرینتر 3بعدی صنعتی",
     url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
   },
   {
@@ -60,12 +60,12 @@ export default function ArticleEditorModal({
   const { error } = useToast();
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState("پرینت ۳بعدی");
+  const [category, setCategory] = useState("پرینت 3بعدی");
   const [coverImage, setCoverImage] = useState(PRESET_IMAGES[0].url);
   const [readTimeMinutes, setReadTimeMinutes] = useState(5);
   const [author, setAuthor] = useState("تیم مهندسی هیزو");
   const [authorRole, setAuthorRole] = useState("استودیو طراحی و ساخت هیزو");
-  const [tagsText, setTagsText] = useState("پرینت ۳بعدی, تکنولوژی, متریال");
+  const [tagsText, setTagsText] = useState("پرینت 3بعدی, تکنولوژی, متریال");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
   const [isPublished, setIsPublished] = useState(true);
@@ -92,12 +92,12 @@ export default function ArticleEditorModal({
       // Reset defaults for new article
       setTitle("");
       setSlug("");
-      setCategory("پرینت ۳بعدی");
+      setCategory("پرینت 3بعدی");
       setCoverImage(PRESET_IMAGES[0].url);
       setReadTimeMinutes(5);
       setAuthor("تیم مهندسی هیزو");
       setAuthorRole("استودیو طراحی و ساخت هیزو");
-      setTagsText("پرینت ۳بعدی, تکنولوژی, متریال");
+      setTagsText("پرینت 3بعدی, تکنولوژی, متریال");
       setSummary("");
       setContent(
         "## مقدمه مقاله\n\nتوضیحات آغازین پیرامون موضوع...\n\n### بررسی فنی\n\nنکات و مشخصات کلیدی محصول یا تکنولوژی...\n\n> [!NOTE]\n> نکته مهم درباره این فرآیند صنعتی در کارگاه هیزو."
@@ -137,7 +137,7 @@ export default function ArticleEditorModal({
   };
 
   const handleInsertTable = () => {
-    const sampleTable = `\n| مشخصه فنی | PLA+ | PETG | ABS | PA12-CF |\n| :--- | :--- | :--- | :--- | :--- |\n| **دمای نازل** | ۲۱۰°C | ۲۴۰°C | ۲۵۰°C | ۲۸۰°C |\n| **دمای بستر** | ۶۰°C | ۸۰°C | ۱۰۰°C | ۱۰۰°C |\n| **مقاومت ضربه‌ای** | متوسط | خوب | عالی | فوق‌العاده |\n| **جمع‌شدگی** | اندک | کم | زیاد | متوسط |\n\n`;
+    const sampleTable = `\n| مشخصه فنی | PLA+ | PETG | ABS | PA12-CF |\n| :--- | :--- | :--- | :--- | :--- |\n| **دمای نازل** | 210°C | 240°C | 250°C | 280°C |\n| **دمای بستر** | 60°C | 80°C | 100°C | 100°C |\n| **مقاومت ضربه‌ای** | متوسط | خوب | عالی | فوق‌العاده |\n| **جمع‌شدگی** | اندک | کم | زیاد | متوسط |\n\n`;
     insertTextAtCursor(sampleTable, "");
   };
 
@@ -265,7 +265,7 @@ export default function ArticleEditorModal({
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs bg-white focus:border-[#082719] focus:outline-none"
               >
-                <option value="پرینت ۳بعدی">پرینت ۳بعدی صنعتی</option>
+                <option value="پرینت 3بعدی">پرینت 3بعدی صنعتی</option>
                 <option value="متریال و فیلامنت">متریال و فیلامنت</option>
                 <option value="طراحی محصول">طراحی محصول و CAD</option>
                 <option value="تکنولوژی و اخبار">تکنولوژی و اخبار کارگاه</option>
@@ -362,7 +362,7 @@ export default function ArticleEditorModal({
                 type="text"
                 value={tagsText}
                 onChange={(e) => setTagsText(e.target.value)}
-                placeholder="پرینت ۳بعدی, PLA, متریال"
+                placeholder="پرینت 3بعدی, PLA, متریال"
                 className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#082719] focus:outline-none"
               />
               <div className="flex gap-2 text-[11px] text-[#5A626A] mt-1">

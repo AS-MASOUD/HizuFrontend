@@ -22,13 +22,14 @@ export default function ContactPage() {
       {/* Title */}
       <div className="border-b border-[#1c211b]/10 pb-6">
         <span className="font-mono text-xs font-bold text-[#8f6d2f] uppercase tracking-wider mb-1">
-          [ CONTACT HIZU ATELIER ]
+          [ CONTACT HIZU ]
         </span>
         <h1 className="text-3xl sm:text-4xl font-black text-[#161A1D]">
-          ارتباط با استودیو و کارگاه ساخت هیزو
+          ارتباط با هیزو
         </h1>
         <p className="text-sm text-[#5A626A] mt-1">
-          جهت هماهنگی بازدید حضوری، بررسی نقشه‌های صنعتی یا پیگیری سفارش‌ها با ما در ارتباط باشید.
+          جهت هماهنگی بازدید حضوری، بررسی نقشه‌های صنعتی یا پیگیری سفارش‌ها با
+          ما در ارتباط باشید.
         </p>
       </div>
 
@@ -41,7 +42,9 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs text-[#5A626A]">ایمیل فنی و دریافت فایل‌های CAD:</span>
+                <span className="text-xs text-[#5A626A]">
+                  ایمیل فنی و دریافت فایل‌:
+                </span>
                 <p className="font-mono font-bold text-sm text-[#161A1D] dir-ltr text-right mt-0.5">
                   Hizu3dprint@gmail.com
                 </p>
@@ -53,7 +56,7 @@ export default function ContactPage() {
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs text-[#5A626A]">تلفن آتلیه و هماهنگی کارگاهی:</span>
+                <span className="text-xs text-[#5A626A]">تلفن تماس:</span>
                 <p className="font-mono font-bold text-sm text-[#161A1D] ![direction:ltr] text-right mt-0.5">
                   +98 990 613 5755
                 </p>
@@ -65,9 +68,9 @@ export default function ContactPage() {
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs text-[#5A626A]">نشانی آتلیه ساخت دیجیتال:</span>
+                <span className="text-xs text-[#5A626A]">نشانی:</span>
                 <p className="font-medium text-xs text-[#161A1D] mt-0.5 leading-relaxed">
-                  تهران، خیابان آزادی، ناحیه نوآوری شریف، مجتمع صنعتی هیزو
+                  تهران - اندیشه - فاز 3 - مجتمع تجاری بوستان - واحد 34
                 </p>
               </div>
             </div>
@@ -77,9 +80,9 @@ export default function ContactPage() {
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xs text-[#5A626A]">ساعات فعالیت کارگاه:</span>
+                <span className="text-xs text-[#5A626A]">ساعات فعالیت:</span>
                 <p className="text-xs font-semibold text-[#161A1D] mt-0.5">
-                  شنبه تا چهارشنبه: 8:30 الی 18:00 • پنج‌شنبه: 8:30 الی 14:00
+                  شنبه تا چهارشنبه: 9:30 الی 20:00 • پنج‌شنبه: 9:00 الی 19:00
                 </p>
               </div>
             </div>
@@ -89,7 +92,7 @@ export default function ContactPage() {
         {/* Message Form */}
         <div className="lg:col-span-7 card-popup rounded-2xl p-8 bg-white border border-[#1c211b]/10 flex flex-col gap-6">
           <h2 className="font-bold text-base text-[#161A1D] border-b border-[#1c211b]/10 pb-3">
-            ارسال پیام مستقیم به سرپرست کارگاه
+            ارسال پیام مستقیم
           </h2>
 
           {sent ? (
@@ -97,14 +100,20 @@ export default function ContactPage() {
               <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
                 ✓
               </div>
-              <p className="font-bold text-sm text-[#161A1D]">پیام شما با موفقیت ارسال شد.</p>
-              <p className="text-xs text-[#5A626A]">سپاس از تماس شما، در اولین فرصت با شما تماس خواهیم گرفت.</p>
+              <p className="font-bold text-sm text-[#161A1D]">
+                پیام شما با موفقیت ارسال شد.
+              </p>
+              <p className="text-xs text-[#5A626A]">
+                سپاس از تماس شما، در اولین فرصت با شما تماس خواهیم گرفت.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-[#161A1D]">نام و نام خانوادگی *</label>
+                  <label className="text-xs font-semibold text-[#161A1D]">
+                    نام و نام خانوادگی *
+                  </label>
                   <input
                     type="text"
                     required
@@ -114,7 +123,9 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-[#161A1D]">ایمیل جهت پاسخ *</label>
+                  <label className="text-xs font-semibold text-[#161A1D]">
+                    ایمیل جهت پاسخ *
+                  </label>
                   <input
                     type="email"
                     required
@@ -126,7 +137,9 @@ export default function ContactPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-[#161A1D]">متن پیام یا استعلام *</label>
+                <label className="text-xs font-semibold text-[#161A1D]">
+                  متن پیام یا استعلام *
+                </label>
                 <textarea
                   required
                   rows={4}
@@ -142,7 +155,7 @@ export default function ContactPage() {
                 className="self-start inline-flex items-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white px-7 py-3 rounded-full text-xs font-bold shadow-md transition-all"
               >
                 <Send className="w-4 h-4" />
-                <span>ارسال پیام به کارگاه</span>
+                <span>ارسال پیام</span>
               </button>
             </form>
           )}

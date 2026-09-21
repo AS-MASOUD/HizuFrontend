@@ -7,7 +7,7 @@ import { useCompare } from "@/providers/CompareProvider";
 import { useCart } from "@/providers/CartProvider";
 import { productsApi } from "@/lib/api/products";
 import { ProductListDto, CompareItem } from "@/types";
-import { formatPrice, toPersianDigits } from "@/lib/utils/formatters";
+import { formatPrice, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
 import RadarChart from "@/components/compare/RadarChart";
 import {
   analyzeProduct,
@@ -143,7 +143,7 @@ function CompareContent() {
             <div className="mt-2 flex items-center gap-3 bg-[#FAF7F0] p-3 rounded-2xl border border-[#1c211b]/10 max-w-sm w-full">
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-white border border-[#1c211b]/10 shrink-0">
                 {compareItems[0].imageUrl ? (
-                  <img src={compareItems[0].imageUrl} alt={compareItems[0].name} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(compareItems[0].imageUrl)} alt={compareItems[0].name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[10px] font-mono">HIZU</div>
                 )}
@@ -195,7 +195,7 @@ function CompareContent() {
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#16191d] shrink-0">
                         {prod.imageUrl && (
-                          <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" />
+                          <img src={getImageUrl(prod.imageUrl)} alt={prod.name} className="w-full h-full object-cover" />
                         )}
                       </div>
                       <div className="flex flex-col min-w-0">
@@ -334,7 +334,7 @@ function CompareContent() {
             <div className="flex gap-4 items-center">
               <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-[#16191d] shrink-0 border border-[#1c211b]/10">
                 {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(item.imageUrl)} alt={item.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center font-mono text-xs text-gray-400">
                     HIZU
@@ -835,7 +835,7 @@ function CompareContent() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#16191d] shrink-0">
                         {prod.imageUrl && (
-                          <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover" />
+                          <img src={getImageUrl(prod.imageUrl)} alt={prod.name} className="w-full h-full object-cover" />
                         )}
                       </div>
                       <div className="flex flex-col min-w-0">

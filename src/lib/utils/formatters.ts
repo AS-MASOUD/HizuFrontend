@@ -2,7 +2,7 @@ export function formatPrice(price: number): string {
   return new Intl.NumberFormat("en-US").format(price) + " تومان";
 }
 
-export function toPersianDigits(num: number | string): string {
+export function toPersianDigits(num?: number | string | null): string {
   return toEnglishDigits(num);
 }
 
@@ -19,7 +19,7 @@ export function formatDate(dateString: string): string {
   }
 }
 
-export function toEnglishDigits(str: string | number): string {
+export function toEnglishDigits(str?: string | number | null): string {
   if (str === null || str === undefined) return "";
   const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
   const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
@@ -30,3 +30,4 @@ export function toEnglishDigits(str: string | number): string {
   return res;
 }
 
+export { getImageUrl } from "./imageUrl";

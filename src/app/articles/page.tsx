@@ -15,7 +15,7 @@ export default function ArticlesHubPage() {
 
   const categories = [
     "همه",
-    "پرینت ۳بعدی",
+    "پرینت 3بعدی",
     "متریال و فیلامنت",
     "طراحی محصول",
     "تکنولوژی و اخبار",
@@ -67,7 +67,7 @@ export default function ArticlesHubPage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-            مقالات تخصصی، تکنولوژی پرینت ۳بعدی و مهندسی ساخت
+            مقالات تخصصی، تکنولوژی پرینت 3بعدی و مهندسی ساخت
           </h1>
 
           <p className="text-sm sm:text-base text-[#FCF9F1]/85 leading-relaxed">
@@ -189,7 +189,7 @@ export default function ArticlesHubPage() {
               ایده یا پروژه‌ای برای ساخت دارید؟
             </h3>
             <p className="text-xs text-[#5A626A] mt-1 leading-relaxed">
-              فایل‌های CAD یا طرح‌های صنعتی خود را ارسال کنید تا فرآیند بهینه ساخت (پرینت ۳بعدی، CNC یا برش لیزر) و هزینه دقیق استعلام شود.
+              فایل‌های CAD یا طرح‌های صنعتی خود را ارسال کنید تا فرآیند بهینه ساخت (پرینت 3بعدی، CNC یا برش لیزر) و هزینه دقیق استعلام شود.
             </p>
           </div>
         </div>

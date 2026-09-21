@@ -30,6 +30,58 @@ import { useCart } from "@/providers/CartProvider";
 import { useCompare } from "@/providers/CompareProvider";
 import { toPersianDigits } from "@/lib/utils/formatters";
 
+import { categoriesApi } from "@/lib/api/categories";
+import { Category } from "@/types";
+
+const DEFAULT_SHOP_CATEGORIES = [
+  {
+    icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
+    title: "پرینت 3بعدی صنعتی",
+    desc: "فیلامنت‌های مهندسی، نایلون کربن و رزین",
+    slug: "3d-printing",
+  },
+  {
+    icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
+    title: "قطعات ماشین‌کاری CNC",
+    desc: "فرزکاری آلومینیوم 7075، برنج و شمش آلیاژی",
+    slug: "cnc-machining",
+  },
+  {
+    icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
+    title: "برش و حکاکی لیزر",
+    desc: "ورق‌های دقیق فلزی، پلکسی و چوب سخت",
+    slug: "laser-cutting",
+  },
+  {
+    icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
+    title: "اکسسوری و ابزار کارگاهی",
+    desc: "ابزارهای دقیق اندازه‌گیری و تجهیزات آتلیه",
+    slug: "tools-accessories",
+  },
+  {
+    icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+    title: "قطعات سفارشی مکاترونیک",
+    desc: "چرخ‌دنده، بازوی رباتیک و شاسی صنعتی",
+    slug: "custom-parts",
+  },
+];
+
+function getCategoryIcon(slug: string) {
+  switch (slug) {
+    case "3d-printing":
+      return <Layers className="w-4 h-4 text-[#0284c7]" />;
+    case "cnc-machining":
+      return <Wrench className="w-4 h-4 text-[#8f6d2f]" />;
+    case "laser-cutting":
+      return <Sparkles className="w-4 h-4 text-[#0284c7]" />;
+    case "tools-accessories":
+      return <Package className="w-4 h-4 text-[#8f6d2f]" />;
+    case "custom-parts":
+    default:
+      return <Cog className="w-4 h-4 text-[#5A626A]" />;
+  }
+}
+
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -40,12 +92,30 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [dynamicCategories, setDynamicCategories] = useState<Category[]>([]);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function loadCats() {
+      try {
+        const data = await categoriesApi.getCategories(true);
+        if (Array.isArray(data) && data.length > 0) {
+          setDynamicCategories(data);
+        }
+      } catch (err) {
+        console.warn("Failed to load categories for header:", err);
+      }
+    }
+    loadCats();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setUserMenuOpen(false);
       }
     }
@@ -55,8 +125,8 @@ export default function Header() {
 
   // Close menus on route change
   useEffect(() => {
-    setUserMenuOpen(false);
     setMobileMenuOpen(false);
+    setUserMenuOpen(false);
     setMobileCategoriesOpen(false);
   }, [pathname]);
 
@@ -67,38 +137,15 @@ export default function Header() {
     }
   };
 
-  const shopCategories = [
-    {
-      icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
-      title: "پرینت 3بعدی صنعتی",
-      desc: "فیلامنت‌های مهندسی، نایلون کربن و رزین",
-      slug: "3d-printing",
-    },
-    {
-      icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
-      title: "قطعات ماشین‌کاری CNC",
-      desc: "فرزکاری آلومینیوم 7075، برنج و شمش آلیاژی",
-      slug: "cnc-machining",
-    },
-    {
-      icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
-      title: "برش و حکاکی لیزر",
-      desc: "ورق‌های دقیق فلزی، پلکسی و چوب سخت",
-      slug: "laser-cutting",
-    },
-    {
-      icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
-      title: "اکسسوری و ابزار کارگاهی",
-      desc: "ابزارهای دقیق اندازه‌گیری و تجهیزات آتلیه",
-      slug: "tools-accessories",
-    },
-    {
-      icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
-      title: "قطعات سفارشی مکاترونیک",
-      desc: "چرخ‌دنده، بازوی رباتیک و شاسی صنعتی",
-      slug: "custom-parts",
-    },
-  ];
+  const shopCategories =
+    dynamicCategories.length > 0
+      ? dynamicCategories.map((c) => ({
+          icon: getCategoryIcon(c.slug),
+          title: c.name,
+          desc: c.description || "",
+          slug: c.slug,
+        }))
+      : DEFAULT_SHOP_CATEGORIES;
 
   const standardNavLinks = [
     { href: "/", label: "خانه" },

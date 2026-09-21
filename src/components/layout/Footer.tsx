@@ -2,8 +2,11 @@ import React from "react";
 import Link from "next/link";
 import { Mail, Phone, MapPin, ArrowLeft, Info, PhoneCall } from "lucide-react";
 
-const TELEGRAM_URL = process.env.NEXT_PUBLIC_TELEGRAM_URL || "https://t.me/hizustudio";
-const INSTAGRAM_URL = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://instagram.com/hizustudio";
+const TELEGRAM_URL =
+  process.env.NEXT_PUBLIC_TELEGRAM_URL || "https://t.me/hizu3dprinter";
+const INSTAGRAM_URL =
+  process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
+  "https://www.instagram.com/hizu3dprinter?igsh=cXA5b243OW5ibWU0";
 
 function TelegramIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -61,7 +64,8 @@ export default function Footer() {
                   درباره استودیو و آزمایشگاه هیزو
                 </h3>
                 <p className="text-xs text-[#5A626A] mt-0.5 line-clamp-1">
-                  آشنایی با تاریخچه، پارک ماشین‌آلات 5 محوره CNC و پرینترهای ابعاد صنعتی
+                  آشنایی با تاریخچه، پارک ماشین‌آلات 5 محوره CNC و پرینترهای
+                  ابعاد صنعتی
                 </p>
               </div>
             </div>
@@ -90,7 +94,8 @@ export default function Footer() {
                   تماس با ما و مشاوره فنی کارگاه
                 </h3>
                 <p className="text-xs text-[#FCF9F1]/80 mt-0.5 line-clamp-1">
-                  مشاوره مهندسی ساخت، بررسی نقشه‌های CAD، نشانی کارگاه و تماس تلفنی
+                  مشاوره مهندسی ساخت، بررسی نقشه‌های CAD، نشانی کارگاه و تماس
+                  تلفنی
                 </p>
               </div>
             </div>
@@ -107,64 +112,157 @@ export default function Footer() {
               <div className="w-9 h-9 rounded-xl bg-[#082719] flex items-center justify-center p-2 shadow-sm border border-[#082719]/20 text-[#dfc79b] font-mono font-bold">
                 H
               </div>
-              <span className="font-extrabold text-xl text-[#161A1D]">استودیو هیزو</span>
+              <span className="font-extrabold text-xl text-[#161A1D]">
+                استودیو هیزو
+              </span>
             </div>
             <p className="text-xs sm:text-sm text-[#5A626A] leading-relaxed max-w-sm">
-              استودیو طراحی و ساخت دیجیتال هیزو؛ تخصص در ماشین‌کاری 5 محوره CNC، پرینت سه‌بعدی ابعاد صنعتی، برش لیزر دقیق و توسعه سیستم‌های مکاترونیک.
+              استودیو طراحی و ساخت دیجیتال هیزو؛ تخصص در ماشین‌کاری 5 محوره CNC،
+              پرینت سه‌بعدی ابعاد صنعتی، برش لیزر دقیق و توسعه سیستم‌های
+              مکاترونیک.
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-2 font-mono text-[11px] text-[#161A1D]">
-              <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">EST. 1400</span>
-              <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">TEHRAN, IR</span>
-              <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">ISO 2768-M</span>
+              <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">
+                EST. 1400
+              </span>
+              <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">
+                TEHRAN, IR
+              </span>
+              <span className="bg-[#EDE8DC] px-2.5 py-1 rounded border border-[#1c211b]/10">
+                ISO 2768-M
+              </span>
             </div>
           </div>
 
           {/* Col 3: Quick Links */}
           <div className="flex flex-col gap-3">
-            <span className="font-bold text-sm text-[#161A1D]">دسترسی سریع</span>
-            <Link href="/" className="text-xs hover:text-[#082719] transition-colors">خانه</Link>
-            <Link href="/services" className="text-xs font-bold text-[#082719] hover:underline transition-colors">خدمات و فرآیندهای ساخت</Link>
-            <Link href="/shop" className="text-xs hover:text-[#082719] transition-colors">فروشگاه و کاتالوگ</Link>
-            <Link href="/courses" className="text-xs font-bold text-[#082719] hover:underline transition-colors">دوره‌های آموزشی و وبینارها</Link>
-            <Link href="/articles" className="text-xs font-bold text-[#082719] hover:text-[#0284c7] transition-colors flex items-center gap-1.5">
+            <span className="font-bold text-sm text-[#161A1D]">
+              دسترسی سریع
+            </span>
+            <Link
+              href="/"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              خانه
+            </Link>
+            <Link
+              href="/services"
+              className="text-xs font-bold text-[#082719] hover:underline transition-colors"
+            >
+              خدمات و فرآیندهای ساخت
+            </Link>
+            <Link
+              href="/shop"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              فروشگاه و کاتالوگ
+            </Link>
+            <Link
+              href="/courses"
+              className="text-xs font-bold text-[#082719] hover:underline transition-colors"
+            >
+              دوره‌های آموزشی و وبینارها
+            </Link>
+            <Link
+              href="/articles"
+              className="text-xs font-bold text-[#082719] hover:text-[#0284c7] transition-colors flex items-center gap-1.5"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-[#082719]"></span>
               <span>مقالات و وبلاگ تخصصی</span>
             </Link>
-            <Link href="/special-orders" className="text-xs hover:text-[#082719] transition-colors">سفارش ساخت فوری</Link>
-            <Link href="/compare" className="text-xs hover:text-[#082719] transition-colors">میز مقایسه محصولات</Link>
-            <Link href="/about" className="text-xs font-extrabold text-[#082719] hover:underline transition-all">درباره کارگاه هیزو</Link>
-            <Link href="/contact" className="text-xs font-extrabold text-[#082719] hover:underline transition-all">تماس با ما</Link>
+            <Link
+              href="/special-orders"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              سفارش ساخت فوری
+            </Link>
+            <Link
+              href="/compare"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              میز مقایسه محصولات
+            </Link>
+            <Link
+              href="/about"
+              className="text-xs font-extrabold text-[#082719] hover:underline transition-all"
+            >
+              درباره کارگاه هیزو
+            </Link>
+            <Link
+              href="/contact"
+              className="text-xs font-extrabold text-[#082719] hover:underline transition-all"
+            >
+              تماس با ما
+            </Link>
           </div>
 
           {/* Col 4: Capabilities */}
           <div className="flex flex-col gap-3">
-            <span className="font-bold text-sm text-[#161A1D]">خدمات کارگاهی</span>
-            <Link href="/services#3d-print" className="text-xs hover:text-[#082719] transition-colors">پرینت 3بعدی FDM / SLS صنعتی</Link>
-            <Link href="/services#cnc" className="text-xs hover:text-[#082719] transition-colors">فرزکاری 5 محوره CNC</Link>
-            <Link href="/services#laser" className="text-xs hover:text-[#082719] transition-colors">برش و حکاکی لیزر فایبر و CO2</Link>
-            <Link href="/services#dfm" className="text-xs hover:text-[#082719] transition-colors">مهندسی معکوس و تحلیل DFM</Link>
-            <Link href="/services#automation" className="text-xs hover:text-[#082719] transition-colors">ساخت و اسمبل مکاترونیک</Link>
+            <span className="font-bold text-sm text-[#161A1D]">
+              خدمات کارگاهی
+            </span>
+            <Link
+              href="/services#3d-print"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              پرینت 3بعدی FDM / SLS صنعتی
+            </Link>
+            <Link
+              href="/services#cnc"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              فرزکاری 5 محوره CNC
+            </Link>
+            <Link
+              href="/services#laser"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              برش و حکاکی لیزر فایبر و CO2
+            </Link>
+            <Link
+              href="/services#dfm"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              مهندسی معکوس و تحلیل DFM
+            </Link>
+            <Link
+              href="/services#automation"
+              className="text-xs hover:text-[#082719] transition-colors"
+            >
+              ساخت و اسمبل مکاترونیک
+            </Link>
           </div>
 
           {/* Col 5: Contact Info */}
           <div className="flex flex-col gap-3">
-            <span className="font-bold text-sm text-[#161A1D]">ارتباط با کارگاه</span>
+            <span className="font-bold text-sm text-[#161A1D]">
+              ارتباط با کارگاه
+            </span>
             <div className="flex items-center gap-2 text-xs">
               <Mail className="w-4 h-4 text-[#0284c7] shrink-0" />
-              <span className="font-mono dir-ltr text-[#333C44]">Hizud3print@gmail.com</span>
+              <span className="font-mono dir-ltr text-[#333C44]">
+                Hizud3print@gmail.com
+              </span>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <Phone className="w-4 h-4 text-[#0284c7] shrink-0" />
-              <span className="font-mono ![direction:ltr] text-[#333C44]">+98 990 613 5755</span>
+              <span className="font-mono ![direction:ltr] text-[#333C44]">
+                +98 990 613 5755
+              </span>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <MapPin className="w-4 h-4 text-[#0284c7] shrink-0" />
-              <span className="text-[#333C44]">تهران، کارگاه ساخت و آتلیه هیزو</span>
+              <span className="text-[#333C44]">
+                {" "}
+                تهران - اندیشه - فاز 3 - مجتمع تجاری بوستان - واحد 34
+              </span>
             </div>
 
             {/* Social Media Links */}
             <div className="pt-3 border-t border-[#1c211b]/10 flex flex-col gap-2.5 mt-1">
-              <span className="text-xs font-bold text-[#161A1D]">شبکه‌های اجتماعی و پیام‌رسان</span>
+              <span className="text-xs font-bold text-[#161A1D]">
+                شبکه‌های اجتماعی و پیام‌رسان
+              </span>
               <div className="flex flex-wrap items-center gap-2">
                 <a
                   href={TELEGRAM_URL}
@@ -175,7 +273,9 @@ export default function Footer() {
                   className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/12 text-[#161A1D] hover:bg-[#082719] hover:text-[#dfc79b] hover:border-[#082719] transition-all duration-200 text-xs shadow-sm interactive-bump focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#082719]"
                 >
                   <TelegramIcon className="w-4 h-4 text-[#229ED9] group-hover:text-[#dfc79b] transition-colors shrink-0" />
-                  <span className="font-mono text-[11px] dir-ltr font-semibold">Telegram</span>
+                  <span className="font-mono text-[11px] dir-ltr font-semibold">
+                    Telegram
+                  </span>
                 </a>
                 <a
                   href={INSTAGRAM_URL}
@@ -186,7 +286,9 @@ export default function Footer() {
                   className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/12 text-[#161A1D] hover:bg-[#082719] hover:text-[#dfc79b] hover:border-[#082719] transition-all duration-200 text-xs shadow-sm interactive-bump focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#082719]"
                 >
                   <InstagramIcon className="w-4 h-4 text-[#E1306C] group-hover:text-[#dfc79b] transition-colors shrink-0" />
-                  <span className="font-mono text-[11px] dir-ltr font-semibold">Instagram</span>
+                  <span className="font-mono text-[11px] dir-ltr font-semibold">
+                    Instagram
+                  </span>
                 </a>
               </div>
             </div>
@@ -200,7 +302,7 @@ export default function Footer() {
               href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="کانال تلگرام استودیو هیزو"
+              aria-label="کانال تلگرام هیزو"
               className="flex items-center gap-1.5 text-[#5A626A] hover:text-[#082719] transition-colors group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#082719] rounded"
             >
               <TelegramIcon className="w-3.5 h-3.5 text-[#229ED9] group-hover:scale-110 transition-transform shrink-0" />
@@ -211,14 +313,14 @@ export default function Footer() {
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="صفحه اینستاگرام استودیو هیزو"
+              aria-label="صفحه اینستاگرام هیزو"
               className="flex items-center gap-1.5 text-[#5A626A] hover:text-[#082719] transition-colors group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#082719] rounded"
             >
               <InstagramIcon className="w-3.5 h-3.5 text-[#E1306C] group-hover:scale-110 transition-transform shrink-0" />
               <span className="font-sans text-xs">اینستاگرام</span>
             </a>
           </div>
-          <span>© 2026 تمامی حقوق برای استودیو هیزو محفوظ است.</span>
+          <span>© 2026 تمامی حقوق برای هیزو محفوظ است.</span>
         </div>
       </div>
     </footer>

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCompare } from "@/providers/CompareProvider";
-import { formatPrice, toPersianDigits } from "@/lib/utils/formatters";
+import { formatPrice, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
 import { Scale, X, Trash2, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 
 export default function FloatingCompareBar() {
@@ -64,7 +64,7 @@ export default function FloatingCompareBar() {
                 >
                   <div className="w-10 h-10 rounded-lg overflow-hidden bg-white shrink-0 border border-[#1c211b]/08">
                     {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(item.imageUrl)} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center font-mono text-[9px] text-gray-400">
                         HIZU

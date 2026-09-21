@@ -19,7 +19,7 @@ import {
   ProductDto,
   ProductComment,
 } from "@/types";
-import { formatPrice, formatDate, toPersianDigits } from "@/lib/utils/formatters";
+import { formatPrice, formatDate, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
 import {
   ShieldCheck,
   Package,
@@ -681,7 +681,7 @@ export default function AdminDashboardPage() {
                         <td className="p-4">
                           <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
                             {p.imageUrl ? (
-                              <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                              <img src={getImageUrl(p.imageUrl)} alt={p.name} className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-gray-400 font-mono text-[9px]">
                                 NO IMG

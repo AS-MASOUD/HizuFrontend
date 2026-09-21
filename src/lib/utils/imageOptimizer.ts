@@ -31,14 +31,9 @@ export async function optimizeProductImage(
         let { width, height } = img;
 
         if (width > maxWidth || height > maxHeight) {
-          if (width > height) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          } else {
-            width = Math.round((width * maxHeight) / height);
-            maxHeight;
-            height = Math.round((img.height * maxHeight) / img.width);
-          }
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.max(1, Math.round(width * ratio));
+          height = Math.max(1, Math.round(height * ratio));
         }
 
         const canvas = document.createElement("canvas");
@@ -57,27 +52,35 @@ export async function optimizeProductImage(
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to WebP blob (fallback to JPEG if webp not supported)
-        const format = "image/webp";
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              resolve(file);
-              return;
-            }
+        // Convert to WebP blob (with automatic fallback to JPEG)
+        const tryBlob = (format: string, ext: string, fallback?: () => void) => {
+          try {
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) {
+                  if (fallback) fallback();
+                  else resolve(file);
+                  return;
+                }
+                const originalNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+                const optimizedFile = new File([blob], `${originalNameWithoutExt}.${ext}`, {
+                  type: format,
+                  lastModified: Date.now(),
+                });
+                resolve(optimizedFile);
+              },
+              format,
+              quality
+            );
+          } catch {
+            if (fallback) fallback();
+            else resolve(file);
+          }
+        };
 
-            // Create a clean filename with .webp extension
-            const originalNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-            const optimizedFile = new File([blob], `${originalNameWithoutExt}.webp`, {
-              type: "image/webp",
-              lastModified: Date.now(),
-            });
-
-            resolve(optimizedFile);
-          },
-          format,
-          quality
-        );
+        tryBlob("image/webp", "webp", () => {
+          tryBlob("image/jpeg", "jpg", () => resolve(file));
+        });
       };
 
       img.onerror = () => {

@@ -5,9 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { ProductListDto } from "@/types";
 import { formatPrice } from "@/lib/utils/formatters";
+import { getImageUrl } from "@/lib/utils/imageUrl";
 import { useCart } from "@/providers/CartProvider";
 import { useCompare } from "@/providers/CompareProvider";
-import { ShoppingBag, ArrowLeft, Scale } from "lucide-react";
+import { GitCompare, ShoppingBag } from "lucide-react";
 
 interface ProductCardProps {
   product: ProductListDto;
@@ -43,18 +44,27 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
   };
 
-
   return (
     <div className="card-popup card-popup-hover rounded-2xl overflow-hidden group flex flex-col justify-between relative border border-[#1c211b]/10 bg-white shadow-[0_14px_34px_-6px_rgba(28,33,27,0.08)]">
       <div>
         {/* Image Container with Badges */}
         <div className="relative block w-full h-56 overflow-hidden bg-[#16191d]">
-          <Link href={`/product/${product.slug}`} className="block w-full h-full">
+          <Link
+            href={`/product/${product.slug}`}
+            className="block w-full h-full"
+          >
             {product.imageUrl ? (
               <img
-                src={product.imageUrl}
+                src={getImageUrl(product.imageUrl)}
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-95 contrast-105"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.dataset.retried) {
+                    target.dataset.retried = "true";
+                    target.src = getImageUrl(product.imageUrl);
+                  }
+                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-[#EDE8DC] text-[#5A626A] font-mono text-sm">
@@ -69,21 +79,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.material || product.sku}
           </div>
 
-          {/* Compare Button on Image */}
-          <button
-            type="button"
-            onClick={handleToggleCompare}
-            className={`absolute top-3 left-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md border transition-all text-[11px] font-bold shadow-xs ${
-              inCompare
-                ? "bg-[#082719] text-[#dfc79b] border-[#dfc79b]/40 shadow-sm"
-                : "bg-white/85 hover:bg-white text-[#161A1D] border-[#1c211b]/15"
-            }`}
-            title={inCompare ? "حذف از مقایسه" : "افزودن به مقایسه"}
-          >
-            <Scale className="w-3 h-3" />
-            <span>{inCompare ? "در مقایسه" : "مقایسه"}</span>
-          </button>
-
           {/* Tolerance Badge */}
           {product.tolerance && (
             <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#dfc79b] dir-ltr">
@@ -96,10 +91,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="p-5 flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs text-[#5A626A]">
             <span>{product.categoryName}</span>
-            <span className="font-mono text-[10px] text-[#0284c7]">{product.technique || "FABRICATED"}</span>
+            <span className="font-mono text-[10px] text-[#0284c7]">
+              {product.technique || "FABRICATED"}
+            </span>
           </div>
 
-          <Link href={`/product/${product.slug}`} className="group-hover:text-[#082719] transition-colors">
+          <Link
+            href={`/product/${product.slug}`}
+            className="group-hover:text-[#082719] transition-colors"
+          >
             <h3 className="font-bold text-base text-[#161A1D] line-clamp-1 leading-snug">
               {product.name}
             </h3>
@@ -133,7 +133,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             }`}
             title={inCompare ? "حذف از مقایسه" : "افزودن به مقایسه"}
           >
-            <Scale className="w-3.5 h-3.5" />
+            <GitCompare className="w-3.5 h-3.5" />
           </button>
 
           <button
@@ -144,7 +144,9 @@ export default function ProductCard({ product }: ProductCardProps) {
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-[#EDE8DC] hover:bg-[#082719] text-[#161A1D] hover:text-[#FFFFFF] border border-[#1c211b]/10"
             }`}
-            title={product.stockQuantity === 0 ? "ناموجود" : "افزودن به سبد خرید"}
+            title={
+              product.stockQuantity === 0 ? "ناموجود" : "افزودن به سبد خرید"
+            }
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             <span>{product.stockQuantity === 0 ? "ناموجود" : "خرید"}</span>

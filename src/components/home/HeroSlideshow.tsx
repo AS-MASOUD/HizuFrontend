@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { ChevronRight, ChevronLeft, Play, Pause, Maximize2 } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronLeft,
+  Play,
+  Pause,
+  Maximize2,
+} from "lucide-react";
 
 export interface SlideItem {
   src: string;
@@ -37,23 +43,30 @@ const DEFAULT_SLIDES: SlideItem[] = [
   },
 ];
 
+export interface HeroSlideshowProps {
+  slides?: SlideItem[];
+}
+
 const AUTOPLAY_INTERVAL = 5500; // ms per slide
 
-export default function HeroSlideshow() {
+export default function HeroSlideshow({ slides: customSlides }: HeroSlideshowProps = {}) {
+  const slides = customSlides && customSlides.length > 0 ? customSlides : DEFAULT_SLIDES;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [loadedSlides, setLoadedSlides] = useState<boolean[]>(
-    new Array(DEFAULT_SLIDES.length).fill(false)
+    new Array(slides.length).fill(false),
   );
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % DEFAULT_SLIDES.length);
-  }, []);
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
 
   const prevSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + DEFAULT_SLIDES.length) % DEFAULT_SLIDES.length);
-  }, []);
+    setCurrentIndex(
+      (prev) => (prev - 1 + slides.length) % slides.length,
+    );
+  }, [slides.length]);
 
   const goToSlide = (idx: number) => {
     setCurrentIndex(idx);
@@ -82,36 +95,35 @@ export default function HeroSlideshow() {
     });
   };
 
-  const currentSlide = DEFAULT_SLIDES[currentIndex];
+  const currentSlide = slides[currentIndex] || slides[0] || DEFAULT_SLIDES[0];
 
   return (
     <div
-      className="relative w-full rounded-2xl p-2.5 card-popup border border-[#1c211b]/12 shadow-[0_18px_45px_-10px_rgba(28,33,27,0.15)] group/slideshow overflow-hidden"
+      className="relative w-full rounded-2xl p-2.5 card-popup border border-[#1c211b]/12 shadow-[0_18px_45px_-10px_rgba(28,33,27,0.15)] group/slideshow"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="region"
       aria-roledescription="carousel"
       aria-label="نمایشگاه کارگاه هیزو"
     >
-      {/* Precision corner calipers */}
-      <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-110" />
-      <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-110" />
-      <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-110" />
-      <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-110" />
-
-      {/* Technical vertical ruler tickmarks */}
-      <div className="hidden sm:block absolute top-8 bottom-8 -left-3.5 w-2 technical-ruler-v z-30 opacity-75 pointer-events-none" />
+      {/* Precision corner frame square calipers */}
+      <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-125"></div>
+      <div className="absolute -top-2 -right-2 w-4 h-4 border-t-2 border-r-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-125 flex justify-end"></div>
+      <div className="absolute -bottom-2 -left-2 w-4 h-4 border-b-2 border-l-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-125 flex items-end"></div>
+      <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-[#b5924d] z-30 pointer-events-none transition-transform duration-300 group-hover/slideshow:scale-125 flex items-end justify-end"></div>
 
       {/* Main viewport */}
       <div className="relative w-full h-[360px] sm:h-[480px] rounded-xl overflow-hidden bg-[#16191d] select-none">
         {/* Images with Ken Burns zoom & crossfade */}
-        {DEFAULT_SLIDES.map((slide, idx) => {
+        {slides.map((slide, idx) => {
           const isActive = idx === currentIndex;
           return (
             <div
               key={slide.src}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                isActive
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0 pointer-events-none"
               }`}
               aria-hidden={!isActive}
             >
@@ -179,7 +191,7 @@ export default function HeroSlideshow() {
         <div className="absolute bottom-4 inset-x-4 sm:inset-x-6 z-30 flex items-center justify-between gap-3 bg-[#121417]/80 backdrop-blur-md border border-white/10 rounded-xl px-4 py-2">
           {/* Slide Numbers & Progress Bars */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {DEFAULT_SLIDES.map((_, idx) => {
+            {slides.map((_, idx) => {
               const isActive = idx === currentIndex;
               return (
                 <button
@@ -214,7 +226,11 @@ export default function HeroSlideshow() {
               {isPaused ? "PAUSED (HOVER)" : "AUTO ROTATING"}
             </span>
             <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[#dfc79b]">
-              {isPaused ? <Pause className="w-2.5 h-2.5" /> : <Play className="w-2.5 h-2.5 ml-0.5" />}
+              {isPaused ? (
+                <Pause className="w-2.5 h-2.5" />
+              ) : (
+                <Play className="w-2.5 h-2.5 ml-0.5" />
+              )}
             </div>
           </div>
         </div>
