@@ -16,41 +16,13 @@ export interface SlideItem {
   badge: string;
 }
 
-const DEFAULT_SLIDES: SlideItem[] = [
-  {
-    src: "/slideshow/slide-1.jpg",
-    title: "کارگاه ماشین‌کاری پیشرفته 5 محوره CNC",
-    subtitle: "CAM 01 // CNC MILLING & PROTOTYPING",
-    badge: "TOLERANCE ±0.01mm",
-  },
-  {
-    src: "/slideshow/slide-2.jpg",
-    title: "پرینت 3بعدی صنعتی ابعاد بزرگ",
-    subtitle: "ADDITIVE 02 // INDUSTRIAL SLS & FDM",
-    badge: "PA12 CARBON / RESIN",
-  },
-  {
-    src: "/slideshow/slide-3.jpg",
-    title: "برش و حکاکی فوق دقیق لیزر فایبر",
-    subtitle: "OPTICS 03 // FIBER LASER 1064nm",
-    badge: "METALS & ACRYLIC",
-  },
-  {
-    src: "/slideshow/slide-4.jpg",
-    title: "توسعه مکاترونیک و ساخت خط تولید",
-    subtitle: "SYSTEMS 04 // INDUSTRIAL AUTOMATION",
-    badge: "DFM & ASSEMBLY",
-  },
-];
-
 export interface HeroSlideshowProps {
   slides?: SlideItem[];
 }
 
 const AUTOPLAY_INTERVAL = 5500; // ms per slide
 
-export default function HeroSlideshow({ slides: customSlides }: HeroSlideshowProps = {}) {
-  const slides = customSlides && customSlides.length > 0 ? customSlides : DEFAULT_SLIDES;
+export default function HeroSlideshow({ slides = [] }: HeroSlideshowProps = {}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [loadedSlides, setLoadedSlides] = useState<boolean[]>(
@@ -59,10 +31,12 @@ export default function HeroSlideshow({ slides: customSlides }: HeroSlideshowPro
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const nextSlide = useCallback(() => {
+    if (slides.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % slides.length);
   }, [slides.length]);
 
   const prevSlide = useCallback(() => {
+    if (slides.length === 0) return;
     setCurrentIndex(
       (prev) => (prev - 1 + slides.length) % slides.length,
     );
@@ -71,6 +45,14 @@ export default function HeroSlideshow({ slides: customSlides }: HeroSlideshowPro
   const goToSlide = (idx: number) => {
     setCurrentIndex(idx);
   };
+
+  if (!slides || slides.length === 0) {
+    return (
+      <div className="w-full h-full min-h-[380px] rounded-2xl bg-[#EDE8DC]/50 border border-[#1c211b]/10 flex items-center justify-center text-xs text-[#5A626A] font-mono">
+        LOADING LAB SLIDESHOW...
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (isPaused) {
@@ -95,7 +77,7 @@ export default function HeroSlideshow({ slides: customSlides }: HeroSlideshowPro
     });
   };
 
-  const currentSlide = slides[currentIndex] || slides[0] || DEFAULT_SLIDES[0];
+  const currentSlide = slides[currentIndex] || slides[0];
 
   return (
     <div

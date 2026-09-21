@@ -31,109 +31,6 @@ const ICON_MAP: Record<string, any> = {
   cog: Cog,
 };
 
-const DEFAULT_SERVICES_DATA = [
-  {
-    id: "3d-print",
-    serviceParam: "3d-print",
-    code: "PROTOCOL 01",
-    badge: "FDM / SLS / SLA | PA12-CF",
-    title: "پرینت 3بعدی صنعتی و نمونه‌سازی سریع",
-    subtitle: "LARGE-FORMAT INDUSTRIAL 3D PRINTING & RAPID TOOLING",
-    desc: "تولید نمونه‌های دقیق مهندسی، جیگ و فیکسچرهای سبک، پوسته‌های محافظ و قطعات تیراژ با مجهزترین پرینترهای ابعاد صنعتی. هیزو با تکیه بر تکنولوژی‌های FDM با محفظه حرارتی فعال و SLS نوری، قابلیت تزریق و پرینت پلیمرهای مقاوم در برابر ضربه، سایش و حرارت‌های بالا را فراهم کرده است.",
-    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
-    icon: Layers,
-    specs: [
-      { label: "تلورانس ابعادی", value: "±0.05 میلی‌متر مطابق استاندارد" },
-      { label: "حداکثر ابعاد ساخت یکپارچه", value: "500×500×600 میلی‌متر" },
-      { label: "رزولوشن لایه‌گذاری", value: "20 تا 200 میکرون قابل انتخاب" },
-      { label: "مقاومت حرارتی پلیمرها", value: "تا 180 درجه سانتی‌گراد نسوز" },
-    ],
-    materials: ["نایلون فیبر کربن PA12-CF", "پلی‌کربنات نسوز (PC)", "رزین مهندسی Tough", "ABS-ESD آنتی‌استاتیک", "پلیمرهای انعطاف‌پذیر TPU"],
-    applications: ["قطعات سبک پهپاد و هوافضا", "پوسته و فریم تجهیزات رباتیک", "قطعات تست کارگاهی و جایگزین آلومینیوم", "هوزینگ‌های ضدآب الکترونیک"],
-    equipment: "پارک پرینترهای صنعتی Bambu Lab با محفظه محصور، سیستم لیزری SLS نوری و پرینترهای فرمت بزرگ FDM",
-  },
-  {
-    id: "cnc",
-    serviceParam: "cnc",
-    code: "PROTOCOL 02",
-    badge: "ISO 2768-FINE | ±0.01mm",
-    title: "ماشین‌کاری 5 محوره همزمان CNC",
-    subtitle: "SIMULTANEOUS 5-AXIS PRECISION CNC MILLING",
-    desc: "فرزکاری فوق‌دقیق 5 محوره همزمان برای قطعات با هندسه‌های پیچیده سه‌بعدی و سطوح آزاد (Freeform) بدون نیاز به بستن‌های چندباره و حذف خطای زوایای متقاطع. کارگاه هیزو با تجهیزات تخصصی و ابزارگیرهای صلب، قطعات حساس هوافضا، هیدرولیک و قالب‌های دقیق را از شمش‌های یکپارچه فلزی فرزکاری می‌کند.",
-    image: "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?auto=format&fit=crop&w=1200&q=80",
-    icon: Wrench,
-    specs: [
-      { label: "دقت موقعیت‌یابی و تکرارپذیری", value: "±0.008 میلی‌متر میکرونی" },
-      { label: "محدوده کارگیر 5 محوره", value: "800×600×500 میلی‌متر" },
-      { label: "زبری سطح پرداختی (Ra)", value: "تا 0.4 میکرومتر آینه‌ای" },
-      { label: "سرعت چرخش اسپیندل", value: "24,000 دور در دقیقه با کولانت" },
-    ],
-    materials: ["آلومینیوم 7075-T6 و 6061", "برنج آلیاژی شمش", "استیل نگیر 316 و 304", "فولاد ابزار SPK سخت‌کاری شده", "چوب‌های سخت متراکم صنعتی"],
-    applications: ["پره‌های توربین و ایمپلرهای دینامیک", "پوسته‌های هیدرولیک و پنوماتیک", "براکت‌های حساس رباتیک و اتوماسیون", "قالب‌های فرم‌دهی و کشش دقیق"],
-    equipment: "مرکز فرزکاری 5 محوره همزمان، سیستم پروب لیزری Renishaw و خنک‌کاری پیشرفته مایع تحت فشار",
-  },
-  {
-    id: "laser",
-    serviceParam: "laser",
-    code: "PROTOCOL 03",
-    badge: "1064nm FIBER & CO2 HIGH-POWER",
-    title: "برش فایبر نوری و حکاکی پرسرعت لیزر",
-    subtitle: "ULTRA-FAST FIBER & CO2 LASER PROCESSING",
-    desc: "برش نوری بی‌نقص انواع ورق‌های فلزی سخت و متریال‌های غیرفلزی با حداقل منطقه متاثر از حرارت (HAZ). استفاده از لیزر فایبر با طول موج 1064 نانومتر و گازهای خلوص بالای نیتروژن و اکسیژن، لبه‌هایی کاملاً صیقلی، عمود و بدون اکسیداسیون یا پلیسه را تضمین می‌کند.",
-    image: "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80",
-    icon: Sparkles,
-    specs: [
-      { label: "حداکثر ضخامت برش فولاد", value: "تا 20 میلی‌متر با نیتروژن خلوص 99.99%" },
-      { label: "دقت پرتو و نقطه فوکوس", value: "±0.03 میلی‌متر روی کانون" },
-      { label: "توان سورس فایبر نوری", value: "6000 وات پیوسته صنعتی" },
-      { label: "حکاکی نوری عمیق", value: "بارکد، شماره فنی، لوگو و درجه‌بندی" },
-    ],
-    materials: ["ورق آهن St37 و St52", "ورق استنلس استیل 304 و 316", "ورق مس خالص و برنج فنری", "آلومینیوم سری 5000 و 6000", "چوب طبیعی، MDF و پلکسی گلاس"],
-    applications: ["شاسی‌های مدولار الکترونیک", "پنل‌های رک و جعبه‌های مخابراتی", "فلنج‌ها و دیسک‌های ترمز صنعتی", "المان‌های مدرن معماری و مشبک"],
-    equipment: "میز برش فایبر 3000×1500 میلی‌متر با هد فوکوس اتوماتیک Precitec و سیستم تزریق گاز نیتروژن و اکسیژن",
-  },
-  {
-    id: "dfm",
-    serviceParam: "dfm",
-    code: "PROTOCOL 04",
-    badge: "METROLOGY GRADE | 5-MICRON SCAN",
-    title: "اسکن نوری سه‌بعدی و بهینه‌سازی ساخت (DFM)",
-    subtitle: "METROLOGY 3D SCANNING & DESIGN FOR MANUFACTURING",
-    desc: "اسکن اپتیکال بدون تماس قطعات مستهلک، نایاب یا دست‌ساز با رزولوشن میکرونی، استخراج ابر نقاط متراکم و بازسازی مدل‌های پارامتریک CAD در نرم‌افزارهای مهندسی. در مرحله بعد، تحلیل جامع قابلیت ساخت (DFM) جهت سبک‌سازی سازه (Topology Optimization) و کاهش هزینه‌های تولید انجام می‌گیرد.",
-    image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80",
-    icon: Scan,
-    specs: [
-      { label: "دقت اندازه‌گیری اسکنر", value: "5 میکرومتر (گواهی کالیبراسیون Metrology)" },
-      { label: "فرمت فایل‌های خروجی", value: "STEP, IGES, Parasolid, Native SolidWorks/NX" },
-      { label: "تحلیل المان محدود (FEA)", value: "استاتیک، خستگی و توزیع تنش فون مایسز" },
-      { label: "گزارش بازرسی ابعادی (Inspection)", value: "نقشه انحراف رنگی با تلورانس GD&T" },
-    ],
-    materials: ["اسکن کلیه قطعات فلزی، پلیمری و کامپوزیتی", "اسکن قطعات ریخته‌گری با سطوح نامنظم", "قالب‌های قدیمی و قطعات از رده خارج"],
-    applications: ["بازسازی قطعات نایاب خطوط تولید خارجی", "تحلیل عیوب و انحرافات ابعادی قطعه ساخته شده", "بهینه‌سازی توپولوژی و کاهش وزن تا 40%", "تبدیل نقشه‌های دوبعدی به مدل‌های سه‌بعدی"],
-    equipment: "اسکنر نوری سه‌بعدی نور آبی (Blue Light Optical Scanner) و ایستگاه‌های پردازش محاسباتی Geomagic Control X",
-  },
-  {
-    id: "automation",
-    serviceParam: "automation",
-    code: "PROTOCOL 05",
-    badge: "EMBEDDED CONTROL & SERVO AUTOMATION",
-    title: "توسعه مکاترونیک، رباتیک و ماشین‌آلات سفارشی",
-    subtitle: "CUSTOM MECHATRONIC SYSTEMS & WORKSHOP AUTOMATION",
-    desc: "مهندسی یکپارچه مکانیک، برق صنعتی و نرم‌افزار برای توسعه سیستم‌های خودکار خط تولید، ربات‌های کارتزین، استیج‌های تست لرزش و خستگی، و فیکسچرهای هوشمند مونتاژ. هیزو کلیه مراحل را از تحلیل فیزیکی و نقشه‌کشی تا مونتاژ قطعات، سیم‌کشی و برنامه‌نویسی میکروکنترلر به صورت درون‌سازمانی به اجرا درمی‌آورد.",
-    image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80",
-    icon: Cog,
-    specs: [
-      { label: "سیستم‌های هدایت حرکتی", value: "بال‌اسکروهای پیش‌بارگذاری C3 و ریل‌های خطی" },
-      { label: "محرک‌ها و موتورها", value: "سروموتورهای سنکرون AC و استپرهای حلقه بسته" },
-      { label: "معماری کنترلر صنعتی", value: "PLC صنعتی زیمنس، دلتا و بردهای امبدد ARM" },
-      { label: "رابط کاربری و مانیتورینگ", value: "HMI لمسی صنعتی و اتصال شبکه Modbus/CAN" },
-    ],
-    materials: ["شاسی‌های پروفیل آلومینیوم مهندسی سخت", "صفحات صلب فولادی تنش‌زدایی شده", "پوشش‌های محافظ شفاف پلی‌کربنات صنعتی"],
-    applications: ["دستگاه‌های تست دوام و لرزش قطعات", "ربات‌های پیک اند پلیس و چیدمان کارگاهی", "فیکسچرهای تست عایق و ابعاد آنلاین", "تجهیزات مکانیزه بسته‌بندی و مونتاژ"],
-    equipment: "آزمایشگاه مونتاژ مکاترونیک، دستگاه‌های جوشکاری دقیق TIG، اسیلوسکوپ‌های دیجیتال و تست‌بنچ کالیبراسیون سنسور",
-  },
-];
-
 export default function ServicesPage() {
   const [services, setServices] = useState<FabricationService[]>([]);
   const [revealedCards, setRevealedCards] = useState<Record<string, boolean>>({});
@@ -147,7 +44,7 @@ export default function ServicesPage() {
           setServices(data);
         }
       } catch (err) {
-        console.warn("Failed to fetch backend services, using fallback:", err);
+        console.warn("Failed to fetch backend services:", err);
       }
     }
     loadServices();
@@ -175,24 +72,21 @@ export default function ServicesPage() {
     return () => observer.disconnect();
   }, [services]);
 
-  const servicesData =
-    services.length > 0
-      ? services.map((s) => ({
-          id: s.slug,
-          serviceParam: s.slug,
-          code: s.code,
-          badge: s.badge,
-          title: s.title,
-          subtitle: s.subtitle,
-          desc: s.description,
-          image: s.imageUrl,
-          icon: ICON_MAP[s.iconName?.toLowerCase()] || Layers,
-          specs: s.specs,
-          materials: s.materials,
-          applications: s.applications,
-          equipment: s.equipment,
-        }))
-      : DEFAULT_SERVICES_DATA;
+  const servicesData = services.map((s) => ({
+    id: s.slug,
+    serviceParam: s.slug,
+    code: s.code,
+    badge: s.badge,
+    title: s.title,
+    subtitle: s.subtitle,
+    desc: s.description,
+    image: s.imageUrl,
+    icon: ICON_MAP[s.iconName?.toLowerCase()] || Layers,
+    specs: s.specs || [],
+    materials: s.materials || [],
+    applications: s.applications || [],
+    equipment: s.equipment,
+  }));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex flex-col gap-16 sm:gap-24">
@@ -226,7 +120,12 @@ export default function ServicesPage() {
 
       {/* Services List - Full Width Objects with Scroll Reveal Animations */}
       <div className="flex flex-col gap-12 sm:gap-16">
-        {servicesData.map((service, index) => {
+        {servicesData.length === 0 ? (
+          <div className="card-popup rounded-3xl p-12 text-center text-[#5A626A] bg-white border border-[#1c211b]/10">
+            درحال بارگذاری خدمات کارگاهی و مهندسی هیزو...
+          </div>
+        ) : (
+          servicesData.map((service, index) => {
           const isEven = index % 2 === 0;
           const isRevealed = revealedCards[service.id];
           const IconComp = service.icon;
@@ -358,7 +257,8 @@ export default function ServicesPage() {
               </div>
             </div>
           );
-        })}
+        })
+      )}
       </div>
 
       {/* Workshop Workflow Steps */}

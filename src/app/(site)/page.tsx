@@ -3,11 +3,10 @@ import Link from "next/link";
 import { productsApi } from "@/lib/api/products";
 import {
   contentApi,
-  DEFAULT_PROCESS_STEPS,
-  DEFAULT_FAQS,
   HomeContent,
 } from "@/lib/api/content";
 import ProductCard from "@/components/product/ProductCard";
+import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import HeroSlideshow from "@/components/home/HeroSlideshow";
 import Accordion from "@/components/ui/Accordion";
 import {
@@ -46,7 +45,7 @@ export default async function HomePage() {
 
   try {
     const [productsRes, contentRes] = await Promise.allSettled([
-      productsApi.getFeaturedProducts(3),
+      productsApi.getFeaturedProducts(6),
       contentApi.getHomeContent(),
     ]);
     if (productsRes.status === "fulfilled") {
@@ -60,80 +59,32 @@ export default async function HomePage() {
   }
 
   const processSteps =
-    homeContent?.processSteps && homeContent.processSteps.length > 0
-      ? homeContent.processSteps.map((s) => ({
-          num: s.stepNumber,
-          title: s.title,
-          desc: s.description,
-        }))
-      : DEFAULT_PROCESS_STEPS.map((s) => ({
-          num: s.stepNumber,
-          title: s.title,
-          desc: s.description,
-        }));
+    homeContent?.processSteps?.map((s) => ({
+      num: s.stepNumber,
+      title: s.title,
+      desc: s.description,
+    })) || [];
 
   const services =
-    homeContent?.services && homeContent.services.length > 0
-      ? homeContent.services.map((s) => ({
-          icon: getServiceIcon(s.iconName),
-          badge: s.badge || "HIZU SPEC",
-          coord: s.coord || "ISO CAD",
-          title: s.shortTitle || s.title,
-          desc: s.shortDescription || s.description,
-        }))
-      : [
-          {
-            icon: <Layers className="w-6 h-6 text-[#0284c7]" />,
-            badge: "FDM / SLS",
-            coord: "15mm",
-            title: "پرینت 3بعدی صنعتی",
-            desc: "تولید نمونه اولیه دقیق و قطعات نهایی با پلیمرهای مهندسی FDM/SLA/SLS و نایلون کربن.",
-          },
-          {
-            icon: <Wrench className="w-6 h-6 text-[#8f6d2f]" />,
-            badge: "5-AXIS MILL",
-            coord: "±0.01",
-            title: "ماشین‌کاری CNC",
-            desc: "فرزکاری 5 محوره فلزات سبک، برنج، چوب و ساخت قالب‌های مستحکم با تلورانس ابعادی میکرونی.",
-          },
-          {
-            icon: <Sparkles className="w-6 h-6 text-[#0284c7]" />,
-            badge: "FIBER/CO2",
-            coord: "1064nm",
-            title: "برش و لیزر",
-            desc: "برش فوق سریع و حکاکی فیبر و CO2 روی چوب طبیعی، پلکسی و ورق‌های سخت صنعتی.",
-          },
-          {
-            icon: <Cog className="w-6 h-6 text-[#5A626A]" />,
-            badge: "SPECIAL CNC",
-            coord: "PLC/ARM",
-            title: "ساخت ماشین‌آلات",
-            desc: "طراحی مکاترونیک، اسمبل فیزیکی و برنامه‌نویسی ماشین‌های خط تولید و سیستم‌های اتوماسیون.",
-          },
-          {
-            icon: <Scan className="w-6 h-6 text-[#5A626A]" />,
-            badge: "DFM & CAD",
-            coord: "ISO CAD",
-            title: "مهندسی معکوس",
-            desc: "اسکن سه‌بعدی نوری، تلورانس‌گذاری هندسی و بهینه‌سازی فایل‌های CAD برای ساخت تجاری.",
-          },
-        ];
+    homeContent?.services?.map((s) => ({
+      icon: getServiceIcon(s.iconName),
+      badge: s.badge || "HIZU SPEC",
+      coord: s.coord || "ISO CAD",
+      title: s.shortTitle || s.title,
+      desc: s.shortDescription || s.description,
+    })) || [];
 
-  const rawFaqs =
-    homeContent?.faqs && homeContent.faqs.length > 0
-      ? homeContent.faqs
-      : DEFAULT_FAQS;
-
-  const faqItems = rawFaqs.map((faq) => ({
-    id: faq.id,
-    title: faq.question,
-    badge: faq.badge,
-    content: (
-      <p className="text-xs sm:text-sm text-[#5A626A] leading-relaxed">
-        {faq.answer}
-      </p>
-    ),
-  }));
+  const faqItems =
+    homeContent?.faqs?.map((faq) => ({
+      id: faq.id,
+      title: faq.question,
+      badge: faq.badge,
+      content: (
+        <p className="text-xs sm:text-sm text-[#5A626A] leading-relaxed">
+          {faq.answer}
+        </p>
+      ),
+    })) || [];
 
   const heroSlides = homeContent?.slides?.map((s) => ({
     src: s.imageUrl,
@@ -287,36 +238,44 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5">
-            {services.map((s, idx) => (
-              <div
-                key={idx}
-                className="card-popup card-popup-hover rounded-2xl p-5 flex flex-col justify-between group relative overflow-hidden bg-white interactive-bump glaze-hover"
-              >
-                <div className="absolute top-2 left-2 text-[9px] font-mono text-[#0284c7]">
-                  {s.coord}
-                </div>
-                <div className="flex flex-col gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#F3EFE6] border border-[#1c211b]/10 flex items-center justify-center text-[#161A1D] group-hover:bg-[#082719] group-hover:text-[#FFFFFF] transition-all shadow-xs group-hover:scale-110 group-hover:-translate-y-1">
-                    {s.icon}
+          <div className="lg:col-span-8">
+            {services.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5">
+                {services.map((s, idx) => (
+                  <div
+                    key={idx}
+                    className="card-popup card-popup-hover rounded-2xl p-5 flex flex-col justify-between group relative overflow-hidden bg-white interactive-bump glaze-hover"
+                  >
+                    <div className="absolute top-2 left-2 text-[9px] font-mono text-[#0284c7]">
+                      {s.coord}
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-[#F3EFE6] border border-[#1c211b]/10 flex items-center justify-center text-[#161A1D] group-hover:bg-[#082719] group-hover:text-[#FFFFFF] transition-all shadow-xs group-hover:scale-110 group-hover:-translate-y-1">
+                        {s.icon}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-base text-[#161A1D]">
+                          {s.title}
+                        </h3>
+                        <p className="text-xs text-[#5A626A] mt-1 leading-relaxed">
+                          {s.desc}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[#1c211b]/10 flex items-center justify-between">
+                      <span className="font-mono text-[10px] bg-[#EDE8DC] text-[#333C44] px-1.5 py-0.5 rounded border border-[#1c211b]/15 font-bold">
+                        {s.badge}
+                      </span>
+                      <ArrowLeft className="w-4 h-4 text-[#5A626A] group-hover:text-[#161A1D] group-hover:-translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-base text-[#161A1D]">
-                      {s.title}
-                    </h3>
-                    <p className="text-xs text-[#5A626A] mt-1 leading-relaxed">
-                      {s.desc}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-4 pt-3 border-t border-[#1c211b]/10 flex items-center justify-between">
-                  <span className="font-mono text-[10px] bg-[#EDE8DC] text-[#333C44] px-1.5 py-0.5 rounded border border-[#1c211b]/15 font-bold">
-                    {s.badge}
-                  </span>
-                  <ArrowLeft className="w-4 h-4 text-[#5A626A] group-hover:text-[#161A1D] group-hover:-translate-x-1 transition-transform" />
-                </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="card-popup rounded-2xl p-12 text-center text-[#5A626A] bg-white">
+                درحال بارگذاری خدمات کارگاه هیزو...
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -329,7 +288,7 @@ export default async function HomePage() {
               [ SELECTED WORK ]
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#161A1D] mt-1">
-              محصولات و پروژه‌های شاخص کارگاه
+              محصولات و پروژه‌های برتر
             </h2>
           </div>
           <Link
@@ -341,17 +300,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        {featuredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="card-popup rounded-2xl p-12 text-center text-[#5A626A] bg-white">
-            درحال بارگذاری محصولات کارگاه هیزو...
-          </div>
-        )}
+        <FeaturedProductsSection initialProducts={featuredProducts} />
       </section>
 
       {/* 4. Engineering Process */}
@@ -366,31 +315,37 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative">
-            {processSteps.map((step) => (
-              <div
-                key={step.num}
-                className="flex flex-col items-center sm:items-start text-center sm:text-right gap-3 group/step"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border-2 border-[#1c211b]/20 text-[#161A1D] flex items-center justify-center font-mono font-black text-sm shadow-sm group-hover/step:border-[#082719] group-hover/step:scale-110 transition-transform">
-                    {step.num}
+          {processSteps.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative">
+              {processSteps.map((step) => (
+                <div
+                  key={step.num}
+                  className="flex flex-col items-center sm:items-start text-center sm:text-right gap-3 group/step"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border-2 border-[#1c211b]/20 text-[#161A1D] flex items-center justify-center font-mono font-black text-sm shadow-sm group-hover/step:border-[#082719] group-hover/step:scale-110 transition-transform">
+                      {step.num}
+                    </div>
+                    <span className="font-mono text-xs font-bold text-[#0284c7] bg-[#EDE8DC] px-2 py-0.5 rounded border border-[#1c211b]/10">
+                      STEP
+                    </span>
                   </div>
-                  <span className="font-mono text-xs font-bold text-[#0284c7] bg-[#EDE8DC] px-2 py-0.5 rounded border border-[#1c211b]/10">
-                    STEP
-                  </span>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#161A1D]">
+                      {step.title}
+                    </h4>
+                    <p className="text-xs text-[#5A626A] mt-1 leading-relaxed">
+                      {step.desc}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-sm text-[#161A1D]">
-                    {step.title}
-                  </h4>
-                  <p className="text-xs text-[#5A626A] mt-1 leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center text-[#5A626A]">
+              درحال دریافت مراحل فرآیند مهندسی...
+            </div>
+          )}
         </div>
       </section>
 

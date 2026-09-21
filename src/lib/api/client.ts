@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+function getBaseApiUrl(): string {
+  const raw = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  return raw.replace(/\/+$/, "").replace(/\/api$/, "");
+}
 
 export class ApiError extends Error {
   status: number;
@@ -51,7 +54,9 @@ export async function apiClient<T>(
     reqHeaders["Authorization"] = `Bearer ${token}`;
   }
 
-  const url = endpoint.startsWith("http") ? endpoint : `${API_URL}${endpoint}`;
+  const base = getBaseApiUrl();
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = endpoint.startsWith("http") ? endpoint : `${base}${path}`;
 
   let response: Response;
   try {

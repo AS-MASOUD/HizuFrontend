@@ -32,7 +32,6 @@ import {
   Sparkles,
   Info,
   GitCompare,
-  GitCompare,
 } from "lucide-react";
 
 function CompareContent() {

@@ -10,10 +10,11 @@ import FloatingCompareBar from "@/components/compare/FloatingCompareBar";
 import ScrollRuler from "@/components/layout/ScrollRuler";
 
 export const metadata: Metadata = {
-  title: "هیزو | استودیو طراحی و ساخت دیجیتال",
-  description: "طراحی، مهندسی دیجیتال، پرینت سه‌بعدی صنعتی، ماشین‌کاری 5 محوره CNC و برش لیزر در قلب کارگاه تهران.",
+  title: "هیزو",
+  description:
+    "طراحی، مهندسی دیجیتال، پرینت سه‌بعدی صنعتی، ماشین‌کاری 5 محوره CNC و برش لیزر در قلب کارگاه تهران.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/images/Hizu-logo.svg",
   },
 };
 
