@@ -118,7 +118,8 @@ export interface Cart {
 
 export interface OrderItem {
   id: string;
-  productId: string;
+  productId?: string;
+  courseId?: string;
   productName: string;
   sku: string;
   imageUrl?: string;
@@ -133,8 +134,10 @@ export interface Order {
   userId: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
   status: number;
   statusText: string;
+  isStockDeducted?: boolean;
   subtotal: number;
   shippingCost: number;
   total: number;

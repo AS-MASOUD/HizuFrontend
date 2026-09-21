@@ -19,13 +19,13 @@ import {
   Truck,
   RefreshCw,
   Wrench,
-  Scale,
   Ruler,
   Palette,
   Layers,
   Weight,
   Cpu,
   Target,
+  GitCompare,
 } from "lucide-react";
 
 export default function ProductDetailPage() {
@@ -244,7 +244,7 @@ export default function ProductDetailPage() {
                     : "افزودن به لیست مقایسه"
                 }
               >
-                <Scale className="w-4 h-4" />
+                <GitCompare className="w-4 h-4" />
                 <span>
                   {isInCompare(product.id) ? "در لیست مقایسه" : "مقایسه"}
                 </span>

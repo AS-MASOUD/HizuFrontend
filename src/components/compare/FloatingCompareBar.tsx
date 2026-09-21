@@ -4,12 +4,29 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCompare } from "@/providers/CompareProvider";
-import { formatPrice, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
-import { Scale, X, Trash2, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
+import {
+  formatPrice,
+  toPersianDigits,
+  getImageUrl,
+} from "@/lib/utils/formatters";
+import {
+  X,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  ArrowLeft,
+  GitCompare,
+} from "lucide-react";
 
 export default function FloatingCompareBar() {
   const pathname = usePathname();
-  const { compareItems, compareCount, removeFromCompare, clearCompare, maxItems } = useCompare();
+  const {
+    compareItems,
+    compareCount,
+    removeFromCompare,
+    clearCompare,
+    maxItems,
+  } = useCompare();
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Do not render if no items or if already on /compare page
@@ -26,8 +43,10 @@ export default function FloatingCompareBar() {
         {/* Header Bar with Toggle & Clear */}
         <div className="bg-[#EDE8DC] px-4 py-2 border-b border-[#1c211b]/10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Scale className="w-4 h-4 text-[#082719]" />
-            <span className="text-xs font-bold text-[#161A1D]">بخش مقایسه هوشمند</span>
+            <GitCompare className="w-4 h-4 text-[#082719]" />
+            <span className="text-xs font-bold text-[#161A1D]">
+              بخش مقایسه هوشمند
+            </span>
             <span className="bg-[#082719] text-[#dfc79b] text-[10px] font-mono font-bold px-2 py-0.5 rounded-full">
               {toPersianDigits(compareCount)} از {toPersianDigits(maxItems)}
             </span>
@@ -47,7 +66,11 @@ export default function FloatingCompareBar() {
               className="p-1 text-[#5A626A] hover:text-[#161A1D] transition-colors rounded-full"
               title={isMinimized ? "باز کردن نوار" : "کوچک کردن"}
             >
-              {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              {isMinimized ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
             </button>
           </div>
         </div>
@@ -64,7 +87,11 @@ export default function FloatingCompareBar() {
                 >
                   <div className="w-10 h-10 rounded-lg overflow-hidden bg-white shrink-0 border border-[#1c211b]/08">
                     {item.imageUrl ? (
-                      <img src={getImageUrl(item.imageUrl)} alt={item.name} className="w-full h-full object-cover" />
+                      <img
+                        src={getImageUrl(item.imageUrl)}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center font-mono text-[9px] text-gray-400">
                         HIZU
@@ -72,7 +99,9 @@ export default function FloatingCompareBar() {
                     )}
                   </div>
                   <div className="flex flex-col min-w-0 pr-1">
-                    <span className="text-[11px] font-bold text-[#161A1D] truncate">{item.name}</span>
+                    <span className="text-[11px] font-bold text-[#161A1D] truncate">
+                      {item.name}
+                    </span>
                     <span className="text-[10px] font-mono text-[#082719] font-semibold">
                       {formatPrice(item.price)}
                     </span>
@@ -107,7 +136,7 @@ export default function FloatingCompareBar() {
                   href="/compare"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md hover:scale-[1.02]"
                 >
-                  <Scale className="w-4 h-4 text-[#dfc79b]" />
+                  <GitCompare className="w-4 h-4 text-[#dfc79b]" />
                   <span>مشاهده جدول و نمودار مقایسه</span>
                   <ArrowLeft className="w-3.5 h-3.5" />
                 </Link>

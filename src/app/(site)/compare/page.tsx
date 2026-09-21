@@ -7,7 +7,11 @@ import { useCompare } from "@/providers/CompareProvider";
 import { useCart } from "@/providers/CartProvider";
 import { productsApi } from "@/lib/api/products";
 import { ProductListDto, CompareItem } from "@/types";
-import { formatPrice, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
+import {
+  formatPrice,
+  toPersianDigits,
+  getImageUrl,
+} from "@/lib/utils/formatters";
 import RadarChart from "@/components/compare/RadarChart";
 import {
   analyzeProduct,
@@ -15,7 +19,6 @@ import {
   determineOverallWinner,
 } from "@/lib/utils/comparisonEngine";
 import {
-  Scale,
   ArrowLeft,
   X,
   Plus,
@@ -28,6 +31,8 @@ import {
   Award,
   Sparkles,
   Info,
+  GitCompare,
+  GitCompare,
 } from "lucide-react";
 
 function CompareContent() {
@@ -42,7 +47,9 @@ function CompareContent() {
   } = useCompare();
   const { addToCart, loading: cartLoading } = useCart();
 
-  const [radarViewMode, setRadarViewMode] = useState<"individual" | "overlay">("individual");
+  const [radarViewMode, setRadarViewMode] = useState<"individual" | "overlay">(
+    "individual",
+  );
   const [catalogProducts, setCatalogProducts] = useState<ProductListDto[]>([]);
   const [loadingCatalog, setLoadingCatalog] = useState(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -69,7 +76,10 @@ function CompareContent() {
     if (idsParam) {
       const ids = idsParam.split(",").filter(Boolean);
       ids.forEach((id) => {
-        if (!compareItems.some((item) => item.id === id) && compareItems.length < maxItems) {
+        if (
+          !compareItems.some((item) => item.id === id) &&
+          compareItems.length < maxItems
+        ) {
           productsApi
             .getProductById(id)
             .then((p) => {
@@ -116,9 +126,13 @@ function CompareContent() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 flex flex-col gap-10">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-[#5A626A] border-b border-[#1c211b]/10 pb-4">
-          <Link href="/" className="hover:text-[#082719]">خانه</Link>
+          <Link href="/" className="hover:text-[#082719]">
+            خانه
+          </Link>
           <span>/</span>
-          <Link href="/shop" className="hover:text-[#082719]">فروشگاه</Link>
+          <Link href="/shop" className="hover:text-[#082719]">
+            فروشگاه
+          </Link>
           <span>/</span>
           <span className="text-[#161A1D] font-bold">میز مقایسه محصولات</span>
         </nav>
@@ -126,15 +140,18 @@ function CompareContent() {
         {/* Empty / Prompt Card */}
         <div className="card-popup rounded-2xl p-8 sm:p-12 bg-white border border-[#1c211b]/10 text-center flex flex-col items-center gap-5 shadow-sm">
           <div className="w-16 h-16 rounded-2xl bg-[#EDE8DC] border border-[#1c211b]/10 flex items-center justify-center text-[#082719]">
-            <Scale className="w-8 h-8" />
+            <GitCompare className="w-8 h-8" />
           </div>
 
           <div className="flex flex-col gap-2 max-w-lg">
             <h1 className="text-2xl font-black text-[#161A1D]">
-              {compareCount === 0 ? "هیچ محصولی در لیست مقایسه نیست" : "یک محصول دیگر برای مقایسه اضافه کنید"}
+              {compareCount === 0
+                ? "هیچ محصولی در لیست مقایسه نیست"
+                : "یک محصول دیگر برای مقایسه اضافه کنید"}
             </h1>
             <p className="text-xs sm:text-sm text-[#5A626A] leading-relaxed">
-              برای رسم نمودار چندضلعی، تحلیل نقاط قوت و ضعف و امتیازدهی بخش‌های فنی، لطفاً حداقل 2 محصول (و حداکثر 3 محصول) را انتخاب کنید.
+              برای رسم نمودار چندضلعی، تحلیل نقاط قوت و ضعف و امتیازدهی بخش‌های
+              فنی، لطفاً حداقل 2 محصول (و حداکثر 3 محصول) را انتخاب کنید.
             </p>
           </div>
 
@@ -143,14 +160,24 @@ function CompareContent() {
             <div className="mt-2 flex items-center gap-3 bg-[#FAF7F0] p-3 rounded-2xl border border-[#1c211b]/10 max-w-sm w-full">
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-white border border-[#1c211b]/10 shrink-0">
                 {compareItems[0].imageUrl ? (
-                  <img src={getImageUrl(compareItems[0].imageUrl)} alt={compareItems[0].name} className="w-full h-full object-cover" />
+                  <img
+                    src={getImageUrl(compareItems[0].imageUrl)}
+                    alt={compareItems[0].name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-mono">HIZU</div>
+                  <div className="w-full h-full flex items-center justify-center text-[10px] font-mono">
+                    HIZU
+                  </div>
                 )}
               </div>
               <div className="flex flex-col flex-1 text-right min-w-0">
-                <span className="text-xs font-bold text-[#161A1D] truncate">{compareItems[0].name}</span>
-                <span className="text-[11px] font-mono text-[#082719] font-semibold">{formatPrice(compareItems[0].price)}</span>
+                <span className="text-xs font-bold text-[#161A1D] truncate">
+                  {compareItems[0].name}
+                </span>
+                <span className="text-[11px] font-mono text-[#082719] font-semibold">
+                  {formatPrice(compareItems[0].price)}
+                </span>
               </div>
               <button
                 onClick={() => removeFromCompare(compareItems[0].id)}
@@ -179,9 +206,13 @@ function CompareContent() {
             <div className="flex items-center justify-between border-b border-[#1c211b]/10 pb-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#8f6d2f]" />
-                <h2 className="font-bold text-sm text-[#161A1D]">انتخاب سریع از میان قطعات کارگاه</h2>
+                <h2 className="font-bold text-sm text-[#161A1D]">
+                  انتخاب سریع از میان قطعات کارگاه
+                </h2>
               </div>
-              <span className="text-xs text-[#5A626A]">روی «افزودن به مقایسه» کلیک کنید</span>
+              <span className="text-xs text-[#5A626A]">
+                روی «افزودن به مقایسه» کلیک کنید
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -195,12 +226,20 @@ function CompareContent() {
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#16191d] shrink-0">
                         {prod.imageUrl && (
-                          <img src={getImageUrl(prod.imageUrl)} alt={prod.name} className="w-full h-full object-cover" />
+                          <img
+                            src={getImageUrl(prod.imageUrl)}
+                            alt={prod.name}
+                            className="w-full h-full object-cover"
+                          />
                         )}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[10px] font-mono text-[#0284c7]">{prod.sku}</span>
-                        <h3 className="text-xs font-bold text-[#161A1D] truncate">{prod.name}</h3>
+                        <span className="text-[10px] font-mono text-[#0284c7]">
+                          {prod.sku}
+                        </span>
+                        <h3 className="text-xs font-bold text-[#161A1D] truncate">
+                          {prod.name}
+                        </h3>
                         <span className="text-xs font-mono font-bold text-[#082719] mt-0.5">
                           {formatPrice(prod.price)}
                         </span>
@@ -262,11 +301,17 @@ function CompareContent() {
       {/* Top Breadcrumbs and Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1c211b]/10 pb-4">
         <nav className="flex items-center gap-2 text-xs text-[#5A626A]">
-          <Link href="/" className="hover:text-[#082719]">خانه</Link>
+          <Link href="/" className="hover:text-[#082719]">
+            خانه
+          </Link>
           <span>/</span>
-          <Link href="/shop" className="hover:text-[#082719]">فروشگاه</Link>
+          <Link href="/shop" className="hover:text-[#082719]">
+            فروشگاه
+          </Link>
           <span>/</span>
-          <span className="text-[#161A1D] font-bold">میز مقایسه تخصصی ({toPersianDigits(compareCount)} محصول)</span>
+          <span className="text-[#161A1D] font-bold">
+            میز مقایسه تخصصی ({toPersianDigits(compareCount)} محصول)
+          </span>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -299,12 +344,15 @@ function CompareContent() {
           مقایسه مهندسی و ارزیابی مشخصات محصولات
         </h1>
         <p className="text-xs sm:text-sm text-[#5A626A]">
-          تحلیل چندضلعی، ارزیابی نقاط قوت و ضعف، مقایسه بخش‌به‌بخش ویژگی‌ها و تعیین قطعه برتر طبق داده‌های آزمایشگاهی هیزو.
+          تحلیل چندضلعی، ارزیابی نقاط قوت و ضعف، مقایسه بخش‌به‌بخش ویژگی‌ها و
+          تعیین قطعه برتر طبق داده‌های آزمایشگاهی هیزو.
         </p>
       </div>
 
       {/* 1. Top Product Header Cards Grid */}
-      <div className={`grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-6`}>
+      <div
+        className={`grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-6`}
+      >
         {compareItems.map((item, idx) => (
           <div
             key={item.id}
@@ -334,7 +382,11 @@ function CompareContent() {
             <div className="flex gap-4 items-center">
               <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-[#16191d] shrink-0 border border-[#1c211b]/10">
                 {item.imageUrl ? (
-                  <img src={getImageUrl(item.imageUrl)} alt={item.name} className="w-full h-full object-cover" />
+                  <img
+                    src={getImageUrl(item.imageUrl)}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center font-mono text-xs text-gray-400">
                     HIZU
@@ -349,7 +401,9 @@ function CompareContent() {
                 >
                   {item.name}
                 </Link>
-                <span className="text-[11px] text-[#5A626A] mt-1">{item.categoryName || "قطعات کارگاهی"}</span>
+                <span className="text-[11px] text-[#5A626A] mt-1">
+                  {item.categoryName || "قطعات کارگاهی"}
+                </span>
                 <div className="text-base font-mono font-black text-[#082719] mt-2">
                   {formatPrice(item.price)}
                 </div>
@@ -364,7 +418,9 @@ function CompareContent() {
                 className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#082719] hover:bg-[#16191d] text-white py-2 px-3 rounded-xl text-xs font-bold transition-all shadow-xs disabled:opacity-50"
               >
                 <ShoppingBag className="w-3.5 h-3.5 text-[#dfc79b]" />
-                <span>{item.stockQuantity === 0 ? "ناموجود" : "خرید مستقیم"}</span>
+                <span>
+                  {item.stockQuantity === 0 ? "ناموجود" : "خرید مستقیم"}
+                </span>
               </button>
 
               <Link
@@ -387,7 +443,9 @@ function CompareContent() {
             <div className="w-12 h-12 rounded-full bg-white border border-[#1c211b]/15 flex items-center justify-center text-[#082719] shadow-xs">
               <Plus className="w-6 h-6" />
             </div>
-            <span className="font-bold text-xs text-[#161A1D]">افزودن محصول سوم</span>
+            <span className="font-bold text-xs text-[#161A1D]">
+              افزودن محصول سوم
+            </span>
             <span className="text-[11px] text-[#5A626A] max-w-[200px]">
               می‌توانید یک قطعه دیگر را برای مقایسه سه جانبه انتخاب کنید.
             </span>
@@ -400,13 +458,14 @@ function CompareContent() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1c211b]/10 pb-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <Scale className="w-5 h-5 text-[#082719]" />
+              <GitCompare className="w-5 h-5 text-[#082719]" />
               <h2 className="font-bold text-lg text-[#161A1D]">
                 نمودار چندضلعی مشخصات فنی (Polygon Radar Chart)
               </h2>
             </div>
             <p className="text-xs text-[#5A626A]">
-              تحلیل هندسی 6 بعدی شامل دقت ابعادی، استحکام، ارزش خرید، سبکی، فناوری تولید و موجودی آماده.
+              تحلیل هندسی 6 بعدی شامل دقت ابعادی، استحکام، ارزش خرید، سبکی،
+              فناوری تولید و موجودی آماده.
             </p>
           </div>
 
@@ -443,13 +502,20 @@ function CompareContent() {
             </div>
 
             {/* Pros & Cons Cards Grid below Overlay */}
-            <div className={`w-full grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-6 pt-4 border-t border-[#1c211b]/10`}>
+            <div
+              className={`w-full grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-6 pt-4 border-t border-[#1c211b]/10`}
+            >
               {compareItems.map((item) => {
                 const a = analyses.find((an) => an.productId === item.id)!;
                 return (
-                  <div key={`analysis-${item.id}`} className="bg-[#FAF7F0] rounded-xl p-5 border border-[#1c211b]/10 flex flex-col gap-4">
+                  <div
+                    key={`analysis-${item.id}`}
+                    className="bg-[#FAF7F0] rounded-xl p-5 border border-[#1c211b]/10 flex flex-col gap-4"
+                  >
                     <div className="flex items-center justify-between border-b border-[#1c211b]/08 pb-2">
-                      <span className="font-bold text-xs text-[#161A1D] truncate">{item.name}</span>
+                      <span className="font-bold text-xs text-[#161A1D] truncate">
+                        {item.name}
+                      </span>
                       <span className="font-mono text-xs font-bold text-[#082719]">
                         امتیاز کلی: {toPersianDigits(a.totalScore)} / 60
                       </span>
@@ -463,7 +529,9 @@ function CompareContent() {
                       </span>
                       <ul className="text-xs text-[#161A1D] space-y-1.5 list-disc list-inside">
                         {a.goodPoints.map((pt, i) => (
-                          <li key={i} className="leading-relaxed">{pt}</li>
+                          <li key={i} className="leading-relaxed">
+                            {pt}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -476,7 +544,9 @@ function CompareContent() {
                       </span>
                       <ul className="text-xs text-[#5A626A] space-y-1.5 list-disc list-inside">
                         {a.drawbacks.map((dr, i) => (
-                          <li key={i} className="leading-relaxed">{dr}</li>
+                          <li key={i} className="leading-relaxed">
+                            {dr}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -487,7 +557,9 @@ function CompareContent() {
           </div>
         ) : (
           /* Individual Polygon Radar Charts side by side */
-          <div className={`grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-8`}>
+          <div
+            className={`grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-8`}
+          >
             {compareItems.map((item) => {
               const a = analyses.find((an) => an.productId === item.id)!;
               return (
@@ -496,7 +568,9 @@ function CompareContent() {
                   className="flex flex-col items-center gap-5 bg-[#FAF7F0]/60 rounded-2xl p-5 border border-[#1c211b]/10"
                 >
                   <div className="w-full flex items-center justify-between border-b border-[#1c211b]/08 pb-2">
-                    <span className="font-bold text-xs text-[#161A1D] truncate">{item.name}</span>
+                    <span className="font-bold text-xs text-[#161A1D] truncate">
+                      {item.name}
+                    </span>
                     <span className="font-mono text-xs font-bold text-[#082719] bg-white px-2 py-0.5 rounded border border-[#1c211b]/10">
                       {toPersianDigits(a.totalScore)} / 60
                     </span>
@@ -504,7 +578,11 @@ function CompareContent() {
 
                   {/* Polygon Graph */}
                   <div className="w-full max-w-[280px]">
-                    <RadarChart products={[item]} mode="single" activeProductId={item.id} />
+                    <RadarChart
+                      products={[item]}
+                      mode="single"
+                      activeProductId={item.id}
+                    />
                   </div>
 
                   {/* Good points */}
@@ -515,7 +593,9 @@ function CompareContent() {
                     </span>
                     <ul className="text-xs text-[#161A1D] space-y-1.5 list-disc list-inside">
                       {a.goodPoints.map((pt, i) => (
-                        <li key={i} className="leading-relaxed">{pt}</li>
+                        <li key={i} className="leading-relaxed">
+                          {pt}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -528,7 +608,9 @@ function CompareContent() {
                     </span>
                     <ul className="text-xs text-[#5A626A] space-y-1.5 list-disc list-inside">
                       {a.drawbacks.map((dr, i) => (
-                        <li key={i} className="leading-relaxed">{dr}</li>
+                        <li key={i} className="leading-relaxed">
+                          {dr}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -549,7 +631,9 @@ function CompareContent() {
             </h2>
           </div>
           <p className="text-xs text-[#5A626A]">
-            در هر بخش، مشخصات فنی مقایسه شده و امتیازی بین 1 تا 10 به هر محصول اختصاص یافته است. محصول حائز رتبه برتر با نشان طلایی برنده مشخص شده است.
+            در هر بخش، مشخصات فنی مقایسه شده و امتیازی بین 1 تا 10 به هر محصول
+            اختصاص یافته است. محصول حائز رتبه برتر با نشان طلایی برنده مشخص شده
+            است.
           </p>
         </div>
 
@@ -560,8 +644,12 @@ function CompareContent() {
               {/* Section Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-black text-[#161A1D]">{sec.title}</h3>
-                  <p className="text-[11px] text-[#5A626A]">{sec.description}</p>
+                  <h3 className="text-sm font-black text-[#161A1D]">
+                    {sec.title}
+                  </h3>
+                  <p className="text-[11px] text-[#5A626A]">
+                    {sec.description}
+                  </p>
                 </div>
 
                 {/* Section Winner Callout */}
@@ -569,7 +657,8 @@ function CompareContent() {
                   <div className="inline-flex items-center gap-2 bg-[#FAF7F0] border border-[#dfc79b] text-[#8f6d2f] px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto">
                     <Trophy className="w-3.5 h-3.5 text-[#8f6d2f]" />
                     <span>
-                      برنده بخش: {compareItems.find((i) => i.id === sec.winnerId)?.name}
+                      برنده بخش:{" "}
+                      {compareItems.find((i) => i.id === sec.winnerId)?.name}
                     </span>
                   </div>
                 ) : (
@@ -580,7 +669,9 @@ function CompareContent() {
               </div>
 
               {/* Grid of Product Values & Points in this section */}
-              <div className={`grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-4 mt-1`}>
+              <div
+                className={`grid grid-cols-1 md:grid-cols-${compareCount === 2 ? "2" : "3"} gap-4 mt-1`}
+              >
                 {compareItems.map((item) => {
                   const isWinner = sec.winnerId === item.id;
                   const score = sec.scores[item.id];
@@ -596,7 +687,9 @@ function CompareContent() {
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span className="text-xs font-bold text-[#161A1D] truncate">{item.name}</span>
+                        <span className="text-xs font-bold text-[#161A1D] truncate">
+                          {item.name}
+                        </span>
                         {/* Score Badge */}
                         <span
                           className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${
@@ -674,7 +767,9 @@ function CompareContent() {
         {overallResult.winnerItem && (
           <button
             onClick={() => handleAddToCart(overallResult.winnerItem!.id)}
-            disabled={cartLoading || overallResult.winnerItem.stockQuantity === 0}
+            disabled={
+              cartLoading || overallResult.winnerItem.stockQuantity === 0
+            }
             className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-2 bg-[#dfc79b] hover:bg-[#c9b183] text-[#082719] font-black text-xs py-3 px-6 rounded-full transition-all shadow-lg hover:scale-105"
           >
             <ShoppingBag className="w-4 h-4" />
@@ -689,16 +784,23 @@ function CompareContent() {
           <span className="font-mono text-xs font-bold text-[#5A4A3A] tracking-wider uppercase">
             DETAILED TECHNICAL DATASHEET // جدول تفصیلی مشخصات
           </span>
-          <span className="font-mono text-[10px] text-[#0284c7] font-bold">ISO 2768-M COMPLIANT</span>
+          <span className="font-mono text-[10px] text-[#0284c7] font-bold">
+            ISO 2768-M COMPLIANT
+          </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-right text-xs">
             <thead>
               <tr className="border-b border-[#1c211b]/10 bg-[#FAF7F0]">
-                <th className="p-4 font-bold text-[#5A626A] w-1/4">مشخصه فنی</th>
+                <th className="p-4 font-bold text-[#5A626A] w-1/4">
+                  مشخصه فنی
+                </th>
                 {compareItems.map((item) => (
-                  <th key={`th-${item.id}`} className="p-4 font-bold text-[#161A1D]">
+                  <th
+                    key={`th-${item.id}`}
+                    className="p-4 font-bold text-[#161A1D]"
+                  >
                     {item.name}
                   </th>
                 ))}
@@ -706,55 +808,87 @@ function CompareContent() {
             </thead>
             <tbody className="divide-y divide-[#1c211b]/08">
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">کد فنی (SKU)</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  کد فنی (SKU)
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`sku-${item.id}`} className="p-4 font-mono font-bold text-[#0284c7]">
+                  <td
+                    key={`sku-${item.id}`}
+                    className="p-4 font-mono font-bold text-[#0284c7]"
+                  >
                     {item.sku}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">متریال مهندسی</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  متریال مهندسی
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`mat-${item.id}`} className="p-4 font-semibold text-[#161A1D]">
+                  <td
+                    key={`mat-${item.id}`}
+                    className="p-4 font-semibold text-[#161A1D]"
+                  >
                     {item.material || "—"}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">فرآیند و شیوه تولید</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  فرآیند و شیوه تولید
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`tech-${item.id}`} className="p-4 font-semibold text-[#161A1D]">
+                  <td
+                    key={`tech-${item.id}`}
+                    className="p-4 font-semibold text-[#161A1D]"
+                  >
                     {item.technique || "—"}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">تلرانس ابعادی مجاز</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  تلرانس ابعادی مجاز
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`tol-${item.id}`} className="p-4 font-mono font-bold text-[#161A1D]">
+                  <td
+                    key={`tol-${item.id}`}
+                    className="p-4 font-mono font-bold text-[#161A1D]"
+                  >
                     {item.tolerance || "استاندارد کارگاهی"}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">ابعاد هندسی (L×W×H)</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  ابعاد هندسی (L×W×H)
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`dim-${item.id}`} className="p-4 font-mono text-[#161A1D]">
+                  <td
+                    key={`dim-${item.id}`}
+                    className="p-4 font-mono text-[#161A1D]"
+                  >
                     {item.dimensions || "—"}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">وزن قطعه</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  وزن قطعه
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`w-${item.id}`} className="p-4 font-mono font-semibold text-[#161A1D]">
+                  <td
+                    key={`w-${item.id}`}
+                    className="p-4 font-mono font-semibold text-[#161A1D]"
+                  >
                     {item.weight || "—"}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">رنگ و فینیشینگ سطحی</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  رنگ و فینیشینگ سطحی
+                </td>
                 {compareItems.map((item) => (
                   <td key={`col-${item.id}`} className="p-4 text-[#161A1D]">
                     {item.color || "طبیعی متریال"}
@@ -762,15 +896,22 @@ function CompareContent() {
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">قیمت قطعه</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  قیمت قطعه
+                </td>
                 {compareItems.map((item) => (
-                  <td key={`pr-${item.id}`} className="p-4 font-mono font-bold text-[#082719]">
+                  <td
+                    key={`pr-${item.id}`}
+                    className="p-4 font-mono font-bold text-[#082719]"
+                  >
                     {formatPrice(item.price)}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">موجودی انبار</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  موجودی انبار
+                </td>
                 {compareItems.map((item) => (
                   <td key={`stk-${item.id}`} className="p-4 text-[#161A1D]">
                     {item.stockQuantity > 0 ? (
@@ -778,13 +919,17 @@ function CompareContent() {
                         موجود ({toPersianDigits(item.stockQuantity)} عدد)
                       </span>
                     ) : (
-                      <span className="text-rose-700 font-bold">ساخت سفارشی</span>
+                      <span className="text-rose-700 font-bold">
+                        ساخت سفارشی
+                      </span>
                     )}
                   </td>
                 ))}
               </tr>
               <tr>
-                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">اقدام خرید</td>
+                <td className="p-4 font-medium text-[#5A626A] bg-[#FAF7F0]/40">
+                  اقدام خرید
+                </td>
                 {compareItems.map((item) => (
                   <td key={`act-${item.id}`} className="p-4">
                     <button
@@ -809,8 +954,10 @@ function CompareContent() {
           <div className="card-popup rounded-2xl bg-white border border-[#1c211b]/10 max-w-xl w-full p-6 flex flex-col gap-4 max-h-[85vh] overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#1c211b]/10 pb-3">
               <div className="flex items-center gap-2">
-                <Scale className="w-4 h-4 text-[#082719]" />
-                <h3 className="font-bold text-sm text-[#161A1D]">انتخاب قطعه برای افزودن به مقایسه</h3>
+                <GitCompare className="w-4 h-4 text-[#082719]" />
+                <h3 className="font-bold text-sm text-[#161A1D]">
+                  انتخاب قطعه برای افزودن به مقایسه
+                </h3>
               </div>
               <button
                 onClick={() => setIsPickerOpen(false)}
@@ -835,12 +982,20 @@ function CompareContent() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#16191d] shrink-0">
                         {prod.imageUrl && (
-                          <img src={getImageUrl(prod.imageUrl)} alt={prod.name} className="w-full h-full object-cover" />
+                          <img
+                            src={getImageUrl(prod.imageUrl)}
+                            alt={prod.name}
+                            className="w-full h-full object-cover"
+                          />
                         )}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-[10px] font-mono text-[#0284c7]">{prod.sku}</span>
-                        <span className="text-xs font-bold text-[#161A1D] truncate">{prod.name}</span>
+                        <span className="text-[10px] font-mono text-[#0284c7]">
+                          {prod.sku}
+                        </span>
+                        <span className="text-xs font-bold text-[#161A1D] truncate">
+                          {prod.name}
+                        </span>
                         <span className="text-xs font-mono text-[#082719] font-semibold mt-0.5">
                           {formatPrice(prod.price)}
                         </span>

@@ -41,12 +41,15 @@ import {
   CheckCircle2,
   XCircle,
   Hash,
+  Eye,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import ArticleEditorModal from "@/components/admin/ArticleEditorModal";
 import CategoryGridModal from "@/components/admin/CategoryGridModal";
 import ProductEditorModal from "@/components/admin/ProductEditorModal";
 import CommentReplyModal from "@/components/admin/CommentReplyModal";
+import OrderDetailModal from "@/components/admin/OrderDetailModal";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -81,6 +84,9 @@ export default function AdminDashboardPage() {
 
   const [editorModalOpen, setEditorModalOpen] = useState(false);
   const [articleToEdit, setArticleToEdit] = useState<Article | null>(null);
+
+  const [orderDetailModalOpen, setOrderDetailModalOpen] = useState(false);
+  const [orderToView, setOrderToView] = useState<Order | null>(null);
 
   // Special order reply state
   const [replyingId, setReplyingId] = useState<string | null>(null);
@@ -300,8 +306,27 @@ export default function AdminDashboardPage() {
   const handleUpdateOrderStatus = async (orderId: string, status: number) => {
     try {
       await adminApi.updateOrderStatus(orderId, status);
-      success("وضعیت سفارش بروزرسانی شد.");
-      loadData();
+      success("وضعیت سفارش و موجودی انبار با موفقیت بروزرسانی شد.");
+      await loadData();
+      setOrderToView((prev) =>
+        prev && prev.id === orderId
+          ? {
+              ...prev,
+              status,
+              isStockDeducted: status === 1 || status === 2 || status === 3,
+              statusText:
+                status === 0
+                  ? "در انتظار پرداخت / تایید"
+                  : status === 1
+                  ? "در حال آماده‌سازی و ساخت"
+                  : status === 2
+                  ? "ارسال شده با پست"
+                  : status === 3
+                  ? "تحویل داده شده به مشتری"
+                  : "لغو شده",
+            }
+          : prev
+      );
     } catch (err: any) {
       error(err.message || "خطا در تغییر وضعیت.");
     }
@@ -947,56 +972,141 @@ export default function AdminDashboardPage() {
 
       {/* ---------------- CONTENT: ORDERS ---------------- */}
       {activeTab === "orders" && (
-        <div className="card-popup rounded-2xl overflow-hidden bg-white border border-[#1c211b]/10">
-          <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
-              <thead className="bg-[#EFE9DC] text-[#5A4A3A] font-mono text-[11px]">
-                <tr>
-                  <th className="p-4">شماره فاکتور</th>
-                  <th className="p-4">نام مشتری</th>
-                  <th className="p-4">اقلام</th>
-                  <th className="p-4">مبلغ فاکتور</th>
-                  <th className="p-4">تاریخ ثبت</th>
-                  <th className="p-4">وضعیت جاری</th>
-                  <th className="p-4">تغییر وضعیت</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#1c211b]/08">
-                {orders.map((o) => (
-                  <tr key={o.id} className="hover:bg-[#FAF7F0] transition-colors">
-                    <td className="p-4 font-mono font-bold text-[#082719]">{o.orderNumber}</td>
-                    <td className="p-4">{o.customerName} ({o.customerEmail})</td>
-                    <td className="p-4">
-                      {o.items.map((i) => (
-                        <div key={i.id} className="font-mono text-[10px] text-[#5A626A]">
-                          {i.productName} × {i.quantity}
-                        </div>
-                      ))}
-                    </td>
-                    <td className="p-4 font-mono font-bold">{formatPrice(o.total)}</td>
-                    <td className="p-4 text-[#5A626A]">{formatDate(o.createdAt)}</td>
-                    <td className="p-4">
-                      <span className="font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded text-[10px]">
-                        {o.statusText}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <select
-                        value={o.status}
-                        onChange={(e) => handleUpdateOrderStatus(o.id, parseInt(e.target.value, 10))}
-                        className="border border-gray-300 rounded px-2 py-1 text-xs bg-white"
-                      >
-                        <option value={0}>در انتظار پرداخت</option>
-                        <option value={1}>در حال ساخت / آماده‌سازی</option>
-                        <option value={2}>ارسال شده</option>
-                        <option value={3}>تحویل شده</option>
-                        <option value={4}>لغو شده</option>
-                      </select>
-                    </td>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#1c211b]/10 shadow-xs">
+            <div>
+              <h3 className="font-bold text-base text-[#161A1D] flex items-center gap-2">
+                <Package className="w-4 h-4 text-[#082719]" />
+                <span>مدیریت و نظارت بر سفارش‌های خرید مشتریان</span>
+              </h3>
+              <p className="text-xs text-[#5A626A] mt-0.5">
+                بررسی اقلام خریداری شده، آدرس تحویل پستی، تایید نهایی سفارش، کسر خودکار از موجودی انبار و چاپ فاکتور
+              </p>
+            </div>
+          </div>
+
+          <div className="card-popup rounded-2xl overflow-hidden bg-white border border-[#1c211b]/10">
+            <div className="overflow-x-auto">
+              <table className="w-full text-right text-xs">
+                <thead className="bg-[#EFE9DC] text-[#5A4A3A] font-mono text-[11px]">
+                  <tr>
+                    <th className="p-4">شماره فاکتور</th>
+                    <th className="p-4">مشخصات خریدار</th>
+                    <th className="p-4">اقلام سفارش</th>
+                    <th className="p-4">وضعیت انبار</th>
+                    <th className="p-4">مبلغ فاکتور</th>
+                    <th className="p-4">تاریخ ثبت</th>
+                    <th className="p-4">وضعیت جاری</th>
+                    <th className="p-4">تغییر وضعیت</th>
+                    <th className="p-4 text-center">عملیات</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-[#1c211b]/08">
+                  {orders.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="p-8 text-center text-[#5A626A]">
+                        هیچ سفارشی در سیستم ثبت نشده است.
+                      </td>
+                    </tr>
+                  ) : (
+                    orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-[#FAF7F0] transition-colors">
+                        <td className="p-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrderToView(o);
+                              setOrderDetailModalOpen(true);
+                            }}
+                            className="font-mono font-bold text-[#082719] hover:text-[#0284c7] hover:underline flex items-center gap-1.5"
+                          >
+                            <span>{o.orderNumber}</span>
+                          </button>
+                        </td>
+                        <td className="p-4">
+                          <div className="font-bold text-[#161A1D]">{o.customerName || "کاربر مهمان"}</div>
+                          {o.customerPhone ? (
+                            <div className="font-mono text-[11px] text-[#0284c7] dir-ltr mt-0.5">
+                              {o.customerPhone}
+                            </div>
+                          ) : o.customerEmail ? (
+                            <div className="font-mono text-[10px] text-[#5A626A] dir-ltr mt-0.5 line-clamp-1">
+                              {o.customerEmail}
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className="p-4 max-w-[200px]">
+                          {o.items.map((i) => (
+                            <div key={i.id} className="font-mono text-[11px] text-[#5A626A] line-clamp-1">
+                              {i.productName} × {toPersianDigits(i.quantity)}
+                            </div>
+                          ))}
+                        </td>
+                        <td className="p-4">
+                          {o.isStockDeducted ? (
+                            <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full text-[10px]">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>کسر از انبار</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full text-[10px]">
+                              <AlertTriangle className="w-3 h-3" />
+                              <span>در انتظار تایید</span>
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-4 font-mono font-bold text-[#082719]">{formatPrice(o.total)}</td>
+                        <td className="p-4 text-[#5A626A]">{formatDate(o.createdAt)}</td>
+                        <td className="p-4">
+                          <span
+                            className={`font-bold px-2 py-0.5 rounded text-[10px] border ${
+                              o.status === 0
+                                ? "bg-amber-100 text-amber-800 border-amber-300"
+                                : o.status === 1
+                                ? "bg-blue-100 text-blue-800 border-blue-300"
+                                : o.status === 2
+                                ? "bg-purple-100 text-purple-800 border-purple-300"
+                                : o.status === 3
+                                ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                                : "bg-rose-100 text-rose-800 border-rose-300"
+                            }`}
+                          >
+                            {o.statusText}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <select
+                            value={o.status}
+                            onChange={(e) => handleUpdateOrderStatus(o.id, parseInt(e.target.value, 10))}
+                            className="border border-gray-300 rounded-lg px-2.5 py-1 text-xs bg-white cursor-pointer focus:outline-none focus:border-[#082719]"
+                          >
+                            <option value={0}>در انتظار پرداخت / تایید</option>
+                            <option value={1}>در حال ساخت (کسر انبار)</option>
+                            <option value={2}>ارسال شده با پست</option>
+                            <option value={3}>تحویل شده به مشتری</option>
+                            <option value={4}>لغو شده (برگشت موجودی)</option>
+                          </select>
+                        </td>
+                        <td className="p-4 text-center">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrderToView(o);
+                              setOrderDetailModalOpen(true);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF7F0] hover:bg-[#EDE8DC] text-[#082719] font-bold border border-[#1c211b]/15 transition-all text-[11px]"
+                            title="مشاهده جزئیات کامل سفارش"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-[#0284c7]" />
+                            <span>جزئیات</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -1406,6 +1516,17 @@ export default function AdminDashboardPage() {
         }}
         onSave={handleSaveArticle}
         articleToEdit={articleToEdit}
+      />
+
+      {/* Order Detail & Inventory Commitment Modal */}
+      <OrderDetailModal
+        isOpen={orderDetailModalOpen}
+        onClose={() => {
+          setOrderDetailModalOpen(false);
+          setOrderToView(null);
+        }}
+        order={orderToView}
+        onUpdateStatus={handleUpdateOrderStatus}
       />
     </div>
   );

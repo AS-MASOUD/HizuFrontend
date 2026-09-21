@@ -15,7 +15,6 @@ import {
   ChevronDown,
   LogOut,
   Package,
-  Scale,
   Layers,
   Wrench,
   Sparkles,
@@ -24,6 +23,7 @@ import {
   MapPin,
   LayoutGrid,
   GraduationCap,
+  GitCompare,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCart } from "@/providers/CartProvider";
@@ -163,10 +163,13 @@ export default function Header() {
         {/* Right: Brand Logo & Search Bar */}
         <div className="flex items-center gap-4 lg:gap-6 flex-1 max-w-2xl">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0 interactive-bump">
+          <Link
+            href="/"
+            className="flex items-center gap-3 group shrink-0 interactive-bump"
+          >
             <div className="w-10 h-10 rounded-xl bg-[#082719] flex items-center justify-center p-2 shadow-md border border-[#082719]/20 transition-transform group-hover:scale-105 text-[#dfc79b] font-mono font-bold text-lg shrink-0">
               <img
-                src="/Hizu-logo.svg"
+                src="/images/Hizu-logo.svg"
                 alt="هیزو"
                 className="w-full h-full object-contain"
               />
@@ -253,7 +256,9 @@ export default function Header() {
                 {/* User Profile Info Header */}
                 <div className="px-4 py-3 border-b border-[#1c211b]/08 bg-[#FAF7F0]/80 rounded-t-xl">
                   <div className="text-xs font-bold text-[#161A1D] truncate">
-                    {user?.fullName || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "کاربر گرامی"}
+                    {user?.fullName ||
+                      `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                      "کاربر گرامی"}
                   </div>
                   <div className="text-[11px] font-mono text-[#5A626A] truncate dir-ltr text-right">
                     {user?.email}
@@ -287,7 +292,9 @@ export default function Header() {
                     >
                       <div className="flex items-center gap-2.5">
                         <ShieldAlert className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>پنل مدیریت {isSysManager ? "ارشد" : "ادمین"}</span>
+                        <span>
+                          پنل مدیریت {isSysManager ? "ارشد" : "ادمین"}
+                        </span>
                       </div>
                       <span className="text-[9px] bg-emerald-100 text-emerald-800 font-mono px-1.5 py-0.5 rounded">
                         {isSysManager ? "SYS" : "ADMIN"}
@@ -335,7 +342,7 @@ export default function Header() {
                     className="flex items-center justify-between px-4 py-2.5 text-xs text-[#161A1D] hover:bg-[#FAF7F0] font-medium transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Scale className="w-4 h-4 text-[#5A626A] shrink-0" />
+                      <GitCompare className="w-4 h-4 text-[#5A626A] shrink-0" />
                       <span>میز مقایسه</span>
                     </div>
                     {compareCount > 0 && (
@@ -509,7 +516,9 @@ export default function Header() {
             title="مشاهده نشانی کارگاه و مراجعه حضوری"
           >
             <MapPin className="w-3.5 h-3.5 text-[#8f6d2f] group-hover:scale-110 transition-transform shrink-0" />
-            <span className="text-[11px] font-semibold text-[#161A1D]">کارگاه مرکزی: تهران</span>
+            <span className="text-[11px] font-semibold text-[#161A1D]">
+              کارگاه مرکزی: تهران
+            </span>
           </Link>
         </div>
       </div>
@@ -526,7 +535,9 @@ export default function Header() {
           {isAuthenticated && (
             <div className="p-3 bg-[#FAF7F0] rounded-xl border border-[#1c211b]/10 flex flex-col gap-1">
               <div className="text-xs font-bold text-[#161A1D]">
-                {user?.fullName || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "کاربر گرامی"}
+                {user?.fullName ||
+                  `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                  "کاربر گرامی"}
               </div>
               <div className="text-[11px] font-mono text-[#5A626A] dir-ltr text-right">
                 {user?.email}
@@ -601,7 +612,9 @@ export default function Header() {
                 />
               </button>
 
-              <div className={`accordion-grid ${mobileCategoriesOpen ? "open" : ""}`}>
+              <div
+                className={`accordion-grid ${mobileCategoriesOpen ? "open" : ""}`}
+              >
                 <div className="accordion-inner">
                   <div className="p-2 flex flex-col gap-1 bg-white">
                     <Link
@@ -622,7 +635,9 @@ export default function Header() {
                         {cat.icon}
                         <div className="flex flex-col">
                           <span>{cat.title}</span>
-                          <span className="text-[10px] text-[#5A626A]">{cat.desc}</span>
+                          <span className="text-[10px] text-[#5A626A]">
+                            {cat.desc}
+                          </span>
                         </div>
                       </Link>
                     ))}
@@ -673,7 +688,7 @@ export default function Header() {
                   className="px-4 py-2 text-sm font-medium rounded-xl text-[#161A1D] hover:bg-[#EDE8DC] flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2">
-                    <Scale className="w-4 h-4 text-[#5A626A]" />
+                    <GitCompare className="w-4 h-4 text-[#5A626A]" />
                     <span>میز مقایسه قطعات</span>
                   </div>
                   {compareCount > 0 && (
