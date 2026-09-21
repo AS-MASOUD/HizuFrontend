@@ -24,6 +24,12 @@ import {
   LayoutGrid,
   GraduationCap,
   GitCompare,
+  ChevronLeft,
+  Printer,
+  Cpu,
+  Zap,
+  Box,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCart } from "@/providers/CartProvider";
@@ -51,6 +57,24 @@ function getCategoryIcon(slug: string) {
   }
 }
 
+interface SubCategoryItem {
+  title: string;
+  desc: string;
+  slug?: string;
+  href?: string;
+  icon: React.ReactNode;
+}
+
+interface MainCategoryGroup {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  badge?: string;
+  defaultSlug?: string;
+  items: SubCategoryItem[];
+}
+
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -60,6 +84,8 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
+  const [activeMainCatId, setActiveMainCatId] = useState("industrial-machines");
+  const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>("industrial-machines");
   const [searchQuery, setSearchQuery] = useState("");
   const [dynamicCategories, setDynamicCategories] = useState<Category[]>([]);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -112,6 +138,139 @@ export default function Header() {
     desc: c.description || "",
     slug: c.slug,
   }));
+
+  const categoryGroups: MainCategoryGroup[] = [
+    {
+      id: "industrial-machines",
+      title: "دستگاه‌های صنعتی",
+      subtitle: "پرینترهای سه‌بعدی، برش لیزر و CNC کارگاهی",
+      icon: <Printer className="w-4 h-4 text-[#0284c7]" />,
+      badge: "تخصصی",
+      defaultSlug: "3d-printing",
+      items: [
+        {
+          title: "پرینتر سه بعدی",
+          desc: "پرینترهای صنعتی دقیق FDM، رزینی SLA و نایلون کربن SLS",
+          slug: "3d-printing",
+          icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
+        },
+        {
+          title: "دستگاه برش لیزر",
+          desc: "برش و حکاکی فایبر و CO2 انواع ورق‌های فلزی، استیل، چوب و پلکسی",
+          slug: "laser-cutting",
+          icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
+        },
+        {
+          title: "دستگاه فرز و CNC",
+          desc: "ماشین‌کاری ۳ و ۵ محوره فلزات سبک، برنج، چوب و قالب‌های صنعتی",
+          slug: "cnc-machining",
+          icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
+        },
+        {
+          title: "دستگاه اسکنر سه بعدی",
+          desc: "اسکنرهای نوری و لیزری صنعتی با دقت بالا جهت مهندسی معکوس",
+          slug: "3d-printing",
+          icon: <Scan className="w-4 h-4 text-[#0284c7]" />,
+        },
+        {
+          title: "تجهیزات و ابزار دقیق",
+          desc: "واحدهای شستشو، کیورینگ اشعه UV، کالیبراسیون و کنترل ابعادی",
+          slug: "tools-accessories",
+          icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+        },
+      ],
+    },
+    {
+      id: "workshop-services",
+      title: "خدمات کارگاهی و ساخت",
+      subtitle: "پرینت سفارشی، برش لیزر، فرزکاری و طراحی CAD",
+      icon: <Cpu className="w-4 h-4 text-[#082719]" />,
+      defaultSlug: "3d-printing",
+      items: [
+        {
+          title: "خدمات پرینت سه‌بعدی صنعتی",
+          desc: "نمونه‌سازی سریع و تولید قطعات نهایی با پلیمرهای مقاوم مهندسی",
+          slug: "3d-printing",
+          icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
+        },
+        {
+          title: "خدمات برش و حکاکی لیزری",
+          desc: "برش فوق‌سریع ورق‌های فولادی، آلومینیوم، پلکسی و ام‌دی‌اف",
+          slug: "laser-cutting",
+          icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
+        },
+        {
+          title: "ماشین‌کاری قطعات CNC",
+          desc: "فرزکاری قطعات آلومینیوم هوایی 7075 و شمش برنج با تلورانس دقیق",
+          slug: "cnc-machining",
+          icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
+        },
+        {
+          title: "طراحی صنعتی و مهندسی معکوس",
+          desc: "مدل‌سازی تخصصی CAD/CAM، بهینه‌سازی توپولوژی و محاسبات مکانیکی",
+          href: "/services",
+          icon: <Zap className="w-4 h-4 text-[#8f6d2f]" />,
+        },
+      ],
+    },
+    {
+      id: "tools-accessories",
+      title: "ابزارآلات و ملزومات",
+      subtitle: "ابزارهای اندازه‌گیری، تجهیزات کارگاه و اکسسوری",
+      icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
+      defaultSlug: "tools-accessories",
+      items: [
+        {
+          title: "اکسسوری و تجهیزات رومیزی",
+          desc: "کیس‌های مکانیکال، پایه‌های ارگونومیک مانیتور و المان‌های کارگاهی",
+          slug: "tools-accessories",
+          icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
+        },
+        {
+          title: "ابزارهای اندازه‌گیری دقیق",
+          desc: "کولیس‌های دیجیتال، میکرومتر دقیق و گیج‌های تلورانس صنعتی",
+          slug: "tools-accessories",
+          icon: <SlidersHorizontal className="w-4 h-4 text-[#8f6d2f]" />,
+        },
+        {
+          title: "تیغه‌ها و ابزار فرزکاری CNC",
+          desc: "اندمیل‌های کاربایدی، تیغه‌های روکش‌دار تیتانیوم و متعلقات ابزارگیر",
+          slug: "cnc-machining",
+          icon: <Wrench className="w-4 h-4 text-[#5A626A]" />,
+        },
+      ],
+    },
+    {
+      id: "custom-parts",
+      title: "قطعات مکاترونیک و رباتیک",
+      subtitle: "شاسی‌های ربات، گریپر، بازوهای مکانیکی و چرخ‌دنده",
+      icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+      defaultSlug: "custom-parts",
+      items: [
+        {
+          title: "گریپرهای رباتیک و اتصالات",
+          desc: "گریپرهای سبک‌سازی شده مهندسی، براکت‌ها و لینک‌های حرکتی",
+          slug: "custom-parts",
+          icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+        },
+        {
+          title: "چرخ‌دنده‌ها و مکانیزم‌های حرکتی",
+          desc: "طراحی و ساخت چرخ‌دنده‌های دقیق مدولار و پولی‌های تایمینگ",
+          slug: "custom-parts",
+          icon: <Box className="w-4 h-4 text-[#0284c7]" />,
+        },
+        {
+          title: "سفارش ساخت قطعات ویژه",
+          desc: "تولید سفارشی انواع قطعات صنعتی نامتعارف طبق نقشه‌های شما",
+          href: "/special-orders",
+          icon: <Sparkles className="w-4 h-4 text-[#dfc79b]" />,
+        },
+      ],
+    },
+  ];
+
+  const activeGroup =
+    categoryGroups.find((g) => g.id === activeMainCatId) || categoryGroups[0];
 
   const standardNavLinks = [
     { href: "/", label: "خانه" },
@@ -399,51 +558,166 @@ export default function Header() {
                 <ChevronDown className="w-3.5 h-3.5 text-[#5A626A] transition-transform duration-300 group-hover/nav:rotate-180" />
               </button>
 
-              {/* Shop Categories Mega Dropdown Menu */}
-              <div className="absolute right-0 top-full pt-1 w-80 opacity-0 translate-y-2 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) z-50">
-                <div className="bg-white rounded-2xl shadow-2xl border border-[#1c211b]/12 p-3 card-popup">
-                  <div className="px-3 py-2 border-b border-[#1c211b]/08 mb-2 flex items-center justify-between">
-                    <span className="font-mono text-[10px] text-[#8f6d2f] font-bold uppercase tracking-wider">
-                      HIZU SHOP CATEGORIES
-                    </span>
+              {/* Shop Categories Mega Dropdown Menu - Extended Menu In Menu */}
+              <div className="absolute right-0 top-full pt-1.5 w-[740px] max-w-[calc(100vw-2rem)] opacity-0 translate-y-2 scale-95 pointer-events-none group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:scale-100 group-hover/nav:pointer-events-auto transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) z-50">
+                <div className="bg-white rounded-2xl shadow-2xl border border-[#1c211b]/12 overflow-hidden card-popup">
+                  {/* Top Header Bar */}
+                  <div className="px-4 py-2.5 bg-[#FAF7F0] border-b border-[#1c211b]/08 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#082719]" />
+                      <span className="font-mono text-[10px] text-[#8f6d2f] font-bold uppercase tracking-wider">
+                        HIZU CATALOG & CATEGORIES
+                      </span>
+                    </div>
                     <Link
                       href="/shop"
-                      className="text-[10px] text-[#0284c7] hover:underline font-medium"
+                      className="text-[11px] text-[#0284c7] hover:text-[#082719] hover:underline font-semibold flex items-center gap-1 transition-colors"
                     >
-                      تمام محصولات
+                      <span>مشاهده همه محصولات کاتالوگ</span>
+                      <ArrowLeft className="w-3.5 h-3.5" />
                     </Link>
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    {shopCategories.map((cat, idx) => (
-                      <Link
-                        key={idx}
-                        href={`/shop?category=${cat.slug}`}
-                        className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#FAF7F0] transition-all group/item text-right"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-[#EDE8DC] border border-[#1c211b]/08 flex items-center justify-center shrink-0 group-hover/item:scale-110 transition-transform">
-                          {cat.icon}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-[#161A1D] group-hover/item:text-[#082719] transition-colors">
-                            {cat.title}
-                          </span>
-                          <span className="text-[10px] text-[#5A626A] font-mono">
-                            {cat.desc}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                  {/* Body: Two columns (Right: Main categories list, Left: Extended Sub-menu) */}
+                  <div className="flex divide-x divide-x-reverse divide-[#1c211b]/08 min-h-[320px]">
+                    {/* Right Column: Main Categories List */}
+                    <div className="w-60 shrink-0 p-2.5 flex flex-col gap-1.5 bg-[#FAF7F0]/40">
+                      <span className="px-2.5 py-1 text-[10px] font-bold text-[#5A626A] uppercase tracking-wider">
+                        دسته‌بندی‌های اصلی
+                      </span>
+                      {categoryGroups.map((group) => {
+                        const isActive = group.id === activeGroup.id;
+                        return (
+                          <div
+                            key={group.id}
+                            onMouseEnter={() => setActiveMainCatId(group.id)}
+                            className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all ${
+                              isActive
+                                ? "bg-white text-[#082719] shadow-xs border border-[#1c211b]/08 font-bold"
+                                : "text-[#161A1D] hover:bg-white/70 hover:text-[#082719] font-medium"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div
+                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                                  isActive
+                                    ? "bg-[#082719] text-[#dfc79b]"
+                                    : "bg-[#EDE8DC] text-[#5A626A]"
+                                }`}
+                              >
+                                {group.icon}
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs truncate">
+                                    {group.title}
+                                  </span>
+                                  {group.badge && (
+                                    <span className="text-[9px] bg-sky-100 text-sky-800 font-bold px-1 rounded">
+                                      {group.badge}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <ChevronLeft
+                              className={`w-4 h-4 transition-transform shrink-0 ${
+                                isActive
+                                  ? "text-[#082719] -translate-x-0.5"
+                                  : "text-[#5A626A]/30"
+                              }`}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                  <div className="mt-2 pt-2 border-t border-[#1c211b]/08 text-center">
-                    <Link
-                      href="/shop"
-                      className="inline-flex items-center justify-center gap-2 w-full py-2 bg-[#082719] text-white rounded-xl text-xs font-bold hover:bg-[#16191d] transition-colors shadow-xs"
-                    >
-                      <span>مشاهده همه محصولات هیزو</span>
-                      <ArrowLeft className="w-3.5 h-3.5 text-[#dfc79b]" />
-                    </Link>
+                    {/* Left Column: Extended Sub-Menu */}
+                    <div className="flex-1 p-4 flex flex-col justify-between bg-white">
+                      <div>
+                        {/* Sub-menu Header */}
+                        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#1c211b]/08">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-[#161A1D]">
+                              {activeGroup.title}
+                            </span>
+                            <span className="text-xs text-[#5A626A]">
+                              — {activeGroup.subtitle}
+                            </span>
+                          </div>
+                          {activeGroup.defaultSlug && (
+                            <Link
+                              href={`/shop?category=${activeGroup.defaultSlug}`}
+                              className="text-[11px] font-semibold text-[#8f6d2f] hover:underline flex items-center gap-1 shrink-0"
+                            >
+                              <span>مشاهده این بخش</span>
+                              <ArrowLeft className="w-3 h-3" />
+                            </Link>
+                          )}
+                        </div>
+
+                        {/* Sub-menu Items Grid */}
+                        <div className="grid grid-cols-2 gap-2.5">
+                          {activeGroup.items.map((item, idx) => {
+                            const linkHref =
+                              item.href ||
+                              (item.slug
+                                ? `/shop?category=${item.slug}`
+                                : "/shop");
+                            const dynamicMatch = item.slug
+                              ? dynamicCategories.find(
+                                  (c) => c.slug === item.slug
+                                )
+                              : null;
+                            const count = dynamicMatch?.productCount;
+
+                            return (
+                              <Link
+                                key={idx}
+                                href={linkHref}
+                                className="group/sub p-2.5 rounded-xl border border-[#1c211b]/06 hover:border-[#082719]/30 hover:bg-[#FAF7F0]/60 transition-all flex items-start gap-2.5 text-right interactive-bump"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-[#EDE8DC]/70 border border-[#1c211b]/08 flex items-center justify-center shrink-0 group-hover/sub:bg-[#082719] group-hover/sub:text-[#dfc79b] transition-colors mt-0.5">
+                                  {item.icon}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="text-xs font-bold text-[#161A1D] group-hover/sub:text-[#082719] transition-colors">
+                                      {item.title}
+                                    </span>
+                                    {count !== undefined && count > 0 && (
+                                      <span className="text-[10px] text-[#8f6d2f] font-mono shrink-0">
+                                        {toPersianDigits(count)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[10px] text-[#5A626A] line-clamp-2 mt-0.5 leading-relaxed">
+                                    {item.desc}
+                                  </span>
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Extended Menu Quick Bottom Banner */}
+                      <div className="mt-4 pt-3 border-t border-[#1c211b]/08 flex items-center justify-between text-xs bg-[#FAF7F0]/70 rounded-xl px-3 py-2">
+                        <div className="flex items-center gap-2 text-[#5A626A]">
+                          <Sparkles className="w-3.5 h-3.5 text-[#dfc79b] shrink-0" />
+                          <span className="text-[11px]">
+                            سفارش ساخت قطعه یا دستگاه صنعتی اختصاصی
+                          </span>
+                        </div>
+                        <Link
+                          href="/special-orders"
+                          className="text-[11px] font-bold text-[#082719] hover:underline flex items-center gap-1 shrink-0"
+                        >
+                          <span>ثبت سفارش ویژه</span>
+                          <ArrowLeft className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -582,31 +856,78 @@ export default function Header() {
                 className={`accordion-grid ${mobileCategoriesOpen ? "open" : ""}`}
               >
                 <div className="accordion-inner">
-                  <div className="p-2 flex flex-col gap-1 bg-white">
+                  <div className="p-2 flex flex-col gap-1.5 bg-white">
                     <Link
                       href="/shop"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="px-3 py-2 text-xs font-bold rounded-lg text-[#082719] bg-[#EDE8DC]/50 hover:bg-[#EDE8DC] flex items-center justify-between"
+                      className="px-3 py-2 text-xs font-bold rounded-lg text-[#082719] bg-[#EDE8DC]/60 hover:bg-[#EDE8DC] flex items-center justify-between"
                     >
                       <span>همه محصولات کاتالوگ</span>
                       <ArrowLeft className="w-3.5 h-3.5 text-[#082719]" />
                     </Link>
-                    {shopCategories.map((cat, idx) => (
-                      <Link
-                        key={idx}
-                        href={`/shop?category=${cat.slug}`}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="px-3 py-2 text-xs font-medium rounded-lg text-[#161A1D] hover:bg-[#FAF7F0] flex items-center gap-2.5"
-                      >
-                        {cat.icon}
-                        <div className="flex flex-col">
-                          <span>{cat.title}</span>
-                          <span className="text-[10px] text-[#5A626A]">
-                            {cat.desc}
-                          </span>
+
+                    {categoryGroups.map((group) => {
+                      const isExpanded = mobileExpandedCat === group.id;
+                      return (
+                        <div
+                          key={group.id}
+                          className="border border-[#1c211b]/08 rounded-xl overflow-hidden"
+                        >
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setMobileExpandedCat(isExpanded ? null : group.id)
+                            }
+                            className="w-full px-3 py-2 text-xs font-bold flex items-center justify-between bg-[#FAF7F0]/60 hover:bg-[#EDE8DC] transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              {group.icon}
+                              <span>{group.title}</span>
+                              {group.badge && (
+                                <span className="text-[9px] bg-sky-100 text-sky-800 font-bold px-1 rounded">
+                                  {group.badge}
+                                </span>
+                              )}
+                            </div>
+                            <ChevronDown
+                              className={`w-3.5 h-3.5 text-[#5A626A] transition-transform duration-300 ${
+                                isExpanded ? "rotate-180 text-[#082719]" : ""
+                              }`}
+                            />
+                          </button>
+
+                          {isExpanded && (
+                            <div className="p-1.5 flex flex-col gap-1 bg-white border-t border-[#1c211b]/06">
+                              {group.items.map((item, subIdx) => {
+                                const linkHref =
+                                  item.href ||
+                                  (item.slug
+                                    ? `/shop?category=${item.slug}`
+                                    : "/shop");
+                                return (
+                                  <Link
+                                    key={subIdx}
+                                    href={linkHref}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="px-2.5 py-2 rounded-lg text-xs hover:bg-[#FAF7F0] flex items-center justify-between text-[#161A1D] transition-colors"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-5 h-5 rounded bg-[#EDE8DC]/60 flex items-center justify-center shrink-0">
+                                        {item.icon}
+                                      </div>
+                                      <span className="font-semibold text-[11px]">
+                                        {item.title}
+                                      </span>
+                                    </div>
+                                    <ArrowLeft className="w-3 h-3 text-[#5A626A]" />
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                      </Link>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
