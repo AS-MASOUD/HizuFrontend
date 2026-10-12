@@ -44,8 +44,8 @@ function LoginForm() {
     }
   }, [isAdmin, router]);
 
-  // Mode: 'otp' | 'password'
-  const [authMode, setAuthMode] = useState<"otp" | "password">("otp");
+  // Mode: 'password' (OTP temporarily disabled)
+  const [authMode, setAuthMode] = useState<"otp" | "password">("password");
 
   // OTP State
   const [otpStep, setOtpStep] = useState<"input" | "verify">("input");
@@ -204,18 +204,6 @@ function LoginForm() {
         <div className="grid grid-cols-2 p-1 bg-[#FAF7F0] rounded-xl border border-[#1c211b]/10 text-xs font-bold">
           <button
             type="button"
-            onClick={() => setAuthMode("otp")}
-            className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-              authMode === "otp"
-                ? "bg-[#082719] text-[#dfc79b] shadow-sm"
-                : "text-[#5A626A] hover:text-[#161A1D]"
-            }`}
-          >
-            <Smartphone className="w-4 h-4" />
-            <span>کد یک‌بار مصرف (پیامک)</span>
-          </button>
-          <button
-            type="button"
             onClick={() => setAuthMode("password")}
             className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
               authMode === "password"
@@ -224,7 +212,19 @@ function LoginForm() {
             }`}
           >
             <KeyRound className="w-4 h-4" />
-            <span>کلمه عبور</span>
+            <span>ورود با کلمه عبور</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAuthMode("otp")}
+            className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              authMode === "otp"
+                ? "bg-[#082719] text-[#dfc79b] shadow-sm"
+                : "text-[#5A626A] hover:text-[#161A1D]"
+            }`}
+          >
+            <Smartphone className="w-4 h-4" />
+            <span>کد یک‌بار مصرف</span>
           </button>
         </div>
 
