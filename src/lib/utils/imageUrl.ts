@@ -8,6 +8,26 @@ export function getImageUrl(pathOrUrl?: string | null): string {
   // Normalize Windows backslashes
   const normalized = pathOrUrl.trim().replace(/\\/g, "/");
 
+  // Intercept any Unsplash or external slow image URLs to prevent network timeouts in Iran
+  if (normalized.includes("images.unsplash.com") || normalized.includes("unsplash.com")) {
+    const localFallbacks = [
+      "/images/workshop-1.jpg",
+      "/images/workshop-2.jpg",
+      "/images/workshop-3.jpg",
+      "/images/workshop-4.jpg",
+      "/images/cnc-facility.jpg",
+      "/images/product-placeholder.webp",
+      "/images/product-placeholder-2.webp",
+    ];
+    let hash = 0;
+    for (let i = 0; i < normalized.length; i++) {
+      hash = (hash << 5) - hash + normalized.charCodeAt(i);
+      hash |= 0;
+    }
+    const idx = Math.abs(hash) % localFallbacks.length;
+    return localFallbacks[idx];
+  }
+
   // If already absolute or blob/data URL
   if (
     normalized.startsWith("http://") ||

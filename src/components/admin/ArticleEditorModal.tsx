@@ -35,19 +35,19 @@ interface ArticleEditorModalProps {
 const PRESET_IMAGES = [
   {
     label: "پرینتر 3بعدی صنعتی",
-    url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+    url: "/images/workshop-1.jpg",
   },
   {
     label: "ماشین‌کاری CNC",
-    url: "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?auto=format&fit=crop&w=1200&q=80",
+    url: "/images/cnc-facility.jpg",
   },
   {
     label: "طراحی محصول و مکاترونیک",
-    url: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80",
+    url: "/images/workshop-2.jpg",
   },
   {
     label: "متریال و رول‌های فیلامنت",
-    url: "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=1200&q=80",
+    url: "/images/workshop-3.jpg",
   },
 ];
 

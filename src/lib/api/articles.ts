@@ -108,7 +108,7 @@ export const articlesApi = {
       slug: slug || "article-" + Date.now(),
       summary: dto.summary.trim(),
       content: dto.content,
-      coverImage: dto.coverImage || "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+      coverImage: dto.coverImage || "/images/workshop-1.jpg",
       category: dto.category || "پرینت 3بعدی",
       tags: dto.tags || ["تکنولوژی", "ساخت"],
       author: dto.author || "کارشناس فنی هیزو",

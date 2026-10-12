@@ -120,7 +120,7 @@ export default async function AboutPage() {
 
         <div className="lg:col-span-5 relative h-72 sm:h-96 rounded-2xl overflow-hidden shadow-lg border border-[#1c211b]/10 bg-[#082719]">
           <img
-            src="https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80"
+            src="/images/cnc-facility.jpg"
             alt="کارگاه و آتلیه ساخت دیجیتال هیزو"
             className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-700"
           />
