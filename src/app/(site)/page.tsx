@@ -1,10 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { productsApi } from "@/lib/api/products";
-import {
-  contentApi,
-  HomeContent,
-} from "@/lib/api/content";
+import { contentApi, HomeContent } from "@/lib/api/content";
 import ProductCard from "@/components/product/ProductCard";
 import FeaturedProductsSection from "@/components/home/FeaturedProductsSection";
 import HeroSlideshow from "@/components/home/HeroSlideshow";
@@ -100,7 +97,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           <div className="lg:col-span-6 flex flex-col gap-6 order-2 lg:order-1">
             {/* High-tech protocol badge with glaze sheen and subtle float */}
-            <div className="inline-flex items-center gap-2.5 self-start bg-[#FFFFFF] border border-[#1c211b]/12 rounded-full px-4 py-1.5 text-xs font-mono font-semibold text-[#161A1D] shadow-[0_2px_10px_rgba(28,33,27,0.06)] glaze-shimmer animate-subtle-float">
+            {/* <div className="inline-flex items-center gap-2.5 self-start bg-[#FFFFFF] border border-[#1c211b]/12 rounded-full px-4 py-1.5 text-xs font-mono font-semibold text-[#161A1D] shadow-[0_2px_10px_rgba(28,33,27,0.06)] glaze-shimmer animate-subtle-float">
               <span className="w-2 h-2 rounded-full bg-[#10b981] shadow-[0_0_8px_#10b981] animate-pulse" />
               <span className="tracking-wide text-[#333C44]">
                 HIZU FABRICATION LAB // PROTOCOL 2026
@@ -108,7 +105,7 @@ export default async function HomePage() {
               <span className="text-[#0284c7] text-[10px] pr-2 border-r border-[#1c211b]/15 dir-ltr font-mono">
                 Z: +42.1mm
               </span>
-            </div>
+            </div> */}
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#161A1D] leading-[1.2] tracking-tight">
               <span className="text-[#1F3D2E]">ایده‌ت رو بساز.</span>
@@ -215,9 +212,9 @@ export default async function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-4 flex flex-col gap-4">
-            <span className="font-mono text-xs font-bold text-[#8f6d2f] bg-[#EDE8DC] border border-[#1c211b]/10 px-2.5 py-1 rounded-full uppercase tracking-wider self-start">
+            {/* <span className="font-mono text-xs font-bold text-[#8f6d2f] bg-[#EDE8DC] border border-[#1c211b]/10 px-2.5 py-1 rounded-full uppercase tracking-wider self-start">
               [ SERVICES WE PROVIDE ]
-            </span>
+            </span> */}
             <h2 className="text-3xl sm:text-4xl font-black text-[#161A1D] leading-tight">
               راهکارهای مهندسی.
               <br />
@@ -284,12 +281,12 @@ export default async function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <span className="font-mono text-xs font-bold text-[#8f6d2f] uppercase tracking-wider">
-              [ SELECTED WORK ]
-            </span>
             <h2 className="text-3xl sm:text-4xl font-black text-[#161A1D] mt-1">
               محصولات و پروژه‌های برتر
             </h2>
+            {/* <span className="font-mono text-xs font-bold text-[#8f6d2f] uppercase tracking-wider">
+              [ SELECTED WORK ]
+            </span> */}
           </div>
           <Link
             href="/shop"
@@ -307,9 +304,9 @@ export default async function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-6 sm:px-8">
         <div className="card-popup rounded-2xl p-8 sm:p-10 shadow-[0_14px_34px_-6px_rgba(28,33,27,0.1),0_4px_12px_rgba(0,0,0,0.03)] relative border border-[#1c211b]/10 bg-white glaze-hover">
           <div className="mb-10 text-center sm:text-right">
-            <span className="font-mono text-xs font-bold text-[#8f6d2f] uppercase tracking-wider">
+            {/* <span className="font-mono text-xs font-bold text-[#8f6d2f] uppercase tracking-wider">
               [ OUR PROCESS ]
-            </span>
+            </span> */}
             <h2 className="text-2xl sm:text-3xl font-black text-[#161A1D] mt-1">
               ایده تا تحویل: فرآیند 5 مرحله‌ای مهندسی در هیزو
             </h2>
@@ -354,9 +351,9 @@ export default async function HomePage() {
         <div className="flex flex-col gap-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="font-mono text-xs font-bold text-[#8f6d2f] bg-[#EDE8DC] border border-[#1c211b]/10 px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
+              {/* <span className="font-mono text-xs font-bold text-[#8f6d2f] bg-[#EDE8DC] border border-[#1c211b]/10 px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
                 [ TECHNICAL PROTOCOLS &amp; FAQ ]
-              </span>
+              </span> */}
               <h2 className="text-3xl sm:text-4xl font-black text-[#161A1D]">
                 پرسش‌های متداول و الزامات فنی ساخت
               </h2>
@@ -415,9 +412,9 @@ export default async function HomePage() {
         <div className="relative w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#082719] via-[#103825] to-[#1f3d2e] p-8 sm:p-12 text-[#ffffff] shadow-2xl border border-[#1f3d2e]/40 glaze-shimmer">
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="flex flex-col gap-2 text-center lg:text-right">
-              <span className="font-mono text-xs font-bold text-[#a7f3d0] uppercase tracking-wider">
+              {/* <span className="font-mono text-xs font-bold text-[#a7f3d0] uppercase tracking-wider">
                 READY TO FABRICATE SOMETHING REAL?
-              </span>
+              </span> */}
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#ffffff]">
                 آماده‌اید ایده‌تان را به یک قطعه یا ماشین واقعی تبدیل کنید؟
               </h2>

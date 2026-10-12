@@ -54,15 +54,15 @@ export default function Footer() {
                 <Info className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
+                <h3 className="text-base sm:text-lg font-black text-[#161A1D] group-hover:text-[#082719] transition-colors">
+                  درباره استودیو و آزمایشگاه هیزو
+                </h3>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-[10px] uppercase font-bold text-[#8f6d2f] tracking-wider">
                     ATELIER &amp; CAPACITIES
                   </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#8f6d2f] animate-pulse" />
                 </div>
-                <h3 className="text-base sm:text-lg font-black text-[#161A1D] group-hover:text-[#082719] transition-colors">
-                  درباره استودیو و آزمایشگاه هیزو
-                </h3>
                 <p className="text-xs text-[#5A626A] mt-0.5 line-clamp-1">
                   آشنایی با تاریخچه، پارک ماشین‌آلات 5 محوره CNC و پرینترهای
                   ابعاد صنعتی
@@ -84,15 +84,15 @@ export default function Footer() {
                 <PhoneCall className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
+                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-[#dfc79b] transition-colors">
+                  تماس با ما و مشاوره فنی کارگاه
+                </h3>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-[10px] uppercase font-bold text-[#dfc79b] tracking-wider">
                     DIRECT CONTACT &amp; VISIT
                   </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
-                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-[#dfc79b] transition-colors">
-                  تماس با ما و مشاوره فنی کارگاه
-                </h3>
                 <p className="text-xs text-[#FCF9F1]/80 mt-0.5 line-clamp-1">
                   مشاوره مهندسی ساخت، بررسی نقشه‌های CAD، نشانی کارگاه و تماس
                   تلفنی

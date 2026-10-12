@@ -97,8 +97,18 @@ function renderRichContent(content: string) {
     }
   };
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
   const formatInline = (text: string): string => {
-    return text
+    const escaped = escapeHtml(text);
+    return escaped
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-[#161A1D]">$1</strong>')
       .replace(/\*(.*?)\*/g, '<em class="italic text-[#5A626A]">$1</em>')
       .replace(/`([^`]+)`/g, '<code class="bg-[#FAF7F0] px-1.5 py-0.5 rounded text-[11px] font-mono text-[#082719] border border-[#1c211b]/10">$1</code>');
@@ -219,17 +229,20 @@ function renderRichContent(content: string) {
     const imgMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
     if (imgMatch) {
       const alt = imgMatch[1];
-      const src = imgMatch[2];
-      elements.push(
-        <div key={`img-${i}`} className="my-8 rounded-2xl overflow-hidden border border-[#1c211b]/10 bg-[#FAF7F0] shadow-md">
-          <img src={src} alt={alt} className="w-full max-h-[500px] object-cover" />
-          {alt && (
-            <p className="p-3 text-center text-xs text-[#5A626A] bg-white border-t border-[#1c211b]/08 font-mono">
-              {alt}
-            </p>
-          )}
-        </div>
-      );
+      const rawSrc = imgMatch[2].trim();
+      const isDangerous = /^(javascript|data:text\/html|vbscript):/i.test(rawSrc);
+      if (!isDangerous && rawSrc) {
+        elements.push(
+          <div key={`img-${i}`} className="my-8 rounded-2xl overflow-hidden border border-[#1c211b]/10 bg-[#FAF7F0] shadow-md">
+            <img src={rawSrc} alt={alt} className="w-full max-h-[500px] object-cover" />
+            {alt && (
+              <p className="p-3 text-center text-xs text-[#5A626A] bg-white border-t border-[#1c211b]/08 font-mono">
+                {alt}
+              </p>
+            )}
+          </div>
+        );
+      }
       continue;
     }
 

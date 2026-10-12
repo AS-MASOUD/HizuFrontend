@@ -5,7 +5,11 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm config set fetch-retries 10 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 180000 \
+    && npm config set fetch-timeout 300000 \
+    && (npm ci --maxsockets 3 || npm ci --registry=https://registry.npmmirror.com --maxsockets 3 || npm install --no-audit)
 
 # 3. Builder
 FROM base AS builder

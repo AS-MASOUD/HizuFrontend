@@ -20,10 +20,19 @@ import {
 import { toPersianDigits } from "@/lib/utils/formatters";
 import { OtpInput } from "@/components/ui/OtpInput";
 
+function getSafeRedirect(target: string | null): string {
+  if (!target) return "/";
+  const trimmed = target.trim();
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("://") && !trimmed.startsWith("/\\")) {
+    return trimmed;
+  }
+  return "/";
+}
+
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") || "/";
+  const redirectUrl = getSafeRedirect(searchParams.get("redirect"));
 
   const { register, sendOtp } = useAuth();
   const { error, success } = useToast();
