@@ -46,16 +46,8 @@ export default function HeroSlideshow({ slides = [] }: HeroSlideshowProps = {}) 
     setCurrentIndex(idx);
   };
 
-  if (!slides || slides.length === 0) {
-    return (
-      <div className="w-full h-full min-h-[380px] rounded-2xl bg-[#EDE8DC]/50 border border-[#1c211b]/10 flex items-center justify-center text-xs text-[#5A626A] font-mono">
-        LOADING LAB SLIDESHOW...
-      </div>
-    );
-  }
-
   useEffect(() => {
-    if (isPaused) {
+    if (isPaused || !slides || slides.length === 0) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
@@ -67,7 +59,7 @@ export default function HeroSlideshow({ slides = [] }: HeroSlideshowProps = {}) 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, nextSlide]);
+  }, [isPaused, nextSlide, slides]);
 
   const handleImageLoad = (idx: number) => {
     setLoadedSlides((prev) => {
@@ -76,6 +68,14 @@ export default function HeroSlideshow({ slides = [] }: HeroSlideshowProps = {}) 
       return next;
     });
   };
+
+  if (!slides || slides.length === 0) {
+    return (
+      <div className="w-full h-full min-h-[380px] rounded-2xl bg-[#EDE8DC]/50 border border-[#1c211b]/10 flex items-center justify-center text-xs text-[#5A626A] font-mono">
+        LOADING LAB SLIDESHOW...
+      </div>
+    );
+  }
 
   const currentSlide = slides[currentIndex] || slides[0];
 

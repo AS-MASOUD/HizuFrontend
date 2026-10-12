@@ -19,8 +19,10 @@ export interface LoginPayload {
 export interface OtpSendResult {
   success: boolean;
   message: string;
-  expiresInSeconds: number;
+  cooldownSeconds?: number;
   resendCooldownSeconds?: number;
+  expiresInSeconds?: number;
+  deliveryChannel?: "bale" | "sms" | "email" | string;
 }
 
 export interface VerifyOtpLoginPayload {

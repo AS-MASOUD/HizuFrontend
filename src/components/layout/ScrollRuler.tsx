@@ -71,8 +71,6 @@ export default function ScrollRuler() {
     };
   }, [isDesktop, handleScroll]);
 
-  if (!isDesktop) return null;
-
   const scrollToPercent = useCallback((pct: number) => {
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     const targetY = (pct / 100) * maxScroll;
@@ -111,6 +109,8 @@ export default function ScrollRuler() {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
   };
+
+  if (!isDesktop) return null;
 
   return (
     <aside
