@@ -113,8 +113,8 @@ export default function HeroSlideshow({ slides = [] }: HeroSlideshowProps = {}) 
                 src={slide.src}
                 alt={slide.title}
                 onLoad={() => handleImageLoad(idx)}
-                className={`w-full h-full object-cover filter contrast-[1.08] brightness-[0.93] saturate-[0.92] transition-transform duration-[6000ms] ease-out ${
-                  isActive ? "scale-105" : "scale-100"
+                className={`w-full h-full object-cover transition-transform duration-[6000ms] ease-out will-change-transform ${
+                  isActive ? "sm:scale-105" : "scale-100"
                 }`}
               />
               {/* Cinematic Vignette & Ambient Gradient */}

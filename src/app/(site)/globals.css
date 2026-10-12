@@ -76,8 +76,18 @@
     font-family: 'Kalameh', 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
   body {
-    overscroll-behavior: none;
     background-color: #F7F5EE;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* GPU-composited background layer: fixes severe 10FPS scroll lag on mobile */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
     background-image: 
       radial-gradient(ellipse 70% 40% at 50% -5%, rgba(56, 189, 248, 0.08), transparent 60%),
       radial-gradient(at 15% 25%, rgba(212, 235, 176, 0.15) 0px, transparent 50%),
@@ -85,14 +95,15 @@
       linear-gradient(rgba(28, 33, 27, 0.04) 1px, transparent 1px),
       linear-gradient(90deg, rgba(28, 33, 27, 0.04) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-    background-attachment: fixed;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
-  /* Universal smooth fade on all links, buttons, and form inputs */
+  /* Lightweight transitions: avoid heavy layout/filter recalculation on touch */
   a, button, [role="button"], input, select, textarea {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter;
+    transition-property: color, background-color, border-color, opacity;
     transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    transition-duration: 220ms;
+    transition-duration: 180ms;
   }
 }
 
@@ -360,4 +371,36 @@
     width: 0%;
   }
 }
+
+/* =========================================================================
+   MOBILE & TOUCH PERFORMANCE OPTIMIZATIONS (60-120 FPS SCROLLING)
+   ========================================================================= */
+
+@media (max-width: 768px) {
+  /* Disable heavy infinite sheen gradient on small mobile GPUs */
+  .glaze-shimmer::after {
+    display: none !important;
+  }
+
+  /* Prevent elements from jumping/jerking when thumb touches during scroll */
+  .card-popup-hover:hover,
+  .interactive-bump:hover,
+  .glass-btn-primary:hover,
+  .glass-btn-machined:hover {
+    transform: none !important;
+  }
+
+  /* Native smooth touch scrolling on iOS & Android */
+  html, body {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+}
+
+@media (hover: none) {
+  .interactive-bump:hover {
+    transform: none !important;
+  }
+}
+
 

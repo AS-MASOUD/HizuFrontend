@@ -50,14 +50,28 @@ export default function ScrollRuler() {
     });
   }, []);
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
   useEffect(() => {
+    const updateSize = () => {
+      setIsDesktop(window.innerWidth >= 1280);
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize, { passive: true });
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop) return;
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => {
       window.removeEventListener("scroll", handleScroll);
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
-  }, [handleScroll]);
+  }, [isDesktop, handleScroll]);
+
+  if (!isDesktop) return null;
 
   const scrollToPercent = useCallback((pct: number) => {
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
