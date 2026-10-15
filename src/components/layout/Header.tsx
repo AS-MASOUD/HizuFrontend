@@ -39,22 +39,30 @@ import { toPersianDigits } from "@/lib/utils/formatters";
 import { categoriesApi } from "@/lib/api/categories";
 import { Category } from "@/types";
 
-
-
-function getCategoryIcon(slug: string) {
-  switch (slug) {
-    case "3d-printing":
-      return <Layers className="w-4 h-4 text-[#0284c7]" />;
-    case "cnc-machining":
-      return <Wrench className="w-4 h-4 text-[#8f6d2f]" />;
-    case "laser-cutting":
-      return <Sparkles className="w-4 h-4 text-[#0284c7]" />;
-    case "tools-accessories":
-      return <Package className="w-4 h-4 text-[#8f6d2f]" />;
-    case "custom-parts":
-    default:
-      return <Cog className="w-4 h-4 text-[#5A626A]" />;
+function getCategoryIcon(slug: string, name = ""): React.ReactNode {
+  const s = (slug + " " + name).toLowerCase();
+  if (s.includes("3d") || s.includes("print") || s.includes("پرینت") || s.includes("اسکن")) {
+    return <Layers className="w-4 h-4 text-[#0284c7]" />;
   }
+  if (s.includes("cnc") || s.includes("machin") || s.includes("فرز") || s.includes("تراش") || s.includes("ماشین")) {
+    return <Wrench className="w-4 h-4 text-[#8f6d2f]" />;
+  }
+  if (s.includes("laser") || s.includes("لیزر") || s.includes("برش") || s.includes("حکاکی")) {
+    return <Sparkles className="w-4 h-4 text-[#0284c7]" />;
+  }
+  if (s.includes("tool") || s.includes("ابزار") || s.includes("تجهیز") || s.includes("لوازم")) {
+    return <Package className="w-4 h-4 text-[#8f6d2f]" />;
+  }
+  if (s.includes("robot") || s.includes("مکاترونیک") || s.includes("ربات") || s.includes("الکترونیک")) {
+    return <Cpu className="w-4 h-4 text-[#082719]" />;
+  }
+  if (s.includes("filam") || s.includes("فیلامنت") || s.includes("رزین") || s.includes("resin") || s.includes("مواد")) {
+    return <Box className="w-4 h-4 text-[#0284c7]" />;
+  }
+  if (s.includes("سفارش") || s.includes("خدمات") || s.includes("service")) {
+    return <Zap className="w-4 h-4 text-[#8f6d2f]" />;
+  }
+  return <Cog className="w-4 h-4 text-[#5A626A]" />;
 }
 
 interface SubCategoryItem {
@@ -75,6 +83,200 @@ interface MainCategoryGroup {
   items: SubCategoryItem[];
 }
 
+const defaultCategoryGroups: MainCategoryGroup[] = [
+  {
+    id: "industrial-machines",
+    title: "دستگاه‌های صنعتی",
+    subtitle: "پرینترهای سه‌بعدی، برش لیزر و CNC کارگاهی",
+    icon: <Printer className="w-4 h-4 text-[#0284c7]" />,
+    badge: "تخصصی",
+    defaultSlug: "3d-printing",
+    items: [
+      {
+        title: "پرینتر سه بعدی",
+        desc: "پرینترهای صنعتی دقیق FDM، رزینی SLA و نایلون کربن SLS",
+        slug: "3d-printing",
+        icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
+      },
+      {
+        title: "دستگاه برش لیزر",
+        desc: "برش و حکاکی فایبر و CO2 انواع ورق‌های فلزی، استیل، چوب و پلکسی",
+        slug: "laser-cutting",
+        icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
+      },
+      {
+        title: "دستگاه فرز و CNC",
+        desc: "ماشین‌کاری ۳ و ۵ محوره فلزات سبک، برنج، چوب و قالب‌های صنعتی",
+        slug: "cnc-machining",
+        icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
+      },
+      {
+        title: "دستگاه اسکنر سه بعدی",
+        desc: "اسکنرهای نوری و لیزری صنعتی با دقت بالا جهت مهندسی معکوس",
+        slug: "3d-printing",
+        icon: <Scan className="w-4 h-4 text-[#0284c7]" />,
+      },
+      {
+        title: "تجهیزات و ابزار دقیق",
+        desc: "واحدهای شستشو، کیورینگ اشعه UV، کالیبراسیون و کنترل ابعادی",
+        slug: "tools-accessories",
+        icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+      },
+    ],
+  },
+  {
+    id: "workshop-services",
+    title: "خدمات کارگاهی و ساخت",
+    subtitle: "پرینت سفارشی، برش لیزر، فرزکاری و طراحی CAD",
+    icon: <Cpu className="w-4 h-4 text-[#082719]" />,
+    defaultSlug: "3d-printing",
+    items: [
+      {
+        title: "خدمات پرینت سه‌بعدی صنعتی",
+        desc: "نمونه‌سازی سریع و تولید قطعات نهایی با پلیمرهای مقاوم مهندسی",
+        slug: "3d-printing",
+        icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
+      },
+      {
+        title: "خدمات برش و حکاکی لیزری",
+        desc: "برش فوق‌سریع ورق‌های فولادی، آلومینیوم، پلکسی و ام‌دی‌اف",
+        slug: "laser-cutting",
+        icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
+      },
+      {
+        title: "ماشین‌کاری قطعات CNC",
+        desc: "فرزکاری قطعات آلومینیوم هوایی 7075 و شمش برنج با تلورانس دقیق",
+        slug: "cnc-machining",
+        icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
+      },
+      {
+        title: "طراحی صنعتی و مهندسی معکوس",
+        desc: "مدل‌سازی تخصصی CAD/CAM، بهینه‌سازی توپولوژی و محاسبات مکانیکی",
+        href: "/services",
+        icon: <Zap className="w-4 h-4 text-[#8f6d2f]" />,
+      },
+    ],
+  },
+  {
+    id: "tools-accessories",
+    title: "ابزارآلات و ملزومات",
+    subtitle: "ابزارهای اندازه‌گیری، تجهیزات کارگاه و اکسسوری",
+    icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
+    defaultSlug: "tools-accessories",
+    items: [
+      {
+        title: "اکسسوری و تجهیزات رومیزی",
+        desc: "کیس‌های مکانیکال، پایه‌های ارگونومیک مانیتور و المان‌های کارگاهی",
+        slug: "tools-accessories",
+        icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
+      },
+      {
+        title: "ابزارهای اندازه‌گیری دقیق",
+        desc: "کولیس‌های دیجیتال، میکرومتر دقیق و گیج‌های تلورانس صنعتی",
+        slug: "tools-accessories",
+        icon: <SlidersHorizontal className="w-4 h-4 text-[#8f6d2f]" />,
+      },
+      {
+        title: "تیغه‌ها و ابزار فرزکاری CNC",
+        desc: "اندمیل‌های کاربایدی، تیغه‌های روکش‌دار تیتانیوم و متعلقات ابزارگیر",
+        slug: "cnc-machining",
+        icon: <Wrench className="w-4 h-4 text-[#5A626A]" />,
+      },
+    ],
+  },
+  {
+    id: "custom-parts",
+    title: "قطعات مکاترونیک و رباتیک",
+    subtitle: "شاسی‌های ربات، گریپر، بازوهای مکانیکی و چرخ‌دنده",
+    icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+    defaultSlug: "custom-parts",
+    items: [
+      {
+        title: "گریپرهای رباتیک و اتصالات",
+        desc: "گریپرهای سبک‌سازی شده مهندسی، براکت‌ها و لینک‌های حرکتی",
+        slug: "custom-parts",
+        icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
+      },
+      {
+        title: "چرخ‌دنده‌ها و مکانیزم‌های حرکتی",
+        desc: "طراحی و ساخت چرخ‌دنده‌های دقیق مدولار و پولی‌های تایمینگ",
+        slug: "custom-parts",
+        icon: <Box className="w-4 h-4 text-[#0284c7]" />,
+      },
+      {
+        title: "سفارش ساخت قطعات ویژه",
+        desc: "تولید سفارشی انواع قطعات صنعتی نامتعارف طبق نقشه‌های شما",
+        href: "/special-orders",
+        icon: <Sparkles className="w-4 h-4 text-[#dfc79b]" />,
+      },
+    ],
+  },
+];
+
+function buildCategoryGroups(categories: Category[]): MainCategoryGroup[] {
+  if (!categories || categories.length === 0) {
+    return defaultCategoryGroups;
+  }
+
+  // Filter root categories
+  const rootCats = categories.filter((c) => !c.parentCategoryId || c.parentCategoryId === 0);
+  const targetRoots = rootCats.length > 0 ? rootCats : categories;
+
+  return targetRoots.map((cat) => {
+    // Look for subcategories
+    const subs =
+      cat.subCategories && cat.subCategories.length > 0
+        ? cat.subCategories
+        : categories.filter((c) => c.parentCategoryId === cat.id);
+
+    let items: SubCategoryItem[] = [];
+
+    if (subs.length > 0) {
+      items = subs.map((sub) => ({
+        title: sub.name,
+        desc:
+          sub.description ||
+          (sub.productCount > 0
+            ? `${toPersianDigits(sub.productCount)} محصول موجود در فروشگاه`
+            : "مشاهده محصولات این زیردسته"),
+        slug: sub.slug,
+        icon: getCategoryIcon(sub.slug, sub.name),
+      }));
+    } else {
+      // Direct category entry
+      items = [
+        {
+          title: `همه محصولات ${cat.name}`,
+          desc: cat.description || `مشاهده تمام قطعات و تجهیزات کاتالوگ ${cat.name}`,
+          slug: cat.slug,
+          icon: getCategoryIcon(cat.slug, cat.name),
+        },
+        {
+          title: "سفارش ساخت و ماشین‌کاری اختصاصی",
+          desc: `تولید سفارشی انواع قطعات ${cat.name} طبق نقشه و فایل فنی`,
+          href: "/special-orders",
+          icon: <Sparkles className="w-4 h-4 text-[#dfc79b]" />,
+        },
+      ];
+    }
+
+    return {
+      id: cat.slug || String(cat.id),
+      title: cat.name,
+      subtitle: cat.description || (cat.code ? `کد مهندسی: ${cat.code}` : ""),
+      icon: getCategoryIcon(cat.slug, cat.name),
+      badge:
+        cat.productCount > 0
+          ? `${toPersianDigits(cat.productCount)} کالا`
+          : cat.code
+          ? cat.code
+          : undefined,
+      defaultSlug: cat.slug,
+      items,
+    };
+  });
+}
+
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -84,17 +286,37 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
-  const [activeMainCatId, setActiveMainCatId] = useState("industrial-machines");
-  const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>("industrial-machines");
   const [searchQuery, setSearchQuery] = useState("");
   const [dynamicCategories, setDynamicCategories] = useState<Category[]>([]);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
+  const categoryGroups: MainCategoryGroup[] = React.useMemo(() => {
+    return buildCategoryGroups(dynamicCategories);
+  }, [dynamicCategories]);
+
+  const [activeMainCatId, setActiveMainCatId] = useState<string>("industrial-machines");
+  const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(
+    "industrial-machines",
+  );
+
   useEffect(() => {
+    if (categoryGroups.length > 0 && !categoryGroups.some((g) => g.id === activeMainCatId)) {
+      setActiveMainCatId(categoryGroups[0].id);
+    }
+  }, [categoryGroups, activeMainCatId]);
+
+  useEffect(() => {
+    if (categoryGroups.length > 0 && !categoryGroups.some((g) => g.id === mobileExpandedCat)) {
+      setMobileExpandedCat(categoryGroups[0].id);
+    }
+  }, [categoryGroups, mobileExpandedCat]);
+
+  useEffect(() => {
+    let mounted = true;
     async function loadCats() {
       try {
         const data = await categoriesApi.getCategories(true);
-        if (Array.isArray(data) && data.length > 0) {
+        if (mounted && Array.isArray(data) && data.length > 0) {
           setDynamicCategories(data);
         }
       } catch (err) {
@@ -102,6 +324,18 @@ export default function Header() {
       }
     }
     loadCats();
+
+    const handleUpdate = () => {
+      loadCats();
+    };
+
+    window.addEventListener("hizu:categories-updated", handleUpdate);
+    window.addEventListener("focus", handleUpdate);
+    return () => {
+      mounted = false;
+      window.removeEventListener("hizu:categories-updated", handleUpdate);
+      window.removeEventListener("focus", handleUpdate);
+    };
   }, []);
 
   // Close dropdown when clicking outside
@@ -131,143 +365,6 @@ export default function Header() {
       window.location.href = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
     }
   };
-
-  const shopCategories = dynamicCategories.map((c) => ({
-    icon: getCategoryIcon(c.slug),
-    title: c.name,
-    desc: c.description || "",
-    slug: c.slug,
-  }));
-
-  const categoryGroups: MainCategoryGroup[] = [
-    {
-      id: "industrial-machines",
-      title: "دستگاه‌های صنعتی",
-      subtitle: "پرینترهای سه‌بعدی، برش لیزر و CNC کارگاهی",
-      icon: <Printer className="w-4 h-4 text-[#0284c7]" />,
-      badge: "تخصصی",
-      defaultSlug: "3d-printing",
-      items: [
-        {
-          title: "پرینتر سه بعدی",
-          desc: "پرینترهای صنعتی دقیق FDM، رزینی SLA و نایلون کربن SLS",
-          slug: "3d-printing",
-          icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
-        },
-        {
-          title: "دستگاه برش لیزر",
-          desc: "برش و حکاکی فایبر و CO2 انواع ورق‌های فلزی، استیل، چوب و پلکسی",
-          slug: "laser-cutting",
-          icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
-        },
-        {
-          title: "دستگاه فرز و CNC",
-          desc: "ماشین‌کاری ۳ و ۵ محوره فلزات سبک، برنج، چوب و قالب‌های صنعتی",
-          slug: "cnc-machining",
-          icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
-        },
-        {
-          title: "دستگاه اسکنر سه بعدی",
-          desc: "اسکنرهای نوری و لیزری صنعتی با دقت بالا جهت مهندسی معکوس",
-          slug: "3d-printing",
-          icon: <Scan className="w-4 h-4 text-[#0284c7]" />,
-        },
-        {
-          title: "تجهیزات و ابزار دقیق",
-          desc: "واحدهای شستشو، کیورینگ اشعه UV، کالیبراسیون و کنترل ابعادی",
-          slug: "tools-accessories",
-          icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
-        },
-      ],
-    },
-    {
-      id: "workshop-services",
-      title: "خدمات کارگاهی و ساخت",
-      subtitle: "پرینت سفارشی، برش لیزر، فرزکاری و طراحی CAD",
-      icon: <Cpu className="w-4 h-4 text-[#082719]" />,
-      defaultSlug: "3d-printing",
-      items: [
-        {
-          title: "خدمات پرینت سه‌بعدی صنعتی",
-          desc: "نمونه‌سازی سریع و تولید قطعات نهایی با پلیمرهای مقاوم مهندسی",
-          slug: "3d-printing",
-          icon: <Layers className="w-4 h-4 text-[#0284c7]" />,
-        },
-        {
-          title: "خدمات برش و حکاکی لیزری",
-          desc: "برش فوق‌سریع ورق‌های فولادی، آلومینیوم، پلکسی و ام‌دی‌اف",
-          slug: "laser-cutting",
-          icon: <Sparkles className="w-4 h-4 text-[#0284c7]" />,
-        },
-        {
-          title: "ماشین‌کاری قطعات CNC",
-          desc: "فرزکاری قطعات آلومینیوم هوایی 7075 و شمش برنج با تلورانس دقیق",
-          slug: "cnc-machining",
-          icon: <Wrench className="w-4 h-4 text-[#8f6d2f]" />,
-        },
-        {
-          title: "طراحی صنعتی و مهندسی معکوس",
-          desc: "مدل‌سازی تخصصی CAD/CAM، بهینه‌سازی توپولوژی و محاسبات مکانیکی",
-          href: "/services",
-          icon: <Zap className="w-4 h-4 text-[#8f6d2f]" />,
-        },
-      ],
-    },
-    {
-      id: "tools-accessories",
-      title: "ابزارآلات و ملزومات",
-      subtitle: "ابزارهای اندازه‌گیری، تجهیزات کارگاه و اکسسوری",
-      icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
-      defaultSlug: "tools-accessories",
-      items: [
-        {
-          title: "اکسسوری و تجهیزات رومیزی",
-          desc: "کیس‌های مکانیکال، پایه‌های ارگونومیک مانیتور و المان‌های کارگاهی",
-          slug: "tools-accessories",
-          icon: <Package className="w-4 h-4 text-[#8f6d2f]" />,
-        },
-        {
-          title: "ابزارهای اندازه‌گیری دقیق",
-          desc: "کولیس‌های دیجیتال، میکرومتر دقیق و گیج‌های تلورانس صنعتی",
-          slug: "tools-accessories",
-          icon: <SlidersHorizontal className="w-4 h-4 text-[#8f6d2f]" />,
-        },
-        {
-          title: "تیغه‌ها و ابزار فرزکاری CNC",
-          desc: "اندمیل‌های کاربایدی، تیغه‌های روکش‌دار تیتانیوم و متعلقات ابزارگیر",
-          slug: "cnc-machining",
-          icon: <Wrench className="w-4 h-4 text-[#5A626A]" />,
-        },
-      ],
-    },
-    {
-      id: "custom-parts",
-      title: "قطعات مکاترونیک و رباتیک",
-      subtitle: "شاسی‌های ربات، گریپر، بازوهای مکانیکی و چرخ‌دنده",
-      icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
-      defaultSlug: "custom-parts",
-      items: [
-        {
-          title: "گریپرهای رباتیک و اتصالات",
-          desc: "گریپرهای سبک‌سازی شده مهندسی، براکت‌ها و لینک‌های حرکتی",
-          slug: "custom-parts",
-          icon: <Cog className="w-4 h-4 text-[#5A626A]" />,
-        },
-        {
-          title: "چرخ‌دنده‌ها و مکانیزم‌های حرکتی",
-          desc: "طراحی و ساخت چرخ‌دنده‌های دقیق مدولار و پولی‌های تایمینگ",
-          slug: "custom-parts",
-          icon: <Box className="w-4 h-4 text-[#0284c7]" />,
-        },
-        {
-          title: "سفارش ساخت قطعات ویژه",
-          desc: "تولید سفارشی انواع قطعات صنعتی نامتعارف طبق نقشه‌های شما",
-          href: "/special-orders",
-          icon: <Sparkles className="w-4 h-4 text-[#dfc79b]" />,
-        },
-      ],
-    },
-  ];
 
   const activeGroup =
     categoryGroups.find((g) => g.id === activeMainCatId) || categoryGroups[0];
@@ -666,7 +763,7 @@ export default function Header() {
                                 : "/shop");
                             const dynamicMatch = item.slug
                               ? dynamicCategories.find(
-                                  (c) => c.slug === item.slug
+                                  (c) => c.slug === item.slug,
                                 )
                               : null;
                             const count = dynamicMatch?.productCount;
@@ -748,18 +845,6 @@ export default function Header() {
               );
             })}
           </nav>
-
-          {/* Left: Workshop Location / Contact Pill (like Digikala's انتخاب آدرس) */}
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF7F0] hover:bg-[#EDE8DC] border border-[#1c211b]/10 text-xs text-[#8f6d2f] hover:text-[#082719] font-medium transition-all shadow-2xs group shrink-0"
-            title="مشاهده نشانی کارگاه و مراجعه حضوری"
-          >
-            <MapPin className="w-3.5 h-3.5 text-[#8f6d2f] group-hover:scale-110 transition-transform shrink-0" />
-            <span className="text-[11px] font-semibold text-[#161A1D]">
-              کارگاه مرکزی: تهران
-            </span>
-          </Link>
         </div>
       </div>
 

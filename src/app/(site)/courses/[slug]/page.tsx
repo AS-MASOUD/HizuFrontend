@@ -7,6 +7,8 @@ import { coursesApi } from "@/lib/api/courses";
 import { Course } from "@/types";
 import { formatPrice, toPersianDigits } from "@/lib/utils/formatters";
 import { useCart } from "@/providers/CartProvider";
+import { useAuth } from "@/providers/AuthProvider";
+import { useToast } from "@/providers/ToastProvider";
 import CourseVideoPlayer from "@/components/courses/CourseVideoPlayer";
 import CourseCurriculumAccordion from "@/components/courses/CourseCurriculumAccordion";
 import {
@@ -24,6 +26,7 @@ import {
   Award,
   BookOpen,
   Share2,
+  BookmarkCheck,
 } from "lucide-react";
 
 export default function CourseDetailPage() {
@@ -31,10 +34,13 @@ export default function CourseDetailPage() {
   const router = useRouter();
   const slug = params?.slug as string;
   const { addCourseToCart, loading: cartLoading } = useCart();
+  const { isAuthenticated } = useAuth();
+  const { success, error, info } = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [reserving, setReserving] = useState(false);
 
   useEffect(() => {
     async function loadCourse() {
@@ -63,6 +69,34 @@ export default function CourseDetailPage() {
       // Error handled in toast
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  const handleReserve = async () => {
+    if (!course) return;
+    if (!isAuthenticated) {
+      info("جهت رزرو و پیش‌ثبت‌نام در این دوره، ابتدا وارد حساب کاربری خود شوید.");
+      router.push(`/login?redirect=/courses/${course.slug}`);
+      return;
+    }
+
+    try {
+      setReserving(true);
+      const res = await coursesApi.reserveCourse(course.id);
+      success(res.message || "رزرو و پیش‌ثبت‌نام شما در این دوره با موفقیت ثبت شد.");
+      setCourse((prev) =>
+        prev
+          ? {
+              ...prev,
+              isEnrolled: true,
+              studentsCount: (prev.studentsCount || 0) + 1,
+            }
+          : null
+      );
+    } catch (err: any) {
+      error(err.message || "خطا در ثبت رزرو دوره. لطفاً مجدداً تلاش کنید.");
+    } finally {
+      setReserving(false);
     }
   };
 
@@ -101,8 +135,17 @@ export default function CourseDetailPage() {
     );
   }
 
+  const isReservation =
+    Boolean(course.isReservationOnly) ||
+    course.price === null ||
+    course.price === undefined ||
+    course.price <= 0;
+
   const discountPercent =
-    course.compareAtPrice && course.compareAtPrice > course.price
+    !isReservation &&
+    course.compareAtPrice &&
+    course.price != null &&
+    course.compareAtPrice > course.price
       ? Math.round(((course.compareAtPrice - course.price) / course.compareAtPrice) * 100)
       : null;
 
@@ -129,6 +172,12 @@ export default function CourseDetailPage() {
             <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-[#dfc79b]/20 text-[#dfc79b] border border-[#dfc79b]/30">
               {course.levelTitle}
             </span>
+            {isReservation ? (
+              <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                <span>دوره در حال ضبط (پیش‌ثبت‌نام و رزرو)</span>
+              </span>
+            ) : null}
             {course.isFeatured && (
               <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -338,38 +387,82 @@ export default function CourseDetailPage() {
                 </div>
               )}
 
-              {/* Price Box */}
-              <div className="flex items-baseline justify-between border-b border-[#1c211b]/10 pb-4">
-                <span className="text-xs font-semibold text-[#5A626A]">شهریه دوره:</span>
-                <div className="flex flex-col items-end">
-                  {course.compareAtPrice && course.compareAtPrice > course.price && (
-                    <div className="flex items-center gap-2">
-                      {discountPercent && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
-                          {toPersianDigits(discountPercent)}٪ تخفیف
-                        </span>
-                      )}
-                      <span className="text-xs line-through text-gray-400 font-mono">
-                        {formatPrice(course.compareAtPrice)}
-                      </span>
-                    </div>
-                  )}
-                  <span className="font-mono font-black text-2xl text-[#082719] mt-0.5">
-                    {course.price === 0 ? "رایگان" : formatPrice(course.price)}
-                  </span>
+              {/* Price / Reservation Box */}
+              {isReservation ? (
+                <div className="flex flex-col gap-3 border-b border-[#1c211b]/10 pb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#5A626A]">وضعیت دوره:</span>
+                    <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                      در حال ضبط و تدوین
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xs font-semibold text-[#5A626A]">شهریه دوره:</span>
+                    <span className="font-mono font-bold text-sm text-[#082719]">
+                      رزرو رایگان (تعیین پس از اتمام ضبط)
+                    </span>
+                  </div>
+                  <div className="bg-amber-50/80 border border-amber-200/70 rounded-xl p-3 text-[11px] text-amber-950 leading-relaxed flex items-start gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>
+                      این دوره در حال حاضر در استودیو هیزو در مرحله ضبط و آماده‌سازی است. می‌توانید با رزرو رایگان، صندلی خود را حفظ کرده و به محض آماده‌شدن جلسات و قیمت‌گذاری مطلع شوید.
+                    </span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-baseline justify-between border-b border-[#1c211b]/10 pb-4">
+                  <span className="text-xs font-semibold text-[#5A626A]">شهریه دوره:</span>
+                  <div className="flex flex-col items-end">
+                    {course.compareAtPrice && course.price != null && course.compareAtPrice > course.price && (
+                      <div className="flex items-center gap-2">
+                        {discountPercent && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                            {toPersianDigits(discountPercent)}٪ تخفیف
+                          </span>
+                        )}
+                        <span className="text-xs line-through text-gray-400 font-mono">
+                          {formatPrice(course.compareAtPrice)}
+                        </span>
+                      </div>
+                    )}
+                    <span className="font-mono font-black text-2xl text-[#082719] mt-0.5">
+                      {course.price === 0 || course.price == null ? "رایگان" : formatPrice(course.price)}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Primary Call to Action */}
-              <button
-                type="button"
-                disabled={isAdding || cartLoading}
-                onClick={handleAddToCart}
-                className="w-full py-4 rounded-xl bg-[#082719] hover:bg-[#162b20] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] disabled:opacity-50 interactive-bump glaze-shimmer"
-              >
-                <ShoppingBag className="w-5 h-5 text-[#dfc79b]" />
-                <span>افزودن به سبد خرید و ثبت‌نام</span>
-              </button>
+              {course.isEnrolled ? (
+                <div className="w-full py-3.5 px-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold text-xs flex items-center justify-center gap-2 text-center shadow-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>
+                    {isReservation
+                      ? "شما در این دوره پیش‌ثبت‌نام کرده‌اید (رزرو شده)"
+                      : "شما قبلاً در این دوره ثبت‌نام کرده‌اید"}
+                  </span>
+                </div>
+              ) : isReservation ? (
+                <button
+                  type="button"
+                  disabled={reserving}
+                  onClick={handleReserve}
+                  className="w-full py-4 rounded-xl bg-[#082719] hover:bg-[#162b20] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] disabled:opacity-50 interactive-bump glaze-shimmer"
+                >
+                  <BookmarkCheck className="w-5 h-5 text-[#dfc79b]" />
+                  <span>{reserving ? "در حال ثبت رزرو..." : "رزرو و پیش‌ثبت‌نام در دوره (رایگان)"}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={isAdding || cartLoading}
+                  onClick={handleAddToCart}
+                  className="w-full py-4 rounded-xl bg-[#082719] hover:bg-[#162b20] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] disabled:opacity-50 interactive-bump glaze-shimmer"
+                >
+                  <ShoppingBag className="w-5 h-5 text-[#dfc79b]" />
+                  <span>افزودن به سبد خرید و ثبت‌نام</span>
+                </button>
+              )}
 
               {/* Guarantee / Value Propositions List */}
               <div className="flex flex-col gap-3 text-xs text-[#5A626A] pt-2 border-t border-[#1c211b]/08">

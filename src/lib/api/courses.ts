@@ -28,4 +28,15 @@ export const coursesApi = {
   async getCourseBySlug(slug: string): Promise<Course> {
     return apiClient<Course>(`/api/courses/${encodeURIComponent(slug)}`);
   },
+
+  async reserveCourse(courseId: string): Promise<{ success: boolean; message: string }> {
+    return apiClient<{ success: boolean; message: string }>(`/api/courses/${courseId}/reserve`, {
+      method: "POST",
+    });
+  },
+
+  async getMyCourses(): Promise<CourseListDto[]> {
+    return apiClient<CourseListDto[]>("/api/courses/my-courses");
+  },
 };
+

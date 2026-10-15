@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ordersApi } from "@/lib/api/orders";
 import { Order } from "@/types";
-import { formatPrice, formatDate } from "@/lib/utils/formatters";
+import { formatPrice, formatDate, getOrderStatusBadge } from "@/lib/utils/formatters";
 import { CheckCircle2, ArrowLeft, PackageCheck, FileText } from "lucide-react";
 
 export default function OrderSuccessPage() {
@@ -21,6 +21,8 @@ export default function OrderSuccessPage() {
       .catch(() => setOrder(null))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const statusBadge = order ? getOrderStatusBadge(order.status) : null;
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-16 flex flex-col items-center">
@@ -48,8 +50,8 @@ export default function OrderSuccessPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#5A626A]">وضعیت سفارش:</span>
-              <span className="font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full text-[11px]">
-                {order.statusText}
+              <span className={`font-bold px-2.5 py-0.5 rounded-full text-[11px] border ${statusBadge?.bg || "bg-emerald-100 text-emerald-700"}`}>
+                {statusBadge?.label || order.statusText}
               </span>
             </div>
             <div className="flex items-center justify-between">

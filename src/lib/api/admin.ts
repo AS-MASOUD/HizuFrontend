@@ -6,6 +6,7 @@ import {
   SpecialOrder,
   PagedResult,
   ProductComment,
+  Course,
 } from "@/types";
 
 export const adminApi = {
@@ -96,4 +97,39 @@ export const adminApi = {
       method: "DELETE",
     });
   },
+
+  // Courses Management
+  async getCourses(search = ""): Promise<Course[]> {
+    const query = new URLSearchParams();
+    if (search) query.append("search", search);
+    const queryString = query.toString();
+    return apiClient<Course[]>(`/api/admin/courses${queryString ? `?${queryString}` : ""}`);
+  },
+
+  async createCourse(courseData: any): Promise<Course> {
+    return apiClient<Course>("/api/admin/courses", {
+      method: "POST",
+      body: JSON.stringify(courseData),
+    });
+  },
+
+  async updateCourse(id: string, courseData: any): Promise<Course> {
+    return apiClient<Course>(`/api/admin/courses/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(courseData),
+    });
+  },
+
+  async deleteCourse(id: string): Promise<void> {
+    return apiClient<void>(`/api/admin/courses/${id}`, {
+      method: "DELETE",
+    });
+  },
+
+  async toggleCoursePublish(id: string): Promise<boolean> {
+    return apiClient<boolean>(`/api/admin/courses/${id}/publish`, {
+      method: "PATCH",
+    });
+  },
 };
+

@@ -30,4 +30,43 @@ export function toEnglishDigits(str?: string | number | null): string {
   return res;
 }
 
+export function getOrderStatusBadge(status: number): {
+  bg: string;
+  label: string;
+} {
+  switch (status) {
+    case 0:
+      return {
+        bg: "bg-amber-100 text-amber-800 border-amber-300",
+        label: "در انتظار پرداخت / تایید",
+      };
+    case 1:
+      return {
+        bg: "bg-blue-100 text-blue-800 border-blue-300",
+        label: "در حال آماده‌سازی و ساخت",
+      };
+    case 2:
+      return {
+        bg: "bg-purple-100 text-purple-800 border-purple-300",
+        label: "ارسال شده با پست",
+      };
+    case 3:
+      return {
+        bg: "bg-emerald-100 text-emerald-800 border-emerald-300",
+        label: "تحویل داده شده به مشتری",
+      };
+    case 4:
+      return {
+        bg: "bg-rose-100 text-rose-800 border-rose-300",
+        label: "لغو شده",
+      };
+    default:
+      return {
+        bg: "bg-gray-100 text-gray-700 border-gray-300",
+        label: "نامشخص",
+      };
+  }
+}
+
 export { getImageUrl } from "./imageUrl";
+

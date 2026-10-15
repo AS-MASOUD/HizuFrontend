@@ -74,6 +74,12 @@ export default function CourseCard({ course }: CourseCardProps) {
             >
               {course.levelTitle}
             </span>
+            {(course.isReservationOnly || course.price === null || course.price === undefined || course.price <= 0) && (
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-400 text-amber-950 border border-amber-300 shadow-xs flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-900" />
+                <span>پیش‌ثبت‌نام و رزرو</span>
+              </span>
+            )}
             {course.isFeatured && (
               <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#082719] text-[#dfc79b] border border-[#dfc79b]/30 shadow-xs flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
@@ -81,6 +87,7 @@ export default function CourseCard({ course }: CourseCardProps) {
               </span>
             )}
           </div>
+
 
           {/* Video Preview Pill Overlay */}
           {course.introVideoUrl && (
@@ -144,29 +151,49 @@ export default function CourseCard({ course }: CourseCardProps) {
       <div className="p-5 pt-0 mt-2">
         <div className="p-3 bg-[#FAF7F0] rounded-xl border border-[#1c211b]/08 flex items-center justify-between gap-3">
           {/* Price */}
-          <div className="flex flex-col">
-            {course.compareAtPrice && course.compareAtPrice > course.price && (
-              <span className="text-[11px] line-through text-gray-400 font-mono">
-                {formatPrice(course.compareAtPrice)}
+          {course.isReservationOnly || course.price === null || course.price === undefined || course.price <= 0 ? (
+            <div className="flex flex-col">
+              <span className="text-[10px] text-amber-800 font-bold">دوره در حال ضبط</span>
+              <span className="font-extrabold text-xs text-[#082719]">
+                رزرو و پیش‌ثبت‌نام
               </span>
-            )}
-            <span className="font-mono font-extrabold text-sm text-[#082719]">
-              {course.price === 0 ? "رایگان" : formatPrice(course.price)}
-            </span>
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {course.compareAtPrice && course.compareAtPrice > (course.price ?? 0) && (
+                <span className="text-[11px] line-through text-gray-400 font-mono">
+                  {formatPrice(course.compareAtPrice)}
+                </span>
+              )}
+              <span className="font-mono font-extrabold text-sm text-[#082719]">
+                {formatPrice(course.price)}
+              </span>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              disabled={isAdding || cartLoading}
-              onClick={handleAddToCart}
-              className="inline-flex items-center gap-1.5 bg-[#082719] hover:bg-[#162b20] text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm transition-all hover:scale-105 disabled:opacity-50 interactive-bump"
-              title="افزودن به سبد خرید"
-            >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#dfc79b]" />
-              <span className="hidden sm:inline">افزودن به سبد</span>
-            </button>
+            {course.isReservationOnly || course.price === null || course.price === undefined || course.price <= 0 ? (
+              <Link
+                href={`/courses/${course.slug}`}
+                className="inline-flex items-center gap-1.5 bg-[#dfc79b] hover:bg-[#c9b287] text-[#082719] px-3.5 py-2 rounded-lg text-xs font-bold shadow-xs transition-all hover:scale-105 interactive-bump"
+                title="رزرو و پیش‌ثبت‌نام دوره"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#082719]" />
+                <span>رزرو دوره</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled={isAdding || cartLoading}
+                onClick={handleAddToCart}
+                className="inline-flex items-center gap-1.5 bg-[#082719] hover:bg-[#162b20] text-white px-3 py-2 rounded-lg text-xs font-bold shadow-sm transition-all hover:scale-105 disabled:opacity-50 interactive-bump"
+                title="افزودن به سبد خرید"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-[#dfc79b]" />
+                <span className="hidden sm:inline">افزودن به سبد</span>
+              </button>
+            )}
 
             <Link
               href={`/courses/${course.slug}`}
@@ -176,6 +203,7 @@ export default function CourseCard({ course }: CourseCardProps) {
               <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
           </div>
+
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@ import { adminApi } from "@/lib/api/admin";
 import { categoriesApi } from "@/lib/api/categories";
 import { productsApi } from "@/lib/api/products";
 import { articlesApi } from "@/lib/api/articles";
+import { contactApi } from "@/lib/api/contact";
 import {
   AdminDashboardStats,
   Order,
@@ -18,6 +19,8 @@ import {
   ProductListDto,
   ProductDto,
   ProductComment,
+  Course,
+  ContactMessage,
 } from "@/types";
 import { formatPrice, formatDate, toPersianDigits, getImageUrl } from "@/lib/utils/formatters";
 import {
@@ -43,6 +46,13 @@ import {
   Hash,
   Eye,
   AlertTriangle,
+  GraduationCap,
+  Video,
+  Server,
+  PlayCircle,
+  Mail,
+  Phone,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import ArticleEditorModal from "@/components/admin/ArticleEditorModal";
@@ -50,6 +60,9 @@ import CategoryGridModal from "@/components/admin/CategoryGridModal";
 import ProductEditorModal from "@/components/admin/ProductEditorModal";
 import CommentReplyModal from "@/components/admin/CommentReplyModal";
 import OrderDetailModal from "@/components/admin/OrderDetailModal";
+import CourseEditorModal from "@/components/admin/CourseEditorModal";
+import ContactMessageModal from "@/components/admin/ContactMessageModal";
+
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -64,9 +77,11 @@ export default function AdminDashboardPage() {
   const [comments, setComments] = useState<ProductComment[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
 
   const [activeTab, setActiveTab] = useState<
-    "orders" | "special" | "categories" | "products" | "comments" | "users" | "articles"
+    "orders" | "special" | "categories" | "products" | "comments" | "users" | "articles" | "courses" | "messages"
   >("orders");
   const [loading, setLoading] = useState(true);
 
@@ -85,8 +100,18 @@ export default function AdminDashboardPage() {
   const [editorModalOpen, setEditorModalOpen] = useState(false);
   const [articleToEdit, setArticleToEdit] = useState<Article | null>(null);
 
+  const [courseModalOpen, setCourseModalOpen] = useState(false);
+  const [courseToEdit, setCourseToEdit] = useState<Course | null>(null);
+  const [courseSearch, setCourseSearch] = useState("");
+
   const [orderDetailModalOpen, setOrderDetailModalOpen] = useState(false);
   const [orderToView, setOrderToView] = useState<Order | null>(null);
+
+  // Contact messages state
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [messageToView, setMessageToView] = useState<ContactMessage | null>(null);
+  const [messagesFilter, setMessagesFilter] = useState<"all" | "unread" | "read">("all");
+  const [messageSearch, setMessageSearch] = useState("");
 
   // Special order reply state
   const [replyingId, setReplyingId] = useState<string | null>(null);
@@ -102,7 +127,7 @@ export default function AdminDashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [s, o, so, cats, prods, comms, u, arts] = await Promise.all([
+      const [s, o, so, cats, prods, comms, u, arts, crs, msgs] = await Promise.all([
         adminApi.getStats(),
         adminApi.getOrders(1, 40),
         adminApi.getSpecialOrders(1, 40),
@@ -111,6 +136,8 @@ export default function AdminDashboardPage() {
         adminApi.getComments(),
         adminApi.getUsers(1, 40),
         articlesApi.getArticles(),
+        adminApi.getCourses(),
+        contactApi.getAdminMessages({ pageSize: 100 }),
       ]);
       setStats(s);
       setOrders(o.items);
@@ -120,6 +147,9 @@ export default function AdminDashboardPage() {
       setComments(comms.items);
       setUsers(u.items);
       setArticles(arts);
+      setCourses(crs);
+      setContactMessages(msgs.items || []);
+
     } catch (err: any) {
       error(err.message || "خطا در بارگذاری اطلاعات پنل مدیریت.");
     } finally {
@@ -145,6 +175,9 @@ export default function AdminDashboardPage() {
       }
       const updatedCats = await categoriesApi.getCategories(false);
       setCategories(updatedCats);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("hizu:categories-updated"));
+      }
     } catch (err: any) {
       error(err.message || "خطا در ذخیره دسته‌بندی.");
       throw err;
@@ -158,6 +191,9 @@ export default function AdminDashboardPage() {
       success("دسته‌بندی حذف شد.");
       const updatedCats = await categoriesApi.getCategories(false);
       setCategories(updatedCats);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("hizu:categories-updated"));
+      }
     } catch (err: any) {
       error(err.message || "خطا در حذف دسته‌بندی.");
     }
@@ -172,8 +208,65 @@ export default function AdminDashboardPage() {
       success(`وضعیت دسته‌بندی به ${!cat.isActive ? "فعال" : "غیرفعال"} تغییر یافت.`);
       const updatedCats = await categoriesApi.getCategories(false);
       setCategories(updatedCats);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("hizu:categories-updated"));
+      }
     } catch (err: any) {
       error("خطا در تغییر وضعیت دسته‌بندی.");
+    }
+  };
+
+  // CONTACT MESSAGE ACTIONS
+  const handleToggleMessageRead = async (msg: ContactMessage) => {
+    try {
+      await contactApi.toggleMessageRead(msg.id, !msg.isRead);
+      setContactMessages((prev) =>
+        prev.map((m) => (m.id === msg.id ? { ...m, isRead: !msg.isRead } : m))
+      );
+      if (messageToView?.id === msg.id) {
+        setMessageToView((prev) => (prev ? { ...prev, isRead: !msg.isRead } : null));
+      }
+      success(msg.isRead ? "پیام به عنوان خوانده‌نشده تنظیم شد." : "پیام به عنوان خوانده‌شده تنظیم شد.");
+    } catch (err: any) {
+      error(err.message || "خطا در تغییر وضعیت پیام.");
+    }
+  };
+
+  const handleSaveMessageReply = async (id: string, notes: string) => {
+    try {
+      await contactApi.replyMessage(id, notes);
+      setContactMessages((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? { ...m, adminNotes: notes, isRead: true, repliedAt: new Date().toISOString() }
+            : m
+        )
+      );
+      if (messageToView?.id === id) {
+        setMessageToView((prev) =>
+          prev
+            ? { ...prev, adminNotes: notes, isRead: true, repliedAt: new Date().toISOString() }
+            : null
+        );
+      }
+      success("یادداشت پیگیری با موفقیت ثبت شد.");
+    } catch (err: any) {
+      error(err.message || "خطا در ثبت یادداشت.");
+    }
+  };
+
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm("آیا از حذف این پیام اطمینان دارید؟")) return;
+    try {
+      await contactApi.deleteMessage(id);
+      setContactMessages((prev) => prev.filter((m) => m.id !== id));
+      if (messageToView?.id === id) {
+        setMessageModalOpen(false);
+        setMessageToView(null);
+      }
+      success("پیام با موفقیت حذف شد.");
+    } catch (err: any) {
+      error(err.message || "خطا در حذف پیام.");
     }
   };
 
@@ -303,6 +396,52 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // COURSE ACTIONS
+  const handleSaveCourse = async (courseData: any) => {
+    try {
+      if (courseToEdit) {
+        await adminApi.updateCourse(courseToEdit.id, courseData);
+        success("دوره آموزشی با موفقیت بروزرسانی شد.");
+      } else {
+        await adminApi.createCourse(courseData);
+        success("دوره آموزشی جدید با موفقیت اضافه شد.");
+      }
+      const updatedCourses = await adminApi.getCourses();
+      setCourses(updatedCourses);
+    } catch (err: any) {
+      error(err.message || "خطا در ذخیره دوره آموزشی.");
+      throw err;
+    }
+  };
+
+  const handleDeleteCourse = async (id: string, title: string) => {
+    if (!confirm(`آیا از حذف دوره آموزشی «${title}» اطمینان دارید؟ تمامی قسمت‌ها و ثبت‌نام‌ها حذف خواهند شد.`)) return;
+    try {
+      await adminApi.deleteCourse(id);
+      success("دوره آموزشی حذف شد.");
+      const updatedCourses = await adminApi.getCourses();
+      setCourses(updatedCourses);
+    } catch (err: any) {
+      error(err.message || "خطا در حذف دوره آموزشی.");
+    }
+  };
+
+  const handleToggleCoursePublish = async (id: string) => {
+    try {
+      const isPub = await adminApi.toggleCoursePublish(id);
+      success(
+        isPub
+          ? "دوره در سایت عمومی و منتشر گردید."
+          : "دوره به حالت پیش‌نویس (مخفی) تغییر یافت."
+      );
+      const updatedCourses = await adminApi.getCourses();
+      setCourses(updatedCourses);
+    } catch (err: any) {
+      error("خطا در تغییر وضعیت انتشار دوره.");
+    }
+  };
+
+
   const handleUpdateOrderStatus = async (orderId: string, status: number) => {
     try {
       await adminApi.updateOrderStatus(orderId, status);
@@ -381,6 +520,22 @@ export default function AdminDashboardPage() {
   const filteredComments = comments.filter((c) => {
     if (commentsFilter === "pending") return !c.isApproved;
     if (commentsFilter === "approved") return c.isApproved;
+    return true;
+  });
+
+  const filteredMessages = contactMessages.filter((m) => {
+    if (messagesFilter === "unread" && m.isRead) return false;
+    if (messagesFilter === "read" && !m.isRead) return false;
+    if (messageSearch.trim()) {
+      const q = messageSearch.toLowerCase();
+      return (
+        m.name.toLowerCase().includes(q) ||
+        m.email.toLowerCase().includes(q) ||
+        (m.phoneNumber && m.phoneNumber.includes(q)) ||
+        (m.subject && m.subject.toLowerCase().includes(q)) ||
+        m.message.toLowerCase().includes(q)
+      );
+    }
     return true;
   });
 
@@ -527,6 +682,29 @@ export default function AdminDashboardPage() {
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>مقالات و وبلاگ ({articles.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("courses")}
+          className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+            activeTab === "courses" ? "bg-[#082719] text-white shadow-sm" : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
+          }`}
+        >
+          <GraduationCap className="w-3.5 h-3.5" />
+          <span>دوره‌های آموزشی ({courses.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("messages")}
+          className={`px-4 py-2.5 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+            activeTab === "messages" ? "bg-[#082719] text-white shadow-sm" : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
+          }`}
+        >
+          <Mail className="w-3.5 h-3.5" />
+          <span>پیام‌های تماس ({contactMessages.length})</span>
+          {contactMessages.some((m) => !m.isRead) && (
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+          )}
         </button>
       </div>
 
@@ -1472,6 +1650,515 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {/* ---------------- CONTENT: COURSES ---------------- */}
+      {activeTab === "courses" && (
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#1c211b]/10 shadow-xs">
+            <div>
+              <h3 className="font-bold text-base text-[#161A1D] flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-[#082719]" />
+                <span>مدیریت دوره‌های آموزشی، ضبط و پیش‌ثبت‌نام‌ها</span>
+              </h3>
+              <p className="text-xs text-[#5A626A] mt-0.5">
+                ایجاد دوره جدید، تعیین وضعیت پیش‌ثبت‌نام (رزرو بدون شهریه) یا فروش با شهریه پس از ضبط، مدیریت لینک‌های فایل‌سرور
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                placeholder="جستجوی عنوان، مدرس، نامک..."
+                value={courseSearch}
+                onChange={(e) => setCourseSearch(e.target.value)}
+                className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-full px-4 py-2 text-xs text-[#161A1D] w-56 focus:outline-none focus:border-[#082719]"
+              />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCourseToEdit(null);
+                  setCourseModalOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#082719] text-white text-xs font-bold hover:bg-[#162b20] transition-all shadow-md shrink-0 cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-[#dfc79b]" />
+                <span>+ ایجاد دوره جدید</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="card-popup rounded-2xl overflow-hidden bg-white border border-[#1c211b]/10">
+            <div className="overflow-x-auto">
+              <table className="w-full text-right text-xs">
+                <thead className="bg-[#EFE9DC] text-[#5A4A3A] font-mono text-[11px]">
+                  <tr>
+                    <th className="p-4">کاور و دوره</th>
+                    <th className="p-4">مدرس</th>
+                    <th className="p-4">لینک‌های فایل‌سرور و ویدیو</th>
+                    <th className="p-4">شهریه و وضعیت ثبت‌نام</th>
+                    <th className="p-4">سطح و مدت</th>
+                    <th className="p-4">شرکت‌کنندگان / رزروها</th>
+                    <th className="p-4">وضعیت انتشار</th>
+                    <th className="p-4 text-center">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1c211b]/08">
+                  {courses.filter((c) => {
+                    if (!courseSearch.trim()) return true;
+                    const s = courseSearch.trim().toLowerCase();
+                    return (
+                      c.title.toLowerCase().includes(s) ||
+                      (c.subtitle && c.subtitle.toLowerCase().includes(s)) ||
+                      c.instructorName.toLowerCase().includes(s) ||
+                      c.slug.toLowerCase().includes(s)
+                    );
+                  }).length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-[#5A626A]">
+                        هیچ دوره آموزشی ثبت نشده است. برای ثبت اولین دوره روی دکمه «+ ایجاد دوره جدید» کلیک کنید.
+                      </td>
+                    </tr>
+                  ) : (
+                    courses
+                      .filter((c) => {
+                        if (!courseSearch.trim()) return true;
+                        const s = courseSearch.trim().toLowerCase();
+                        return (
+                          c.title.toLowerCase().includes(s) ||
+                          (c.subtitle && c.subtitle.toLowerCase().includes(s)) ||
+                          c.instructorName.toLowerCase().includes(s) ||
+                          c.slug.toLowerCase().includes(s)
+                        );
+                      })
+                      .map((c) => {
+                        const isReserved = c.isReservationOnly || c.price === null || c.price === 0;
+                        return (
+                          <tr key={c.id} className="hover:bg-[#FAF7F0] transition-colors">
+                            {/* 1. Cover & Title */}
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-16 h-11 rounded-lg overflow-hidden bg-gray-900 border shrink-0">
+                                  {c.coverImageUrl ? (
+                                    <img
+                                      src={getImageUrl(c.coverImageUrl)}
+                                      alt={c.title}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-[#dfc79b] bg-[#082719]">
+                                      <GraduationCap className="w-5 h-5 opacity-70" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="max-w-xs">
+                                  <div className="font-bold text-[#161A1D] line-clamp-1 flex items-center gap-1.5">
+                                    <span>{c.title}</span>
+                                    {c.isFeatured && (
+                                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#082719] text-[#dfc79b]">
+                                        منتخب
+                                      </span>
+                                    )}
+                                  </div>
+                                  {c.subtitle && (
+                                    <div className="text-[11px] text-[#5A626A] line-clamp-1 mt-0.5">
+                                      {c.subtitle}
+                                    </div>
+                                  )}
+                                  <div className="font-mono text-[10px] text-[#0284c7] dir-ltr text-right mt-0.5">
+                                    /courses/{c.slug}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* 2. Instructor */}
+                            <td className="p-4">
+                              <div className="font-bold text-[#161A1D]">{c.instructorName || "تیم فنی هیزو"}</div>
+                              {c.instructorTitle && (
+                                <div className="text-[10px] text-[#5A626A] line-clamp-1">{c.instructorTitle}</div>
+                              )}
+                            </td>
+
+                            {/* 3. File Server & Video Links */}
+                            <td className="p-4">
+                              <div className="flex flex-col gap-1 max-w-[190px]">
+                                {c.introVideoUrl ? (
+                                  <a
+                                    href={c.introVideoUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1 text-[10px] text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md font-mono transition-colors truncate"
+                                    title={c.introVideoUrl}
+                                  >
+                                    <PlayCircle className="w-3 h-3 text-blue-600 shrink-0" />
+                                    <span className="truncate">ویدیو معرفی / تیزر</span>
+                                    <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-70" />
+                                  </a>
+                                ) : (
+                                  <span className="text-[10px] text-gray-400">بدون ویدیوی تیزر</span>
+                                )}
+
+                                {(c.fileServerBaseUrl || c.storagePath) && (
+                                  <div className="inline-flex items-center gap-1 text-[10px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md font-mono truncate" title={`${c.fileServerBaseUrl || ""}${c.storagePath || ""}`}>
+                                    <Server className="w-3 h-3 text-gray-500 shrink-0" />
+                                    <span className="truncate">{c.storagePath || c.fileServerBaseUrl}</span>
+                                  </div>
+                                )}
+
+                                {c.downloadableFilesUrl && (
+                                  <a
+                                    href={c.downloadableFilesUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md font-mono transition-colors truncate"
+                                    title={c.downloadableFilesUrl}
+                                  >
+                                    <ExternalLink className="w-2.5 h-2.5 shrink-0 text-emerald-600" />
+                                    <span className="truncate">فایل‌های تمرینی</span>
+                                  </a>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* 4. Pricing & Reservation */}
+                            <td className="p-4">
+                              {isReserved ? (
+                                <div className="flex flex-col gap-1">
+                                  <span className="inline-flex items-center gap-1 font-bold px-2.5 py-1 rounded-full text-[10px] bg-amber-100 text-amber-900 border border-amber-300 w-fit">
+                                    <Sparkles className="w-3 h-3 text-amber-600" />
+                                    <span>در حال ضبط (رزرو رایگان)</span>
+                                  </span>
+                                  <span className="text-[10px] text-gray-400">بدون شهریه فعلی</span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col">
+                                  {c.compareAtPrice && c.compareAtPrice > (c.price ?? 0) && (
+                                    <span className="font-mono text-[10px] text-gray-400 line-through">
+                                      {formatPrice(c.compareAtPrice)}
+                                    </span>
+                                  )}
+                                  <span className="font-mono font-bold text-sm text-[#082719]">
+                                    {formatPrice(c.price ?? 0)}
+                                  </span>
+                                </div>
+                              )}
+                            </td>
+
+                            {/* 5. Level & Duration */}
+                            <td className="p-4">
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-bold text-[11px] text-[#161A1D]">{c.levelTitle}</span>
+                                <span className="font-mono text-[10px] text-[#5A626A]">
+                                  {c.durationText || `${c.durationMinutes} دقیقه`}
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* 6. Students & Reservations count */}
+                            <td className="p-4">
+                              <div className="flex items-center gap-1 font-mono font-bold text-xs text-[#082719]">
+                                <Users className="w-3.5 h-3.5 text-[#8f6d2f]" />
+                                <span>{toPersianDigits(c.studentsCount)}</span>
+                                <span className="text-[10px] font-normal text-[#5A626A]">{isReserved ? "رزرو" : "دانشجو"}</span>
+                              </div>
+                            </td>
+
+                            {/* 7. Publish toggle */}
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                    c.isPublished
+                                      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                                      : "bg-amber-100 text-amber-800 border-amber-200"
+                                  }`}
+                                >
+                                  {c.isPublished ? "منتشر شده" : "پیش‌نویس"}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleCoursePublish(c.id)}
+                                  className="text-[10px] text-[#5A626A] hover:text-[#082719] underline font-medium cursor-pointer"
+                                >
+                                  {c.isPublished ? "مخفی‌سازی" : "انتشار فوری"}
+                                </button>
+                              </div>
+                            </td>
+
+                            {/* 8. Actions */}
+                            <td className="p-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setCourseToEdit(c);
+                                    setCourseModalOpen(true);
+                                  }}
+                                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-[#EDE8DC] text-[#161A1D] transition-colors cursor-pointer"
+                                  title="ویرایش دوره آموزشی و تغییر شهریه"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+
+                                <Link
+                                  href={`/courses/${c.slug}`}
+                                  target="_blank"
+                                  className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0284c7] transition-colors"
+                                  title="مشاهده صفحه دوره در سایت"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </Link>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteCourse(c.id, c.title)}
+                                  className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors cursor-pointer"
+                                  title="حذف دوره"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------- CONTENT: CONTACT MESSAGES ---------------- */}
+      {activeTab === "messages" && (
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#1c211b]/10 shadow-xs">
+            <div>
+              <h3 className="font-bold text-base text-[#161A1D] flex items-center gap-2">
+                <Mail className="w-4 h-4 text-[#082719]" />
+                <span>پیام‌ها و استعلام‌های ارسالی کاربران از صفحه تماس</span>
+              </h3>
+              <p className="text-xs text-[#5A626A] mt-0.5">
+                پیام‌های دریافتی از فرم تماس با ما، همراه با امکان بررسی، پاسخ ایمیلی، یادداشت مدیر و پیگیری
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Search input */}
+              <div className="relative min-w-[200px]">
+                <input
+                  type="text"
+                  value={messageSearch}
+                  onChange={(e) => setMessageSearch(e.target.value)}
+                  placeholder="جستجو در پیام‌ها یا نام..."
+                  className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl pr-3 pl-8 py-1.5 text-xs text-[#161A1D] focus:outline-none focus:border-[#082719]"
+                />
+              </div>
+
+              {/* Filter Buttons */}
+              <div className="flex items-center gap-1.5 bg-[#FAF7F0] p-1 rounded-xl border border-[#1c211b]/10">
+                <button
+                  type="button"
+                  onClick={() => setMessagesFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    messagesFilter === "all"
+                      ? "bg-[#082719] text-white"
+                      : "text-[#5A626A] hover:text-[#161A1D]"
+                  }`}
+                >
+                  همه ({contactMessages.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMessagesFilter("unread")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    messagesFilter === "unread"
+                      ? "bg-rose-700 text-white"
+                      : "text-rose-700 hover:bg-rose-50"
+                  }`}
+                >
+                  بررسی‌نشده ({contactMessages.filter((m) => !m.isRead).length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMessagesFilter("read")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    messagesFilter === "read"
+                      ? "bg-emerald-700 text-white"
+                      : "text-emerald-700 hover:bg-emerald-50"
+                  }`}
+                >
+                  خوانده شده ({contactMessages.filter((m) => m.isRead).length})
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Messages Table */}
+          <div className="card-popup rounded-2xl overflow-hidden bg-white border border-[#1c211b]/10">
+            <div className="overflow-x-auto">
+              <table className="w-full text-right text-xs">
+                <thead className="bg-[#EFE9DC] text-[#5A4A3A] font-mono text-[11px]">
+                  <tr>
+                    <th className="p-4">فرستنده</th>
+                    <th className="p-4">ارتباط</th>
+                    <th className="p-4">موضوع و متن پیام</th>
+                    <th className="p-4">وضعیت</th>
+                    <th className="p-4">تاریخ ثبت</th>
+                    <th className="p-4 text-center">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1c211b]/08">
+                  {filteredMessages.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-12 text-center text-[#5A626A]">
+                        {messageSearch
+                          ? "پیامی با مشخصات جستجو شده یافت نشد."
+                          : "تاکنون هیچ پیامی از فرم تماس ارسال نشده است."}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredMessages.map((msg) => (
+                      <tr
+                        key={msg.id}
+                        className={`hover:bg-[#FAF7F0]/60 transition-colors ${
+                          !msg.isRead ? "bg-rose-50/30" : ""
+                        }`}
+                      >
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                                !msg.isRead
+                                  ? "bg-rose-100 text-rose-800"
+                                  : "bg-[#EDE8DC] text-[#5A626A]"
+                              }`}
+                            >
+                              {msg.name.slice(0, 1)}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-[#161A1D]">
+                                {msg.name}
+                              </span>
+                              {!msg.isRead && (
+                                <span className="text-[10px] text-rose-600 font-semibold">
+                                  ● جدید
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-4">
+                          <div className="flex flex-col gap-1">
+                            <a
+                              href={`mailto:${msg.email}`}
+                              className="font-mono text-xs text-[#0284c7] hover:underline dir-ltr text-right flex items-center gap-1"
+                            >
+                              <Mail className="w-3 h-3 shrink-0" />
+                              <span>{msg.email}</span>
+                            </a>
+                            {msg.phoneNumber && (
+                              <a
+                                href={`tel:${msg.phoneNumber}`}
+                                className="font-mono text-[11px] text-[#5A626A] hover:underline dir-ltr text-right flex items-center gap-1"
+                              >
+                                <Phone className="w-3 h-3 shrink-0" />
+                                <span>{msg.phoneNumber}</span>
+                              </a>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="p-4 max-w-md">
+                          <div className="flex flex-col gap-1">
+                            {msg.subject && (
+                              <span className="font-bold text-[#161A1D]">
+                                {msg.subject}
+                              </span>
+                            )}
+                            <p className="text-[#5A626A] line-clamp-2 leading-relaxed">
+                              {msg.message}
+                            </p>
+                            {msg.adminNotes && (
+                              <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded mt-1 w-fit flex items-center gap-1">
+                                <MessageSquare className="w-2.5 h-2.5" />
+                                <span>دارای یادداشت پیگیری</span>
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="p-4">
+                          <span
+                            className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+                              msg.isRead
+                                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                : "bg-rose-50 text-rose-800 border-rose-200"
+                            }`}
+                          >
+                            {msg.isRead ? "بررسی شده" : "جدید (بررسی‌نشده)"}
+                          </span>
+                        </td>
+
+                        <td className="p-4 text-[#5A626A] whitespace-nowrap text-[11px]">
+                          {formatDate(msg.createdAt)}
+                        </td>
+
+                        <td className="p-4">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setMessageToView(msg);
+                                setMessageModalOpen(true);
+                              }}
+                              className="p-1.5 rounded-lg bg-[#EDE8DC] hover:bg-[#dfc79b] text-[#082719] transition-colors"
+                              title="مشاهده جزئیات و پاسخ"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleToggleMessageRead(msg)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                msg.isRead
+                                  ? "bg-gray-100 hover:bg-gray-200 text-[#5A626A]"
+                                  : "bg-emerald-100 hover:bg-emerald-200 text-emerald-800"
+                              }`}
+                              title={
+                                msg.isRead
+                                  ? "علامت‌گذاری به عنوان خوانده نشده"
+                                  : "علامت‌گذاری به عنوان خوانده شده"
+                              }
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMessage(msg.id)}
+                              className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors"
+                              title="حذف پیام"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+
       {/* Category Grid Modal */}
       <CategoryGridModal
         isOpen={categoryModalOpen}
@@ -1518,6 +2205,17 @@ export default function AdminDashboardPage() {
         articleToEdit={articleToEdit}
       />
 
+      {/* Course Editor Modal */}
+      <CourseEditorModal
+        isOpen={courseModalOpen}
+        onClose={() => {
+          setCourseModalOpen(false);
+          setCourseToEdit(null);
+        }}
+        onSave={handleSaveCourse}
+        courseToEdit={courseToEdit}
+      />
+
       {/* Order Detail & Inventory Commitment Modal */}
       <OrderDetailModal
         isOpen={orderDetailModalOpen}
@@ -1527,6 +2225,19 @@ export default function AdminDashboardPage() {
         }}
         order={orderToView}
         onUpdateStatus={handleUpdateOrderStatus}
+      />
+
+      {/* Contact Message Details & Reply Modal */}
+      <ContactMessageModal
+        isOpen={messageModalOpen}
+        message={messageToView}
+        onClose={() => {
+          setMessageModalOpen(false);
+          setMessageToView(null);
+        }}
+        onToggleRead={handleToggleMessageRead}
+        onSaveReply={handleSaveMessageReply}
+        onDelete={handleDeleteMessage}
       />
     </div>
   );

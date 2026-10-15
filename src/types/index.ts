@@ -193,6 +193,20 @@ export interface AdminDashboardStats {
   pendingSpecialOrders: number;
   totalUsers: number;
   totalRevenue: number;
+  unreadContactMessagesCount?: number;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber?: string;
+  subject?: string;
+  message: string;
+  isRead: boolean;
+  adminNotes?: string;
+  repliedAt?: string;
+  createdAt: string;
 }
 
 export interface AdminUser {
@@ -364,10 +378,14 @@ export interface CourseListDto {
   title: string;
   slug: string;
   subtitle?: string;
-  price: number;
-  compareAtPrice?: number;
+  price?: number | null;
+  compareAtPrice?: number | null;
+  isReservationOnly?: boolean;
   coverImageUrl?: string;
   introVideoUrl?: string;
+  fileServerBaseUrl?: string;
+  storagePath?: string;
+  downloadableFilesUrl?: string;
   durationMinutes: number;
   durationText?: string;
   level: CourseLevel;
@@ -377,14 +395,14 @@ export interface CourseListDto {
   averageRating: number;
   ratingCount: number;
   studentsCount: number;
+  isPublished?: boolean;
   isFeatured: boolean;
+  displayOrder?: number;
+  createdAt?: string;
 }
 
 export interface Course extends CourseListDto {
   description: string;
-  fileServerBaseUrl?: string;
-  storagePath?: string;
-  downloadableFilesUrl?: string;
   language: string;
   downloadableResourcesCount: number;
   includesCertificate: boolean;
@@ -392,9 +410,14 @@ export interface Course extends CourseListDto {
   instructorTitle?: string;
   instructorBio?: string;
   instructorAvatarUrl?: string;
+  isEnrolled?: boolean;
+  whatYouWillLearn?: string;
+  requirements?: string;
+  targetAudience?: string;
   whatYouWillLearnList: string[];
   requirementsList: string[];
   targetAudienceList: string[];
   sections: CourseSection[];
   sampleEpisodes: CourseEpisode[];
 }
+

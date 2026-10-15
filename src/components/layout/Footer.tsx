@@ -254,7 +254,7 @@ export default function Footer() {
               <MapPin className="w-4 h-4 text-[#0284c7] shrink-0" />
               <span className="text-[#333C44]">
                 {" "}
-                تهران - اندیشه - فاز 3 - مجتمع تجاری بوستان - واحد 34
+                تهران - اندیشه - فاز 3 - مجتمع تجاری بوستان - واحد 36
               </span>
             </div>
 

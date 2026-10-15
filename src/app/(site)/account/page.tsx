@@ -1,23 +1,46 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { ordersApi } from "@/lib/api/orders";
 import { specialOrdersApi } from "@/lib/api/specialOrders";
-import { OrderSummary, SpecialOrder } from "@/types";
-import { formatPrice, formatDate } from "@/lib/utils/formatters";
-import { User, Package, Wrench, LogOut, Save, FileText, CheckCircle2, Clock } from "lucide-react";
+import { coursesApi } from "@/lib/api/courses";
+import { OrderSummary, SpecialOrder, CourseListDto } from "@/types";
+import { formatPrice, formatDate, getOrderStatusBadge } from "@/lib/utils/formatters";
+import {
+  User,
+  Package,
+  Wrench,
+  LogOut,
+  Save,
+  FileText,
+  CheckCircle2,
+  Clock,
+  GraduationCap,
+  PlayCircle,
+  Sparkles,
+} from "lucide-react";
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, isAuthenticated, loading: authLoading, logout, updateProfile } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+    loading: authLoading,
+    logout,
+    updateProfile,
+  } = useAuth();
   const { success, error } = useToast();
 
-  const [activeTab, setActiveTab] = useState<"profile" | "orders" | "special">("orders");
+  const [activeTab, setActiveTab] = useState<"profile" | "orders" | "special" | "courses">(
+    "orders",
+  );
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [specialOrders, setSpecialOrders] = useState<SpecialOrder[]>([]);
+  const [myCourses, setMyCourses] = useState<CourseListDto[]>([]);
   const [loadingData, setLoadingData] = useState(false);
 
   // Profile Form state
@@ -53,10 +76,15 @@ export default function AccountPage() {
   useEffect(() => {
     if (!isAuthenticated) return;
     setLoadingData(true);
-    Promise.all([ordersApi.getMyOrders(), specialOrdersApi.getMy()])
-      .then(([ordersData, specialData]) => {
+    Promise.all([
+      ordersApi.getMyOrders(),
+      specialOrdersApi.getMy(),
+      coursesApi.getMyCourses(),
+    ])
+      .then(([ordersData, specialData, coursesData]) => {
         setOrders(ordersData);
         setSpecialOrders(specialData);
+        setMyCourses(coursesData);
       })
       .catch(() => {})
       .finally(() => setLoadingData(false));
@@ -91,7 +119,11 @@ export default function AccountPage() {
   };
 
   if (authLoading) {
-    return <div className="max-w-7xl mx-auto px-6 py-20 text-center font-mono">LOADING PROFILE...</div>;
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 text-center font-mono">
+        LOADING PROFILE...
+      </div>
+    );
   }
 
   return (
@@ -103,15 +135,12 @@ export default function AccountPage() {
             {user?.firstName ? user.firstName[0] : "H"}
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl sm:text-2xl font-black text-[#161A1D]">{user?.fullName || "کاربر هیزو"}</h1>
-            <span className="font-mono text-xs text-[#5A626A]">{user?.email}</span>
-            <div className="flex items-center gap-2 mt-1">
-              {user?.roles?.map((r) => (
-                <span key={r} className="text-[10px] font-bold bg-[#EDE8DC] text-[#161A1D] px-2 py-0.5 rounded">
-                  {r}
-                </span>
-              ))}
-            </div>
+            <h1 className="text-xl sm:text-2xl font-black text-[#161A1D]">
+              {user?.fullName || "کاربر هیزو"}
+            </h1>
+            <span className="font-mono text-xs text-[#5A626A]">
+              {user?.email}
+            </span>
           </div>
         </div>
 
@@ -125,10 +154,10 @@ export default function AccountPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#1c211b]/10 pb-2">
+      <div className="flex items-center gap-2 border-b border-[#1c211b]/10 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab("orders")}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "orders"
               ? "bg-[#082719] text-white shadow-sm"
               : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
@@ -139,8 +168,20 @@ export default function AccountPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab("courses")}
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+            activeTab === "courses"
+              ? "bg-[#082719] text-white shadow-sm"
+              : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
+          }`}
+        >
+          <GraduationCap className="w-4 h-4" />
+          <span>آموزش‌ها و دوره‌های من ({myCourses.length})</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("special")}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "special"
               ? "bg-[#082719] text-white shadow-sm"
               : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
@@ -152,7 +193,7 @@ export default function AccountPage() {
 
         <button
           onClick={() => setActiveTab("profile")}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "profile"
               ? "bg-[#082719] text-white shadow-sm"
               : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
@@ -167,27 +208,36 @@ export default function AccountPage() {
       {activeTab === "orders" && (
         <div className="flex flex-col gap-4">
           {loadingData ? (
-            <div className="card-popup rounded-2xl p-10 text-center font-mono bg-white">بارگذاری سفارش‌ها...</div>
+            <div className="card-popup rounded-2xl p-10 text-center font-mono bg-white">
+              بارگذاری سفارش‌ها...
+            </div>
           ) : orders.length > 0 ? (
-            orders.map((o) => (
-              <div
-                key={o.id}
-                className="card-popup rounded-2xl p-5 bg-white border border-[#1c211b]/10 flex flex-col sm:flex-row items-center justify-between gap-4"
-              >
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono font-bold text-sm text-[#161A1D]">{o.orderNumber}</span>
-                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                      {o.statusText}
+            orders.map((o) => {
+              const statusBadge = getOrderStatusBadge(o.status);
+              return (
+                <div
+                  key={o.id}
+                  className="card-popup rounded-2xl p-5 bg-white border border-[#1c211b]/10 flex flex-col sm:flex-row items-center justify-between gap-4"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono font-bold text-sm text-[#161A1D]">
+                        {o.orderNumber}
+                      </span>
+                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${statusBadge.bg}`}>
+                        {statusBadge.label || o.statusText}
+                      </span>
+                    </div>
+                    <span className="text-xs text-[#5A626A]">
+                      ثبت شده در: {formatDate(o.createdAt)} • تعداد: {o.itemCount}{" "}
+                      قلم
                     </span>
                   </div>
-                  <span className="text-xs text-[#5A626A]">
-                    ثبت شده در: {formatDate(o.createdAt)} • تعداد: {o.itemCount} قلم
-                  </span>
-                </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="font-mono font-bold text-base text-[#082719]">{formatPrice(o.total)}</span>
+                  <span className="font-mono font-bold text-base text-[#082719]">
+                    {formatPrice(o.total)}
+                  </span>
                   <button
                     onClick={() => router.push(`/order-success/${o.id}`)}
                     className="text-xs font-bold text-[#082719] bg-[#EDE8DC] hover:bg-[#dfc79b] px-4 py-2 rounded-full transition-colors"
@@ -196,7 +246,8 @@ export default function AccountPage() {
                   </button>
                 </div>
               </div>
-            ))
+            );
+          })
           ) : (
             <div className="card-popup rounded-2xl p-12 text-center bg-white text-[#5A626A]">
               شما تاکنون سفارشی ثبت نکرده‌اید.
@@ -208,7 +259,9 @@ export default function AccountPage() {
       {activeTab === "special" && (
         <div className="flex flex-col gap-4">
           {loadingData ? (
-            <div className="card-popup rounded-2xl p-10 text-center font-mono bg-white">بارگذاری پروژه‌ها...</div>
+            <div className="card-popup rounded-2xl p-10 text-center font-mono bg-white">
+              بارگذاری پروژه‌ها...
+            </div>
           ) : specialOrders.length > 0 ? (
             specialOrders.map((so) => (
               <div
@@ -217,8 +270,12 @@ export default function AccountPage() {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#1c211b]/10 pb-3">
                   <div>
-                    <span className="font-mono text-[10px] text-[#0284c7] font-bold">{so.orderNumber}</span>
-                    <h3 className="font-bold text-base text-[#161A1D]">{so.title}</h3>
+                    <span className="font-mono text-[10px] text-[#0284c7] font-bold">
+                      {so.orderNumber}
+                    </span>
+                    <h3 className="font-bold text-base text-[#161A1D]">
+                      {so.title}
+                    </h3>
                   </div>
                   <span className="text-xs font-bold text-[#8f6d2f] bg-[#EDE8DC] px-3 py-1 rounded-full self-start sm:self-auto">
                     {so.statusText}
@@ -232,7 +289,9 @@ export default function AccountPage() {
                 {so.materialPreference && (
                   <div className="text-xs">
                     <span className="text-[#5A626A]">متریال درخواستی: </span>
-                    <span className="font-bold text-[#161A1D]">{so.materialPreference}</span>
+                    <span className="font-bold text-[#161A1D]">
+                      {so.materialPreference}
+                    </span>
                   </div>
                 )}
 
@@ -242,7 +301,9 @@ export default function AccountPage() {
                       <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                       <span>پاسخ کارگاه و برآورد هزینه:</span>
                     </span>
-                    <p className="text-emerald-800 leading-relaxed">{so.adminReply}</p>
+                    <p className="text-emerald-800 leading-relaxed">
+                      {so.adminReply}
+                    </p>
                     {so.quotedPrice && (
                       <span className="font-mono font-black text-emerald-900 pt-1">
                         قیمت کارشناسی: {formatPrice(so.quotedPrice)}
@@ -260,6 +321,106 @@ export default function AccountPage() {
         </div>
       )}
 
+      {activeTab === "courses" && (
+        <div className="flex flex-col gap-4">
+          {loadingData ? (
+            <div className="card-popup rounded-2xl p-10 text-center font-mono bg-white">
+              بارگذاری دوره‌ها...
+            </div>
+          ) : myCourses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {myCourses.map((c) => {
+                const isReservation =
+                  Boolean(c.isReservationOnly) ||
+                  c.price === null ||
+                  c.price === undefined ||
+                  c.price <= 0;
+
+                return (
+                  <div
+                    key={c.id}
+                    className="card-popup rounded-2xl p-5 bg-white border border-[#1c211b]/10 flex flex-col gap-4 justify-between shadow-xs hover:border-[#1c211b]/20 transition-all"
+                  >
+                    <div className="flex items-start gap-4">
+                      {c.coverImageUrl ? (
+                        <div className="w-20 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-[#1c211b]/08">
+                          <img
+                            src={c.coverImageUrl}
+                            alt={c.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-16 rounded-xl bg-[#082719] text-[#dfc79b] flex items-center justify-center shrink-0">
+                          <GraduationCap className="w-8 h-8" />
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#dfc79b]/20 text-[#8f6d2f] border border-[#dfc79b]/40">
+                            {c.levelTitle}
+                          </span>
+                          {isReservation ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              <span>رزرو شده (در حال ضبط)</span>
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>ثبت‌نام شده</span>
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-bold text-sm text-[#161A1D] truncate mt-1">
+                          {c.title}
+                        </h3>
+                        {c.instructorName && (
+                          <span className="text-xs text-[#5A626A]">
+                            مدرس: {c.instructorName}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-[#1c211b]/08 gap-3">
+                      <span className="text-xs font-mono text-[#5A626A]">
+                        {c.durationText || (c.durationMinutes ? `${c.durationMinutes} دقیقه` : "")}
+                      </span>
+                      <Link
+                        href={`/courses/${c.slug}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#082719] bg-[#EDE8DC] hover:bg-[#dfc79b] px-4 py-2 rounded-full transition-colors"
+                      >
+                        <PlayCircle className="w-4 h-4" />
+                        <span>مشاهده و ورود به دوره</span>
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="card-popup rounded-2xl p-12 text-center bg-white border border-[#1c211b]/10 flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-[#FAF7F0] flex items-center justify-center text-[#8f6d2f]">
+                <GraduationCap className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-base text-[#161A1D]">
+                هنوز در هیچ دوره‌ای ثبت‌نام یا پیش‌ثبت‌نام نکرده‌اید
+              </h3>
+              <p className="text-xs text-[#5A626A] max-w-sm leading-relaxed">
+                می‌توانید دوره‌های کارگاهی استودیو هیزو را مشاهده کرده و در دوره‌های در حال ضبط، جایگاه خود را رایگان رزرو نمایید.
+              </p>
+              <Link
+                href="/courses"
+                className="mt-2 inline-flex items-center gap-2 bg-[#082719] text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-[#162b20] transition-colors"
+              >
+                <span>مشاهده کاتالوگ دوره‌های آموزشی هیزو</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+
       {activeTab === "profile" && (
         <form
           onSubmit={handleProfileSubmit}
@@ -271,7 +432,9 @@ export default function AccountPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#161A1D]">نام</label>
+              <label className="text-xs font-semibold text-[#161A1D]">
+                نام
+              </label>
               <input
                 type="text"
                 value={firstName}
@@ -280,7 +443,9 @@ export default function AccountPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#161A1D]">نام خانوادگی</label>
+              <label className="text-xs font-semibold text-[#161A1D]">
+                نام خانوادگی
+              </label>
               <input
                 type="text"
                 value={lastName}
@@ -291,7 +456,9 @@ export default function AccountPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#161A1D]">شماره همراه</label>
+            <label className="text-xs font-semibold text-[#161A1D]">
+              شماره همراه
+            </label>
             <input
               type="text"
               value={phoneNumber}
@@ -302,7 +469,9 @@ export default function AccountPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#161A1D]">استان</label>
+              <label className="text-xs font-semibold text-[#161A1D]">
+                استان
+              </label>
               <input
                 type="text"
                 value={state}
@@ -311,7 +480,9 @@ export default function AccountPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#161A1D]">شهر</label>
+              <label className="text-xs font-semibold text-[#161A1D]">
+                شهر
+              </label>
               <input
                 type="text"
                 value={city}
@@ -320,7 +491,9 @@ export default function AccountPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#161A1D]">کد پستی</label>
+              <label className="text-xs font-semibold text-[#161A1D]">
+                کد پستی
+              </label>
               <input
                 type="text"
                 value={zipCode}
@@ -331,7 +504,9 @@ export default function AccountPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#161A1D]">نشانی دقیق پستی</label>
+            <label className="text-xs font-semibold text-[#161A1D]">
+              نشانی دقیق پستی
+            </label>
             <textarea
               rows={3}
               value={street}

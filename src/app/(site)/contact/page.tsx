@@ -2,19 +2,51 @@
 
 import React, { useState } from "react";
 import { useToast } from "@/providers/ToastProvider";
-import { Mail, Phone, MapPin, Clock, Send, ShieldCheck } from "lucide-react";
+import { contactApi } from "@/lib/api/contact";
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, Loader2 } from "lucide-react";
 
 export default function ContactPage() {
-  const { success } = useToast();
+  const { success, error } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-    success("پیام شما دریافت شد. همکاران کارگاه در اسرع وقت پاسخ خواهند داد.");
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      error("لطفاً فیلدهای ستاره‌دار را تکمیل نمایید.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await contactApi.sendMessage({
+        name: name.trim(),
+        email: email.trim(),
+        phoneNumber: phoneNumber.trim() || undefined,
+        subject: subject.trim() || undefined,
+        message: message.trim(),
+      });
+      setSent(true);
+      success("پیام شما دریافت شد. همکاران کارگاه در اسرع وقت پاسخ خواهند داد.");
+    } catch (err: any) {
+      error(err.message || "خطا در ارسال پیام. لطفاً دوباره تلاش کنید.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setName("");
+    setEmail("");
+    setPhoneNumber("");
+    setSubject("");
+    setMessage("");
+    setSent(false);
   };
 
   return (
@@ -70,7 +102,7 @@ export default function ContactPage() {
               <div>
                 <span className="text-xs text-[#5A626A]">نشانی:</span>
                 <p className="font-medium text-xs text-[#161A1D] mt-0.5 leading-relaxed">
-                  تهران - اندیشه - فاز 3 - مجتمع تجاری بوستان - واحد 34
+                  تهران - اندیشه - فاز 3 - مجتمع تجاری بوستان - واحد 36
                 </p>
               </div>
             </div>
@@ -96,16 +128,25 @@ export default function ContactPage() {
           </h2>
 
           {sent ? (
-            <div className="p-8 text-center flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                ✓
+            <div className="p-8 text-center flex flex-col items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-8 h-8" />
               </div>
-              <p className="font-bold text-sm text-[#161A1D]">
-                پیام شما با موفقیت ارسال شد.
-              </p>
-              <p className="text-xs text-[#5A626A]">
-                سپاس از تماس شما، در اولین فرصت با شما تماس خواهیم گرفت.
-              </p>
+              <div>
+                <p className="font-bold text-base text-[#161A1D]">
+                  پیام شما با موفقیت در سیستم ثبت شد.
+                </p>
+                <p className="text-xs text-[#5A626A] mt-1.5 leading-relaxed">
+                  سپاس از تماس شما، همکاران بخش فنی در اولین فرصت بررسی و پاسخ خواهند داد.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="mt-2 text-xs font-bold text-[#082719] bg-[#EDE8DC] hover:bg-[#dfc79b] px-6 py-2.5 rounded-full transition-colors"
+              >
+                ارسال پیام جدید
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -119,7 +160,8 @@ export default function ContactPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D]"
+                    placeholder="نام کامل خود را وارد کنید"
+                    className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D] focus:outline-none focus:border-[#082719]"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -131,7 +173,35 @@ export default function ContactPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr text-[#161A1D]"
+                    placeholder="example@mail.com"
+                    className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-[#161A1D]">
+                    شماره تماس (اختیاری)
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="0912..."
+                    className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr text-[#161A1D] focus:outline-none focus:border-[#082719]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-[#161A1D]">
+                    موضوع پیام (اختیاری)
+                  </label>
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="مثلاً: استعلام قیمت، مشاوره فنی"
+                    className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D] focus:outline-none focus:border-[#082719]"
                   />
                 </div>
               </div>
@@ -145,17 +215,22 @@ export default function ContactPage() {
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D]"
+                  className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs text-[#161A1D] focus:outline-none focus:border-[#082719]"
                   placeholder="موضوع همکاری، سوال یا مشخصات مورد نظر را بنویسید..."
                 />
               </div>
 
               <button
                 type="submit"
-                className="self-start inline-flex items-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white px-7 py-3 rounded-full text-xs font-bold shadow-md transition-all"
+                disabled={loading}
+                className="self-start inline-flex items-center gap-2 bg-[#082719] hover:bg-[#16191d] text-white px-7 py-3 rounded-full text-xs font-bold shadow-md transition-all disabled:opacity-50 interactive-bump"
               >
-                <Send className="w-4 h-4" />
-                <span>ارسال پیام</span>
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                <span>{loading ? "در حال ارسال..." : "ارسال پیام"}</span>
               </button>
             </form>
           )}
