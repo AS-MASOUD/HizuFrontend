@@ -11,15 +11,22 @@ import {
   Clock,
   CheckCircle2,
   FolderOpen,
+  Sparkles,
 } from "lucide-react";
 
 interface CourseCurriculumAccordionProps {
   sections: CourseSection[];
+  isEnrolled?: boolean;
+  activeEpisodeId?: string;
+  onSelectEpisode?: (episode: CourseEpisode) => void;
   onSelectSampleEpisode?: (episode: CourseEpisode) => void;
 }
 
 export default function CourseCurriculumAccordion({
   sections,
+  isEnrolled = false,
+  activeEpisodeId,
+  onSelectEpisode,
   onSelectSampleEpisode,
 }: CourseCurriculumAccordionProps) {
   // Open first section by default
@@ -44,6 +51,16 @@ export default function CourseCurriculumAccordion({
       next[sec.id] = expand;
     });
     setOpenSections(next);
+  };
+
+  const handleEpisodeClick = (episode: CourseEpisode) => {
+    if (isEnrolled || episode.isFreePreview) {
+      if (onSelectEpisode) {
+        onSelectEpisode(episode);
+      } else if (onSelectSampleEpisode) {
+        onSelectSampleEpisode(episode);
+      }
+    }
   };
 
   const totalEpisodes = sections.reduce((sum, s) => sum + s.episodes.length, 0);
@@ -129,59 +146,108 @@ export default function CourseCurriculumAccordion({
               {/* Section Episodes */}
               {isOpen && (
                 <div className="border-t border-[#1c211b]/08 divide-y divide-[#1c211b]/06">
-                  {section.episodes.map((episode, eIdx) => (
-                    <div
-                      key={episode.id}
-                      className="px-5 py-3.5 flex items-center justify-between gap-3 hover:bg-[#FAF7F0]/40 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        {episode.isFreePreview ? (
-                          <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
-                            <PlayCircle className="w-3.5 h-3.5 fill-current" />
-                          </div>
-                        ) : (
-                          <div className="w-6 h-6 rounded-lg bg-[#EDE8DC] text-[#5A626A] flex items-center justify-center shrink-0">
-                            <Lock className="w-3.5 h-3.5" />
-                          </div>
-                        )}
+                  {section.episodes.map((episode) => {
+                    const isAccessible = isEnrolled || episode.isFreePreview;
+                    const isActive = activeEpisodeId === episode.id;
 
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-xs font-medium text-[#161A1D] truncate">
-                            {episode.title}
-                          </span>
-                          {episode.description && (
-                            <span className="text-[10px] text-[#5A626A] truncate">
-                              {episode.description}
-                            </span>
+                    return (
+                      <div
+                        key={episode.id}
+                        onClick={() => handleEpisodeClick(episode)}
+                        className={`px-5 py-3.5 flex items-center justify-between gap-3 transition-colors ${
+                          isAccessible ? "cursor-pointer" : "cursor-default"
+                        } ${
+                          isActive
+                            ? "bg-[#dfc79b]/20 border-r-4 border-[#082719]"
+                            : isAccessible
+                            ? "hover:bg-[#FAF7F0]/80"
+                            : "hover:bg-[#FAF7F0]/30"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          {isActive ? (
+                            <div className="w-6 h-6 rounded-lg bg-[#082719] text-[#dfc79b] flex items-center justify-center shrink-0 shadow-xs">
+                              <PlayCircle className="w-3.5 h-3.5 fill-current" />
+                            </div>
+                          ) : isAccessible ? (
+                            <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                              <PlayCircle className="w-3.5 h-3.5 fill-current" />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-lg bg-[#EDE8DC] text-[#5A626A] flex items-center justify-center shrink-0">
+                              <Lock className="w-3.5 h-3.5" />
+                            </div>
                           )}
-                        </div>
-                      </div>
 
-                      {/* Episode Meta & Action */}
-                      <div className="flex items-center gap-3 shrink-0">
-                        {episode.attachmentUrl && (
-                          <div
-                            className="hidden sm:flex items-center gap-1 text-[10px] text-[#0284c7] font-medium bg-blue-50 px-2 py-0.5 rounded"
-                            title="دارای فایل تمرین و پروژه"
-                          >
-                            <FileDown className="w-3 h-3" />
-                            <span>فایل پیوست</span>
+                          <div className="flex flex-col min-w-0">
+                            <span
+                              className={`text-xs truncate ${
+                                isActive
+                                  ? "font-black text-[#082719]"
+                                  : isAccessible
+                                  ? "font-medium text-[#161A1D]"
+                                  : "text-[#5A626A]"
+                              }`}
+                            >
+                              {episode.title}
+                            </span>
+                            {episode.description && (
+                              <span className="text-[10px] text-[#5A626A] truncate">
+                                {episode.description}
+                              </span>
+                            )}
                           </div>
-                        )}
+                        </div>
 
-                        {episode.isFreePreview ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            پیش‌نمایش رایگان
-                          </span>
-                        ) : null}
+                        {/* Episode Meta & Action */}
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          {episode.attachmentUrl && (
+                            isAccessible ? (
+                              <a
+                                href={episode.attachmentUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download={episode.attachmentName || "course-material"}
+                                onClick={(e) => e.stopPropagation()}
+                                className="hidden sm:inline-flex items-center gap-1 text-[10px] text-[#0284c7] hover:text-[#0369a1] bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded transition-colors"
+                                title={`دانلود: ${episode.attachmentName || "فایل تمرین و پروژه"}`}
+                              >
+                                <FileDown className="w-3 h-3" />
+                                <span>فایل تمرین</span>
+                              </a>
+                            ) : (
+                              <div
+                                className="hidden sm:flex items-center gap-1 text-[10px] text-[#5A626A]/70 bg-gray-100 px-2 py-0.5 rounded"
+                                title="فایل تمرین مختص دانشجویان دوره"
+                              >
+                                <FileDown className="w-3 h-3" />
+                                <span>فایل پیوست</span>
+                              </div>
+                            )
+                          )}
 
-                        <div className="flex items-center gap-1 text-[11px] font-mono text-[#5A626A]">
-                          <Clock className="w-3 h-3 text-[#8f6d2f]" />
-                          <span>{episode.durationText || `${episode.durationMinutes} دقیقه`}</span>
+                          {isActive ? (
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#082719] text-[#dfc79b]">
+                              در حال پخش
+                            </span>
+                          ) : isEnrolled ? (
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              دسترسی کامل
+                            </span>
+                          ) : episode.isFreePreview ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              پیش‌نمایش رایگان
+                            </span>
+                          ) : null}
+
+                          <div className="flex items-center gap-1 text-[11px] font-mono text-[#5A626A]">
+                            <Clock className="w-3 h-3 text-[#8f6d2f]" />
+                            <span>{episode.durationText || (episode.durationMinutes ? `${episode.durationMinutes} دقیقه` : "")}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

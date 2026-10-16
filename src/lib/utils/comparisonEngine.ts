@@ -83,12 +83,14 @@ export function calculateProductMetrics(item: CompareItem): { [key: string]: num
   else if (tech.includes("parametric") || tech.includes("cnc")) techniqueScore = 8.8;
 
   // 6. Stock Availability
-  let availabilityScore = 7.0;
-  if (item.stockQuantity >= 25) availabilityScore = 9.8;
-  else if (item.stockQuantity >= 15) availabilityScore = 9.0;
-  else if (item.stockQuantity >= 8) availabilityScore = 8.2;
-  else if (item.stockQuantity >= 1) availabilityScore = 7.2;
-  else availabilityScore = 4.5;
+  let availabilityScore = 8.5;
+  if (item.stockQuantity !== null && item.stockQuantity !== undefined) {
+    if (item.stockQuantity >= 25) availabilityScore = 9.8;
+    else if (item.stockQuantity >= 15) availabilityScore = 9.0;
+    else if (item.stockQuantity >= 8) availabilityScore = 8.2;
+    else if (item.stockQuantity >= 1) availabilityScore = 7.2;
+    else availabilityScore = 4.5;
+  }
 
   return {
     precision: precisionScore,
@@ -140,7 +142,7 @@ export function analyzeProduct(item: CompareItem): ProductAnalysis {
     goodPoints.push(`فرآیند ساخت پیشرفته و دقیق کارگاهی (${item.technique})`);
   }
 
-  if (item.stockQuantity >= 15) {
+  if (item.stockQuantity !== null && item.stockQuantity !== undefined && item.stockQuantity >= 15) {
     goodPoints.push(`موجودی آماده بالا در انبار کارگاه (${item.stockQuantity} عدد) با امکان ارسال فوری`);
   }
 
@@ -157,8 +159,12 @@ export function analyzeProduct(item: CompareItem): ProductAnalysis {
     drawbacks.push(`وزن بالا (${item.weight})؛ مناسب قرارگیری ثابت در میز کار یا خطوط بدون جابجایی`);
   }
 
-  if (item.stockQuantity < 6) {
-    drawbacks.push(`موجودی انبار محدود (${item.stockQuantity} عدد) به دلیل حساسیت و زمان‌بر بودن فرآیند ساخت`);
+  if (item.stockQuantity !== null && item.stockQuantity !== undefined) {
+    if (item.stockQuantity === 0) {
+      drawbacks.push("در حال حاضر ناموجود بوده و نیازمند سفارش ساخت اختصاصی است");
+    } else if (item.stockQuantity < 6) {
+      drawbacks.push(`موجودی انبار محدود (${item.stockQuantity} عدد) به دلیل حساسیت و زمان‌بر بودن فرآیند ساخت`);
+    }
   }
 
   if (tolVal !== null && tolVal >= 0.05) {
@@ -247,9 +253,17 @@ export function buildFeatureComparisons(items: CompareItem[]): FeatureSectionCom
       key: "stock",
       title: "موجودی انبار و آمادگی تحویل",
       description: "تعداد قطعه آماده در انبار کارگاه و سرعت ارسال به مشتری.",
-      getValue: (i) => i.stockQuantity > 0 ? `${i.stockQuantity.toLocaleString("fa-IR")} عدد آماده ارسال` : "سفارش ساخت",
+      getValue: (i) =>
+        i.stockQuantity !== null && i.stockQuantity !== undefined
+          ? i.stockQuantity > 0
+            ? `${i.stockQuantity.toLocaleString("fa-IR")} عدد آماده ارسال`
+            : "سفارش ساخت"
+          : "موجود (آماده سفارش)",
       getScore: (i, a) => a.metrics.availability,
-      winnerReason: (w) => `بالاترین تعداد موجودی آماده ارسال فوری (${w.stockQuantity.toLocaleString("fa-IR")} عدد)`,
+      winnerReason: (w) =>
+        w.stockQuantity !== null && w.stockQuantity !== undefined && w.stockQuantity > 0
+          ? `بالاترین تعداد موجودی آماده ارسال فوری (${w.stockQuantity.toLocaleString("fa-IR")} عدد)`
+          : "آماده ثبت سفارش ساخت و تحویل کارگاهی",
     },
   ];
 

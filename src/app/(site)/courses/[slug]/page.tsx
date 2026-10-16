@@ -175,7 +175,7 @@ export default function CourseDetailPage() {
             {isReservation ? (
               <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
-                <span>دوره در حال ضبط (پیش‌ثبت‌نام و رزرو)</span>
+                <span>پیش‌ثبت‌نام دوره</span>
               </span>
             ) : null}
             {course.isFeatured && (
@@ -393,19 +393,19 @@ export default function CourseDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-[#5A626A]">وضعیت دوره:</span>
                     <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-                      در حال ضبط و تدوین
+                      پیش‌ثبت‌نام
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
                     <span className="text-xs font-semibold text-[#5A626A]">شهریه دوره:</span>
                     <span className="font-mono font-bold text-sm text-[#082719]">
-                      رزرو رایگان (تعیین پس از اتمام ضبط)
+                      پیش‌ثبت‌نام و رزرو رایگان
                     </span>
                   </div>
                   <div className="bg-amber-50/80 border border-amber-200/70 rounded-xl p-3 text-[11px] text-amber-950 leading-relaxed flex items-start gap-2">
                     <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <span>
-                      این دوره در حال حاضر در استودیو هیزو در مرحله ضبط و آماده‌سازی است. می‌توانید با رزرو رایگان، صندلی خود را حفظ کرده و به محض آماده‌شدن جلسات و قیمت‌گذاری مطلع شوید.
+                      این دوره در مرحله پیش‌ثبت‌نام است. می‌توانید با رزرو رایگان، صندلی خود را حفظ کرده و به محض آماده‌شدن جلسات و آغاز دوره مطلع شوید.
                     </span>
                   </div>
                 </div>

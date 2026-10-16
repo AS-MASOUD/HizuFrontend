@@ -913,13 +913,19 @@ function CompareContent() {
                 </td>
                 {compareItems.map((item) => (
                   <td key={`stk-${item.id}`} className="p-4 text-[#161A1D]">
-                    {item.stockQuantity > 0 ? (
-                      <span className="text-emerald-700 font-bold">
-                        موجود ({toPersianDigits(item.stockQuantity)} عدد)
-                      </span>
+                    {item.stockQuantity !== null && item.stockQuantity !== undefined ? (
+                      item.stockQuantity > 0 ? (
+                        <span className="text-emerald-700 font-bold">
+                          موجود ({toPersianDigits(item.stockQuantity)} عدد)
+                        </span>
+                      ) : (
+                        <span className="text-rose-700 font-bold">
+                          ساخت سفارشی
+                        </span>
+                      )
                     ) : (
-                      <span className="text-rose-700 font-bold">
-                        ساخت سفارشی
+                      <span className="text-emerald-700 font-bold">
+                        موجود (آماده سفارش)
                       </span>
                     )}
                   </td>

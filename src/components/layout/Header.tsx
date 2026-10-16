@@ -534,6 +534,15 @@ export default function Header() {
                   </Link>
 
                   <Link
+                    href="/courses?tab=my-courses"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#161A1D] hover:bg-[#FAF7F0] font-medium transition-colors"
+                  >
+                    <GraduationCap className="w-4 h-4 text-[#8f6d2f] shrink-0" />
+                    <span>دوره‌های من</span>
+                  </Link>
+
+                  <Link
                     href="/account?tab=orders"
                     onClick={() => setUserMenuOpen(false)}
                     className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-[#161A1D] hover:bg-[#FAF7F0] font-medium transition-colors"
@@ -1038,6 +1047,14 @@ export default function Header() {
                 >
                   <UserIcon className="w-4 h-4 text-[#5A626A]" />
                   <span>حساب کاربری من</span>
+                </Link>
+                <Link
+                  href="/courses?tab=my-courses"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2 text-sm font-medium rounded-xl text-[#161A1D] hover:bg-[#EDE8DC] flex items-center gap-2"
+                >
+                  <GraduationCap className="w-4 h-4 text-[#8f6d2f]" />
+                  <span>دوره‌های من</span>
                 </Link>
                 <Link
                   href="/cart"

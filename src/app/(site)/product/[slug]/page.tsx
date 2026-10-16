@@ -135,18 +135,20 @@ export default function ProductDetailPage() {
               <span className="text-xs text-[#5A626A]">
                 {product.categoryName}
               </span>
-              {product.stockQuantity > 0 ? (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                  <Check className="w-3 h-3" />
-                  <span>
-                    موجود در انبار ({toPersianDigits(product.stockQuantity)}{" "}
-                    عدد)
+              {product.stockQuantity !== null && product.stockQuantity !== undefined && (
+                product.stockQuantity > 0 ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    <Check className="w-3 h-3" />
+                    <span>
+                      موجود در انبار ({toPersianDigits(product.stockQuantity)}{" "}
+                      عدد)
+                    </span>
                   </span>
-                </span>
-              ) : (
-                <span className="text-[11px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                  ناموجود / ساخت سفارشی
-                </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                    ناموجود / ساخت سفارشی
+                  </span>
+                )
               )}
             </div>
 
@@ -189,9 +191,17 @@ export default function ProductDetailPage() {
                 </span>
                 <button
                   onClick={() =>
-                    setQuantity(Math.min(product.stockQuantity, quantity + 1))
+                    setQuantity(
+                      product.stockQuantity !== null && product.stockQuantity !== undefined
+                        ? Math.min(product.stockQuantity, quantity + 1)
+                        : quantity + 1
+                    )
                   }
-                  disabled={quantity >= product.stockQuantity}
+                  disabled={
+                    product.stockQuantity !== null &&
+                    product.stockQuantity !== undefined &&
+                    quantity >= product.stockQuantity
+                  }
                   className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-base hover:bg-white transition-colors disabled:opacity-40"
                 >
                   +

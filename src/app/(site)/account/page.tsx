@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { ordersApi } from "@/lib/api/orders";
@@ -10,6 +10,7 @@ import { specialOrdersApi } from "@/lib/api/specialOrders";
 import { coursesApi } from "@/lib/api/courses";
 import { OrderSummary, SpecialOrder, CourseListDto } from "@/types";
 import { formatPrice, formatDate, getOrderStatusBadge } from "@/lib/utils/formatters";
+import MyCourseCard from "@/components/courses/MyCourseCard";
 import {
   User,
   Package,
@@ -24,8 +25,9 @@ import {
   Sparkles,
 } from "lucide-react";
 
-export default function AccountPage() {
+function AccountPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     user,
     isAuthenticated,
@@ -35,13 +37,25 @@ export default function AccountPage() {
   } = useAuth();
   const { success, error } = useToast();
 
+  const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "special" | "courses">(
-    "orders",
+    tabParam === "courses" || tabParam === "special" || tabParam === "profile" ? tabParam : "orders"
   );
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [specialOrders, setSpecialOrders] = useState<SpecialOrder[]>([]);
   const [myCourses, setMyCourses] = useState<CourseListDto[]>([]);
   const [loadingData, setLoadingData] = useState(false);
+
+  useEffect(() => {
+    if (tabParam === "courses" || tabParam === "orders" || tabParam === "special" || tabParam === "profile") {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (tab: "profile" | "orders" | "special" | "courses") => {
+    setActiveTab(tab);
+    router.replace(`/account?tab=${tab}`, { scroll: false });
+  };
 
   // Profile Form state
   const [firstName, setFirstName] = useState("");
@@ -154,9 +168,9 @@ export default function AccountPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#1c211b]/10 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-[#1c211b]/10 pb-2 overflow-x-auto" role="tablist">
         <button
-          onClick={() => setActiveTab("orders")}
+          onClick={() => handleTabChange("orders")}
           className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "orders"
               ? "bg-[#082719] text-white shadow-sm"
@@ -168,19 +182,19 @@ export default function AccountPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab("courses")}
+          onClick={() => handleTabChange("courses")}
           className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "courses"
-              ? "bg-[#082719] text-white shadow-sm"
+              ? "bg-[#082719] text-[#dfc79b] shadow-sm"
               : "bg-white text-[#5A626A] hover:bg-[#EDE8DC]"
           }`}
         >
           <GraduationCap className="w-4 h-4" />
-          <span>آموزش‌ها و دوره‌های من ({myCourses.length})</span>
+          <span>دوره‌های من ({myCourses.length})</span>
         </button>
 
         <button
-          onClick={() => setActiveTab("special")}
+          onClick={() => handleTabChange("special")}
           className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "special"
               ? "bg-[#082719] text-white shadow-sm"
@@ -192,7 +206,7 @@ export default function AccountPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab("profile")}
+          onClick={() => handleTabChange("profile")}
           className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
             activeTab === "profile"
               ? "bg-[#082719] text-white shadow-sm"
@@ -328,76 +342,10 @@ export default function AccountPage() {
               بارگذاری دوره‌ها...
             </div>
           ) : myCourses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {myCourses.map((c) => {
-                const isReservation =
-                  Boolean(c.isReservationOnly) ||
-                  c.price === null ||
-                  c.price === undefined ||
-                  c.price <= 0;
-
-                return (
-                  <div
-                    key={c.id}
-                    className="card-popup rounded-2xl p-5 bg-white border border-[#1c211b]/10 flex flex-col gap-4 justify-between shadow-xs hover:border-[#1c211b]/20 transition-all"
-                  >
-                    <div className="flex items-start gap-4">
-                      {c.coverImageUrl ? (
-                        <div className="w-20 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-[#1c211b]/08">
-                          <img
-                            src={c.coverImageUrl}
-                            alt={c.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-20 h-16 rounded-xl bg-[#082719] text-[#dfc79b] flex items-center justify-center shrink-0">
-                          <GraduationCap className="w-8 h-8" />
-                        </div>
-                      )}
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#dfc79b]/20 text-[#8f6d2f] border border-[#dfc79b]/40">
-                            {c.levelTitle}
-                          </span>
-                          {isReservation ? (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              <span>رزرو شده (در حال ضبط)</span>
-                            </span>
-                          ) : (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" />
-                              <span>ثبت‌نام شده</span>
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-bold text-sm text-[#161A1D] truncate mt-1">
-                          {c.title}
-                        </h3>
-                        {c.instructorName && (
-                          <span className="text-xs text-[#5A626A]">
-                            مدرس: {c.instructorName}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-[#1c211b]/08 gap-3">
-                      <span className="text-xs font-mono text-[#5A626A]">
-                        {c.durationText || (c.durationMinutes ? `${c.durationMinutes} دقیقه` : "")}
-                      </span>
-                      <Link
-                        href={`/courses/${c.slug}`}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#082719] bg-[#EDE8DC] hover:bg-[#dfc79b] px-4 py-2 rounded-full transition-colors"
-                      >
-                        <PlayCircle className="w-4 h-4" />
-                        <span>مشاهده و ورود به دوره</span>
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myCourses.map((c) => (
+                <MyCourseCard key={c.id} course={c} />
+              ))}
             </div>
           ) : (
             <div className="card-popup rounded-2xl p-12 text-center bg-white border border-[#1c211b]/10 flex flex-col items-center gap-4">
@@ -408,11 +356,11 @@ export default function AccountPage() {
                 هنوز در هیچ دوره‌ای ثبت‌نام یا پیش‌ثبت‌نام نکرده‌اید
               </h3>
               <p className="text-xs text-[#5A626A] max-w-sm leading-relaxed">
-                می‌توانید دوره‌های کارگاهی استودیو هیزو را مشاهده کرده و در دوره‌های در حال ضبط، جایگاه خود را رایگان رزرو نمایید.
+                می‌توانید دوره‌های کارگاهی استودیو هیزو را مشاهده کرده و در دوره‌های مدنظر، پیش‌ثبت‌نام نمایید.
               </p>
               <Link
                 href="/courses"
-                className="mt-2 inline-flex items-center gap-2 bg-[#082719] text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-[#162b20] transition-colors"
+                className="mt-2 inline-flex items-center gap-2 bg-[#082719] text-[#dfc79b] text-xs font-bold px-6 py-2.5 rounded-full hover:bg-[#162b20] transition-colors"
               >
                 <span>مشاهده کاتالوگ دوره‌های آموزشی هیزو</span>
               </Link>
@@ -526,5 +474,19 @@ export default function AccountPage() {
         </form>
       )}
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-6 py-20 text-center font-mono">
+          LOADING ACCOUNT...
+        </div>
+      }
+    >
+      <AccountPageContent />
+    </Suspense>
   );
 }

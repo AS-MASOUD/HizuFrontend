@@ -44,7 +44,7 @@ export default function ProductEditorModal({
   const [sku, setSku] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [compareAtPrice, setCompareAtPrice] = useState<number | "">("");
-  const [stockQuantity, setStockQuantity] = useState<number>(10);
+  const [stockQuantity, setStockQuantity] = useState<number | "">("");
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -71,7 +71,11 @@ export default function ProductEditorModal({
       setSku(productToEdit.sku || "");
       setPrice(productToEdit.price ?? 0);
       setCompareAtPrice(productToEdit.compareAtPrice ?? "");
-      setStockQuantity(productToEdit.stockQuantity ?? 0);
+      setStockQuantity(
+        productToEdit.stockQuantity !== null && productToEdit.stockQuantity !== undefined
+          ? productToEdit.stockQuantity
+          : ""
+      );
       setShortDescription(productToEdit.shortDescription || "");
       setDescription(productToEdit.description || "");
       setIsActive(productToEdit.isActive ?? true);
@@ -96,7 +100,7 @@ export default function ProductEditorModal({
       setSku("");
       setPrice("");
       setCompareAtPrice("");
-      setStockQuantity(10);
+      setStockQuantity("");
       setShortDescription("");
       setDescription("");
       setIsActive(true);
@@ -192,7 +196,7 @@ export default function ProductEditorModal({
         sku: sku.trim() || undefined, // Optional: backend generates automated SKU if empty!
         price: Number(price),
         compareAtPrice: compareAtPrice !== "" ? Number(compareAtPrice) : undefined,
-        stockQuantity: Number(stockQuantity) || 0,
+        stockQuantity: stockQuantity === "" ? null : Number(stockQuantity),
         imageUrl: primaryImageUrl || imageUrls[0] || undefined,
         imageUrls: imageUrls,
         isActive,
@@ -324,13 +328,20 @@ export default function ProductEditorModal({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-semibold text-[#161A1D]">موجودی انبار (عدد) *</label>
+                <label className="font-semibold text-[#161A1D]">
+                  موجودی انبار (عدد){" "}
+                  <span className="text-[10px] text-[#5A626A] font-normal">
+                    (اختیاری)
+                  </span>
+                </label>
                 <input
                   type="number"
-                  required
                   min={0}
                   value={stockQuantity}
-                  onChange={(e) => setStockQuantity(parseInt(e.target.value, 10) || 0)}
+                  onChange={(e) =>
+                    setStockQuantity(e.target.value === "" ? "" : Number(e.target.value))
+                  }
+                  placeholder="بدون محدودیت / عدم نمایش"
                   className="w-full bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-3 py-2 text-xs font-mono text-[#161A1D] focus:outline-none focus:border-[#082719]"
                 />
               </div>

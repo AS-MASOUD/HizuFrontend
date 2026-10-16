@@ -68,5 +68,19 @@ export function getOrderStatusBadge(status: number): {
   }
 }
 
+export function formatDurationHoursMinutes(minutes: number): string {
+  if (!minutes || minutes <= 0) return "۰ دقیقه";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0 && m > 0) {
+    return `${toPersianDigits(h)} ساعت و ${toPersianDigits(m)} دقیقه`;
+  }
+  if (h > 0) {
+    return `${toPersianDigits(h)} ساعت`;
+  }
+  return `${toPersianDigits(m)} دقیقه`;
+}
+
 export { getImageUrl } from "./imageUrl";
+
 

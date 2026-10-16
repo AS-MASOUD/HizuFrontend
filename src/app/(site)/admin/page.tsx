@@ -53,6 +53,9 @@ import {
   Mail,
   Phone,
   Sparkles,
+  Search,
+  Filter,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import ArticleEditorModal from "@/components/admin/ArticleEditorModal";
@@ -106,6 +109,9 @@ export default function AdminDashboardPage() {
 
   const [orderDetailModalOpen, setOrderDetailModalOpen] = useState(false);
   const [orderToView, setOrderToView] = useState<Order | null>(null);
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderTypeFilter, setOrderTypeFilter] = useState<"all" | "courses" | "products">("all");
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
 
   // Contact messages state
   const [messageModalOpen, setMessageModalOpen] = useState(false);
@@ -539,6 +545,44 @@ export default function AdminDashboardPage() {
     return true;
   });
 
+  const filteredOrders = orders.filter((o) => {
+    // 1. Search text
+    if (orderSearch.trim()) {
+      const q = orderSearch.trim().toLowerCase();
+      const matchOrderNum = o.orderNumber?.toLowerCase().includes(q);
+      const matchCustomer = o.customerName?.toLowerCase().includes(q);
+      const matchPhone = o.customerPhone?.toLowerCase().includes(q);
+      const matchEmail = o.customerEmail?.toLowerCase().includes(q);
+      const matchItems = o.items?.some(
+        (i) => i.productName?.toLowerCase().includes(q) || i.sku?.toLowerCase().includes(q)
+      );
+      if (!matchOrderNum && !matchCustomer && !matchPhone && !matchEmail && !matchItems) {
+        return false;
+      }
+    }
+
+    // 2. Order Type filter
+    const isCourseOrder =
+      o.orderNumber?.startsWith("ORD-CRS-") ||
+      o.items?.some((i) => !!i.courseId || i.productName?.includes("دوره"));
+
+    if (orderTypeFilter === "courses" && !isCourseOrder) {
+      return false;
+    }
+    if (orderTypeFilter === "products" && isCourseOrder) {
+      return false;
+    }
+
+    // 3. Status filter
+    if (orderStatusFilter !== "all") {
+      if (o.status !== parseInt(orderStatusFilter, 10)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-6 sm:px-8 py-10 flex flex-col gap-8">
       {/* Header */}
@@ -912,12 +956,16 @@ export default function AdminDashboardPage() {
                           {formatPrice(p.price)}
                         </td>
                         <td className="p-4 font-mono">
-                          {p.stockQuantity > 0 ? (
-                            <span className="text-emerald-700 font-bold">
-                              {toPersianDigits(p.stockQuantity)} عدد
-                            </span>
+                          {p.stockQuantity !== null && p.stockQuantity !== undefined ? (
+                            p.stockQuantity > 0 ? (
+                              <span className="text-emerald-700 font-bold">
+                                {toPersianDigits(p.stockQuantity)} عدد
+                              </span>
+                            ) : (
+                              <span className="text-rose-600 font-bold">ناموجود</span>
+                            )
                           ) : (
-                            <span className="text-rose-600 font-bold">ناموجود</span>
+                            <span className="text-gray-400 font-normal text-xs">ثبت‌نشده (نامحدود)</span>
                           )}
                         </td>
                         <td className="p-4">
@@ -1151,15 +1199,112 @@ export default function AdminDashboardPage() {
       {/* ---------------- CONTENT: ORDERS ---------------- */}
       {activeTab === "orders" && (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#1c211b]/10 shadow-xs">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-[#1c211b]/10 shadow-xs">
             <div>
               <h3 className="font-bold text-base text-[#161A1D] flex items-center gap-2">
                 <Package className="w-4 h-4 text-[#082719]" />
                 <span>مدیریت و نظارت بر سفارش‌های خرید مشتریان</span>
               </h3>
               <p className="text-xs text-[#5A626A] mt-0.5">
-                بررسی اقلام خریداری شده، آدرس تحویل پستی، تایید نهایی سفارش، کسر خودکار از موجودی انبار و چاپ فاکتور
+                بررسی سفارش‌های فیزیکی و دیجیتال، دوره‌های ثبت‌نام و رزرو شده، فاکتورها و وضعیت تحویل
               </p>
+            </div>
+
+            {/* Orders Search and Filters */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="جستجوی شماره، خریدار، دوره، کالا..."
+                  value={orderSearch}
+                  onChange={(e) => setOrderSearch(e.target.value)}
+                  className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-full pr-8 pl-8 py-2 text-xs text-[#161A1D] w-56 sm:w-64 focus:outline-none focus:border-[#082719]"
+                />
+                {orderSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setOrderSearch("")}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Type Filter Buttons */}
+              <div className="flex items-center gap-1 bg-[#FAF7F0] p-1 rounded-xl border border-[#1c211b]/10">
+                <button
+                  type="button"
+                  onClick={() => setOrderTypeFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    orderTypeFilter === "all"
+                      ? "bg-[#082719] text-white shadow-xs"
+                      : "text-[#5A626A] hover:text-[#161A1D]"
+                  }`}
+                >
+                  همه ({orders.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderTypeFilter("courses")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    orderTypeFilter === "courses"
+                      ? "bg-purple-800 text-white shadow-xs"
+                      : "text-purple-800 hover:bg-purple-50"
+                  }`}
+                >
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span>
+                    دوره‌ها (
+                    {
+                      orders.filter(
+                        (o) =>
+                          o.orderNumber?.startsWith("ORD-CRS-") ||
+                          o.items?.some((i) => !!i.courseId || i.productName?.includes("دوره"))
+                      ).length
+                    }
+                    )
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderTypeFilter("products")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    orderTypeFilter === "products"
+                      ? "bg-[#8f6d2f] text-white shadow-xs"
+                      : "text-[#8f6d2f] hover:bg-amber-50"
+                  }`}
+                >
+                  <Package className="w-3.5 h-3.5" />
+                  <span>
+                    محصولات (
+                    {
+                      orders.filter(
+                        (o) =>
+                          !o.orderNumber?.startsWith("ORD-CRS-") &&
+                          !o.items?.some((i) => !!i.courseId || i.productName?.includes("دوره"))
+                      ).length
+                    }
+                    )
+                  </span>
+                </button>
+              </div>
+
+              {/* Status Filter */}
+              <select
+                value={orderStatusFilter}
+                onChange={(e) => setOrderStatusFilter(e.target.value)}
+                className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-3 py-2 text-xs text-[#161A1D] cursor-pointer focus:outline-none focus:border-[#082719]"
+              >
+                <option value="all">همه وضعیت‌ها</option>
+                <option value="0">در انتظار پرداخت / تایید</option>
+                <option value="1">در حال ساخت / پردازش</option>
+                <option value="2">ارسال شده با پست</option>
+                <option value="3">تحویل شده به مشتری</option>
+                <option value="4">لغو شده</option>
+              </select>
             </div>
           </div>
 
@@ -1168,10 +1313,10 @@ export default function AdminDashboardPage() {
               <table className="w-full text-right text-xs">
                 <thead className="bg-[#EFE9DC] text-[#5A4A3A] font-mono text-[11px]">
                   <tr>
-                    <th className="p-4">شماره فاکتور</th>
+                    <th className="p-4">شماره فاکتور و نوع</th>
                     <th className="p-4">مشخصات خریدار</th>
                     <th className="p-4">اقلام سفارش</th>
-                    <th className="p-4">وضعیت انبار</th>
+                    <th className="p-4">وضعیت موجودی / دسترسی</th>
                     <th className="p-4">مبلغ فاکتور</th>
                     <th className="p-4">تاریخ ثبت</th>
                     <th className="p-4">وضعیت جاری</th>
@@ -1180,107 +1325,166 @@ export default function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1c211b]/08">
-                  {orders.length === 0 ? (
+                  {filteredOrders.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="p-8 text-center text-[#5A626A]">
-                        هیچ سفارشی در سیستم ثبت نشده است.
+                        {orders.length === 0
+                          ? "هیچ سفارشی در سیستم ثبت نشده است."
+                          : "هیچ سفارشی با شرایط جستجو و فیلترهای انتخابی یافت نشد."}
                       </td>
                     </tr>
                   ) : (
-                    orders.map((o) => (
-                      <tr key={o.id} className="hover:bg-[#FAF7F0] transition-colors">
-                        <td className="p-4">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setOrderToView(o);
-                              setOrderDetailModalOpen(true);
-                            }}
-                            className="font-mono font-bold text-[#082719] hover:text-[#0284c7] hover:underline flex items-center gap-1.5"
-                          >
-                            <span>{o.orderNumber}</span>
-                          </button>
-                        </td>
-                        <td className="p-4">
-                          <div className="font-bold text-[#161A1D]">{o.customerName || "کاربر مهمان"}</div>
-                          {o.customerPhone ? (
-                            <div className="font-mono text-[11px] text-[#0284c7] dir-ltr mt-0.5">
-                              {o.customerPhone}
+                    filteredOrders.map((o) => {
+                      const isCourseOrder =
+                        o.orderNumber?.startsWith("ORD-CRS-") ||
+                        o.items?.some((i) => !!i.courseId || i.productName?.includes("دوره"));
+
+                      return (
+                        <tr key={o.id} className="hover:bg-[#FAF7F0] transition-colors">
+                          <td className="p-4">
+                            <div className="flex flex-col gap-1.5 items-start">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOrderToView(o);
+                                  setOrderDetailModalOpen(true);
+                                }}
+                                className="font-mono font-bold text-[#082719] hover:text-[#0284c7] hover:underline flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <span>{o.orderNumber}</span>
+                              </button>
+
+                              {isCourseOrder ? (
+                                <span className="inline-flex items-center gap-1 font-bold text-purple-900 bg-purple-100 border border-purple-300 px-2 py-0.5 rounded-full text-[10px]">
+                                  <GraduationCap className="w-3 h-3 text-purple-700" />
+                                  <span>دوره آموزشی</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 font-bold text-[#8f6d2f] bg-[#EDE8DC] border border-[#dfc79b]/40 px-2 py-0.5 rounded-full text-[10px]">
+                                  <Package className="w-3 h-3 text-[#8f6d2f]" />
+                                  <span>محصول فیزیکی</span>
+                                </span>
+                              )}
                             </div>
-                          ) : o.customerEmail ? (
-                            <div className="font-mono text-[10px] text-[#5A626A] dir-ltr mt-0.5 line-clamp-1">
-                              {o.customerEmail}
-                            </div>
-                          ) : null}
-                        </td>
-                        <td className="p-4 max-w-[200px]">
-                          {o.items.map((i) => (
-                            <div key={i.id} className="font-mono text-[11px] text-[#5A626A] line-clamp-1">
-                              {i.productName} × {toPersianDigits(i.quantity)}
-                            </div>
-                          ))}
-                        </td>
-                        <td className="p-4">
-                          {o.isStockDeducted ? (
-                            <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full text-[10px]">
-                              <CheckCircle2 className="w-3 h-3" />
-                              <span>کسر از انبار</span>
+                          </td>
+
+                          <td className="p-4">
+                            <div className="font-bold text-[#161A1D]">{o.customerName || "کاربر مهمان"}</div>
+                            {o.customerPhone ? (
+                              <div className="font-mono text-[11px] text-[#0284c7] dir-ltr mt-0.5">
+                                {o.customerPhone}
+                              </div>
+                            ) : o.customerEmail ? (
+                              <div className="font-mono text-[10px] text-[#5A626A] dir-ltr mt-0.5 line-clamp-1">
+                                {o.customerEmail}
+                              </div>
+                            ) : null}
+                          </td>
+
+                          <td className="p-4 max-w-[220px]">
+                            {o.items.map((i) => {
+                              const isCourseItem = !!i.courseId || i.productName?.includes("دوره");
+                              return (
+                                <div
+                                  key={i.id}
+                                  className="text-[11px] text-[#5A626A] line-clamp-1 flex items-center gap-1.5 my-0.5"
+                                >
+                                  {isCourseItem ? (
+                                    <GraduationCap className="w-3 h-3 text-purple-600 shrink-0" />
+                                  ) : (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+                                  )}
+                                  <span className="truncate">{i.productName}</span>
+                                  <span className="font-mono text-gray-400 shrink-0">
+                                    × {toPersianDigits(i.quantity)}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </td>
+
+                          <td className="p-4">
+                            {isCourseOrder ? (
+                              <span className="inline-flex items-center gap-1 font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full text-[10px]">
+                                <Sparkles className="w-3 h-3 text-blue-600" />
+                                <span>دسترسی دیجیتال</span>
+                              </span>
+                            ) : o.isStockDeducted ? (
+                              <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full text-[10px]">
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>کسر از انبار</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full text-[10px]">
+                                <AlertTriangle className="w-3 h-3" />
+                                <span>در انتظار تایید</span>
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="p-4">
+                            {o.total === 0 && isCourseOrder ? (
+                              <span className="font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full text-[10px]">
+                                پیش‌ثبت‌نام (رایگان)
+                              </span>
+                            ) : (
+                              <span className="font-mono font-bold text-[#082719] text-xs">
+                                {formatPrice(o.total)}
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="p-4 text-[#5A626A] font-mono text-[11px]">{formatDate(o.createdAt)}</td>
+
+                          <td className="p-4">
+                            <span
+                              className={`font-bold px-2 py-0.5 rounded text-[10px] border ${
+                                o.status === 0
+                                  ? "bg-amber-100 text-amber-800 border-amber-300"
+                                  : o.status === 1
+                                  ? "bg-blue-100 text-blue-800 border-blue-300"
+                                  : o.status === 2
+                                  ? "bg-purple-100 text-purple-800 border-purple-300"
+                                  : o.status === 3
+                                  ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                                  : "bg-rose-100 text-rose-800 border-rose-300"
+                              }`}
+                            >
+                              {o.statusText}
                             </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full text-[10px]">
-                              <AlertTriangle className="w-3 h-3" />
-                              <span>در انتظار تایید</span>
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-4 font-mono font-bold text-[#082719]">{formatPrice(o.total)}</td>
-                        <td className="p-4 text-[#5A626A]">{formatDate(o.createdAt)}</td>
-                        <td className="p-4">
-                          <span
-                            className={`font-bold px-2 py-0.5 rounded text-[10px] border ${
-                              o.status === 0
-                                ? "bg-amber-100 text-amber-800 border-amber-300"
-                                : o.status === 1
-                                ? "bg-blue-100 text-blue-800 border-blue-300"
-                                : o.status === 2
-                                ? "bg-purple-100 text-purple-800 border-purple-300"
-                                : o.status === 3
-                                ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                                : "bg-rose-100 text-rose-800 border-rose-300"
-                            }`}
-                          >
-                            {o.statusText}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <select
-                            value={o.status}
-                            onChange={(e) => handleUpdateOrderStatus(o.id, parseInt(e.target.value, 10))}
-                            className="border border-gray-300 rounded-lg px-2.5 py-1 text-xs bg-white cursor-pointer focus:outline-none focus:border-[#082719]"
-                          >
-                            <option value={0}>در انتظار پرداخت / تایید</option>
-                            <option value={1}>در حال ساخت (کسر انبار)</option>
-                            <option value={2}>ارسال شده با پست</option>
-                            <option value={3}>تحویل شده به مشتری</option>
-                            <option value={4}>لغو شده (برگشت موجودی)</option>
-                          </select>
-                        </td>
-                        <td className="p-4 text-center">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setOrderToView(o);
-                              setOrderDetailModalOpen(true);
-                            }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF7F0] hover:bg-[#EDE8DC] text-[#082719] font-bold border border-[#1c211b]/15 transition-all text-[11px]"
-                            title="مشاهده جزئیات کامل سفارش"
-                          >
-                            <Eye className="w-3.5 h-3.5 text-[#0284c7]" />
-                            <span>جزئیات</span>
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+
+                          <td className="p-4">
+                            <select
+                              value={o.status}
+                              onChange={(e) => handleUpdateOrderStatus(o.id, parseInt(e.target.value, 10))}
+                              className="border border-gray-300 rounded-lg px-2.5 py-1 text-xs bg-white cursor-pointer focus:outline-none focus:border-[#082719]"
+                            >
+                              <option value={0}>در انتظار پرداخت / تایید</option>
+                              <option value={1}>در حال ساخت (کسر انبار)</option>
+                              <option value={2}>ارسال شده با پست</option>
+                              <option value={3}>تحویل شده به مشتری</option>
+                              <option value={4}>لغو شده (برگشت موجودی)</option>
+                            </select>
+                          </td>
+
+                          <td className="p-4 text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOrderToView(o);
+                                setOrderDetailModalOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF7F0] hover:bg-[#EDE8DC] text-[#082719] font-bold border border-[#1c211b]/15 transition-all text-[11px] cursor-pointer"
+                              title="مشاهده جزئیات کامل سفارش"
+                            >
+                              <Eye className="w-3.5 h-3.5 text-[#0284c7]" />
+                              <span>جزئیات</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -1657,10 +1861,10 @@ export default function AdminDashboardPage() {
             <div>
               <h3 className="font-bold text-base text-[#161A1D] flex items-center gap-2">
                 <GraduationCap className="w-5 h-5 text-[#082719]" />
-                <span>مدیریت دوره‌های آموزشی، ضبط و پیش‌ثبت‌نام‌ها</span>
+                <span>مدیریت دوره‌های آموزشی و پیش‌ثبت‌نام‌ها</span>
               </h3>
               <p className="text-xs text-[#5A626A] mt-0.5">
-                ایجاد دوره جدید، تعیین وضعیت پیش‌ثبت‌نام (رزرو بدون شهریه) یا فروش با شهریه پس از ضبط، مدیریت لینک‌های فایل‌سرور
+                ایجاد دوره جدید، سرفصل‌ها و جلسات، وضعیت پیش‌ثبت‌نام (رزرو بدون شهریه) یا فروش با شهریه، مدیریت لینک‌های فایل‌سرور
               </p>
             </div>
 
@@ -1826,7 +2030,7 @@ export default function AdminDashboardPage() {
                                 <div className="flex flex-col gap-1">
                                   <span className="inline-flex items-center gap-1 font-bold px-2.5 py-1 rounded-full text-[10px] bg-amber-100 text-amber-900 border border-amber-300 w-fit">
                                     <Sparkles className="w-3 h-3 text-amber-600" />
-                                    <span>در حال ضبط (رزرو رایگان)</span>
+                                    <span>پیش‌ثبت‌نام (رزرو)</span>
                                   </span>
                                   <span className="text-[10px] text-gray-400">بدون شهریه فعلی</span>
                                 </div>

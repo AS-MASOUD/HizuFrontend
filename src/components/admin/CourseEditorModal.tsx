@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Course, CourseLevel } from "@/types";
+import { Course, CourseLevel, CourseSection, CourseEpisode } from "@/types";
 import { productsApi } from "@/lib/api/products";
 import { optimizeProductImage } from "@/lib/utils/imageOptimizer";
 import { useToast } from "@/providers/ToastProvider";
@@ -19,10 +19,18 @@ import {
   User,
   BookOpen,
   Settings,
-  Link as LinkIcon,
   HelpCircle,
+  Layers,
+  Plus,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  PlayCircle,
+  FileText,
+  Clock,
+  Paperclip,
 } from "lucide-react";
-import { formatPrice } from "@/lib/utils/formatters";
+import { formatPrice, toPersianDigits } from "@/lib/utils/formatters";
 import { getImageUrl } from "@/lib/utils/imageUrl";
 
 interface CourseEditorModalProps {
@@ -42,9 +50,11 @@ export default function CourseEditorModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<"general" | "pricing" | "media" | "instructor" | "syllabus" | "settings">("general");
+  const [activeTab, setActiveTab] = useState<
+    "general" | "curriculum" | "pricing" | "media" | "instructor" | "syllabus" | "settings"
+  >("general");
 
-  // Form State
+  // Form State - General
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [subtitle, setSubtitle] = useState("");
@@ -55,15 +65,20 @@ export default function CourseEditorModal({
   const [price, setPrice] = useState<number | "">("");
   const [compareAtPrice, setCompareAtPrice] = useState<number | "">("");
 
-  // Course Metadata
+  // Course Duration & Metadata
   const [level, setLevel] = useState<CourseLevel>(4);
   const [language, setLanguage] = useState("فارسی");
+  const [courseHours, setCourseHours] = useState<number>(0);
+  const [courseMinutes, setCourseMinutes] = useState<number>(0);
   const [durationMinutes, setDurationMinutes] = useState<number>(0);
   const [durationText, setDurationText] = useState("");
   const [totalEpisodesCount, setTotalEpisodesCount] = useState<number>(0);
   const [downloadableResourcesCount, setDownloadableResourcesCount] = useState<number>(0);
   const [includesCertificate, setIncludesCertificate] = useState(true);
   const [hasLifetimeAccess, setHasLifetimeAccess] = useState(true);
+
+  // Sections & Episodes (Curriculum)
+  const [sections, setSections] = useState<CourseSection[]>([]);
 
   // Media & File Server Links
   const [coverImageUrl, setCoverImageUrl] = useState("");
@@ -98,19 +113,57 @@ export default function CourseEditorModal({
       setSubtitle(courseToEdit.subtitle || "");
       setDescription(courseToEdit.description || "");
 
-      const isRes = courseToEdit.isReservationOnly || courseToEdit.price === null || courseToEdit.price === 0;
+      const isRes =
+        courseToEdit.isReservationOnly ||
+        courseToEdit.price === null ||
+        courseToEdit.price === undefined ||
+        courseToEdit.price === 0;
       setIsReservationOnly(isRes);
       setPrice(courseToEdit.price ?? "");
       setCompareAtPrice(courseToEdit.compareAtPrice ?? "");
 
       setLevel(courseToEdit.level || 4);
       setLanguage(courseToEdit.language || "فارسی");
-      setDurationMinutes(courseToEdit.durationMinutes || 0);
+
+      const totalMin = courseToEdit.durationMinutes || 0;
+      setDurationMinutes(totalMin);
+      setCourseHours(Math.floor(totalMin / 60));
+      setCourseMinutes(totalMin % 60);
       setDurationText(courseToEdit.durationText || "");
+
       setTotalEpisodesCount(courseToEdit.totalEpisodesCount || 0);
       setDownloadableResourcesCount(courseToEdit.downloadableResourcesCount || 0);
       setIncludesCertificate(courseToEdit.includesCertificate ?? true);
       setHasLifetimeAccess(courseToEdit.hasLifetimeAccess ?? true);
+
+      // Deep copy sections and episodes
+      if (courseToEdit.sections && courseToEdit.sections.length > 0) {
+        setSections(
+          courseToEdit.sections.map((s) => ({
+            id: s.id,
+            title: s.title || "",
+            description: s.description || "",
+            displayOrder: s.displayOrder || 1,
+            episodes: (s.episodes || []).map((e) => ({
+              id: e.id,
+              sectionId: e.sectionId || s.id,
+              title: e.title || "",
+              description: e.description || "",
+              durationMinutes: e.durationMinutes || 0,
+              durationText: e.durationText || "",
+              videoUrl: e.videoUrl || "",
+              fileServerUrl: e.fileServerUrl || "",
+              attachmentUrl: e.attachmentUrl || "",
+              attachmentName: e.attachmentName || "",
+              attachmentSizeBytes: e.attachmentSizeBytes,
+              isFreePreview: !!e.isFreePreview,
+              displayOrder: e.displayOrder || 1,
+            })),
+          }))
+        );
+      } else {
+        setSections([]);
+      }
 
       setCoverImageUrl(courseToEdit.coverImageUrl || "");
       setIntroVideoUrl(courseToEdit.introVideoUrl || "");
@@ -123,9 +176,21 @@ export default function CourseEditorModal({
       setInstructorBio(courseToEdit.instructorBio || "");
       setInstructorAvatarUrl(courseToEdit.instructorAvatarUrl || "");
 
-      setWhatYouWillLearn(courseToEdit.whatYouWillLearn || courseToEdit.whatYouWillLearnList?.join("\n") || "");
-      setRequirements(courseToEdit.requirements || courseToEdit.requirementsList?.join("\n") || "");
-      setTargetAudience(courseToEdit.targetAudience || courseToEdit.targetAudienceList?.join("\n") || "");
+      setWhatYouWillLearn(
+        courseToEdit.whatYouWillLearn ||
+          courseToEdit.whatYouWillLearnList?.join("\n") ||
+          ""
+      );
+      setRequirements(
+        courseToEdit.requirements ||
+          courseToEdit.requirementsList?.join("\n") ||
+          ""
+      );
+      setTargetAudience(
+        courseToEdit.targetAudience ||
+          courseToEdit.targetAudienceList?.join("\n") ||
+          ""
+      );
 
       setIsPublished(courseToEdit.isPublished ?? true);
       setIsFeatured(courseToEdit.isFeatured ?? false);
@@ -142,12 +207,15 @@ export default function CourseEditorModal({
 
       setLevel(4);
       setLanguage("فارسی");
+      setCourseHours(0);
+      setCourseMinutes(0);
       setDurationMinutes(0);
       setDurationText("");
       setTotalEpisodesCount(0);
       setDownloadableResourcesCount(0);
       setIncludesCertificate(true);
       setHasLifetimeAccess(true);
+      setSections([]);
 
       setCoverImageUrl("");
       setIntroVideoUrl("");
@@ -172,6 +240,178 @@ export default function CourseEditorModal({
   }, [courseToEdit, isOpen]);
 
   if (!isOpen) return null;
+
+  // Handle duration change on course level
+  const handleCourseDurationChange = (hours: number, minutes: number) => {
+    const h = Math.max(0, hours);
+    const m = Math.max(0, Math.min(59, minutes));
+    setCourseHours(h);
+    setCourseMinutes(m);
+    const totalMin = h * 60 + m;
+    setDurationMinutes(totalMin);
+
+    if (totalMin > 0) {
+      if (h > 0 && m > 0) {
+        setDurationText(`${h} ساعت و ${m} دقیقه`);
+      } else if (h > 0) {
+        setDurationText(`${h} ساعت`);
+      } else {
+        setDurationText(`${m} دقیقه`);
+      }
+    } else {
+      setDurationText("");
+    }
+  };
+
+  // Section Handlers
+  const handleAddSection = () => {
+    const newSection: CourseSection = {
+      id: `temp-sec-${Date.now()}`,
+      title: `فصل ${sections.length + 1}: `,
+      description: "",
+      displayOrder: sections.length + 1,
+      episodes: [],
+    };
+    setSections([...sections, newSection]);
+  };
+
+  const handleUpdateSection = (index: number, field: "title" | "description", value: string) => {
+    const next = [...sections];
+    next[index] = { ...next[index], [field]: value };
+    setSections(next);
+  };
+
+  const handleDeleteSection = (index: number) => {
+    const secTitle = sections[index].title || `فصل ${index + 1}`;
+    if (confirm(`آیا از حذف «${secTitle}» و تمام جلسات درون آن اطمینان دارید؟`)) {
+      const next = sections.filter((_, i) => i !== index);
+      setSections(next);
+    }
+  };
+
+  const handleMoveSection = (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= sections.length) return;
+    const next = [...sections];
+    const [moved] = next.splice(index, 1);
+    next.splice(targetIndex, 0, moved);
+    setSections(next);
+  };
+
+  // Episode Handlers
+  const handleAddEpisode = (sectionIndex: number) => {
+    const next = [...sections];
+    const episodes = next[sectionIndex].episodes || [];
+    const newEp: CourseEpisode = {
+      id: `temp-ep-${Date.now()}`,
+      sectionId: next[sectionIndex].id,
+      title: `جلسه ${episodes.length + 1}: `,
+      description: "",
+      durationMinutes: 0,
+      durationText: "",
+      videoUrl: "",
+      attachmentUrl: "",
+      attachmentName: "",
+      isFreePreview: false,
+      displayOrder: episodes.length + 1,
+    };
+    next[sectionIndex] = {
+      ...next[sectionIndex],
+      episodes: [...episodes, newEp],
+    };
+    setSections(next);
+  };
+
+  const handleUpdateEpisode = (
+    sectionIndex: number,
+    episodeIndex: number,
+    fields: Partial<CourseEpisode>
+  ) => {
+    const next = [...sections];
+    const episodes = [...next[sectionIndex].episodes];
+    episodes[episodeIndex] = { ...episodes[episodeIndex], ...fields };
+    next[sectionIndex] = { ...next[sectionIndex], episodes };
+    setSections(next);
+  };
+
+  const handleEpisodeTimeChange = (
+    sectionIndex: number,
+    episodeIndex: number,
+    hours: number,
+    minutes: number
+  ) => {
+    const h = Math.max(0, hours);
+    const m = Math.max(0, Math.min(59, minutes));
+    const totalMin = h * 60 + m;
+    let text = "";
+    if (totalMin > 0) {
+      if (h > 0 && m > 0) {
+        text = `${h} ساعت و ${m} دقیقه`;
+      } else if (h > 0) {
+        text = `${h} ساعت`;
+      } else {
+        text = `${m} دقیقه`;
+      }
+    }
+
+    handleUpdateEpisode(sectionIndex, episodeIndex, {
+      durationMinutes: totalMin,
+      durationText: text,
+    });
+  };
+
+  const handleDeleteEpisode = (sectionIndex: number, episodeIndex: number) => {
+    const next = [...sections];
+    const episodes = next[sectionIndex].episodes.filter((_, i) => i !== episodeIndex);
+    next[sectionIndex] = { ...next[sectionIndex], episodes };
+    setSections(next);
+  };
+
+  const handleMoveEpisode = (
+    sectionIndex: number,
+    episodeIndex: number,
+    direction: "up" | "down"
+  ) => {
+    const targetIndex = direction === "up" ? episodeIndex - 1 : episodeIndex + 1;
+    const episodes = sections[sectionIndex].episodes || [];
+    if (targetIndex < 0 || targetIndex >= episodes.length) return;
+    const nextEpisodes = [...episodes];
+    const [moved] = nextEpisodes.splice(episodeIndex, 1);
+    nextEpisodes.splice(targetIndex, 0, moved);
+
+    const nextSections = [...sections];
+    nextSections[sectionIndex] = { ...nextSections[sectionIndex], episodes: nextEpisodes };
+    setSections(nextSections);
+  };
+
+  // Auto calculate total duration & episode count from all added episodes
+  const handleAutoCalculateFromEpisodes = () => {
+    const allEps = sections.flatMap((s) => s.episodes || []);
+    const totalMin = allEps.reduce((acc, ep) => acc + (Number(ep.durationMinutes) || 0), 0);
+    const totalCount = allEps.length;
+
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+
+    setCourseHours(h);
+    setCourseMinutes(m);
+    setDurationMinutes(totalMin);
+    setTotalEpisodesCount(totalCount);
+
+    if (totalMin > 0) {
+      if (h > 0 && m > 0) {
+        setDurationText(`${h} ساعت و ${m} دقیقه`);
+      } else if (h > 0) {
+        setDurationText(`${h} ساعت`);
+      } else {
+        setDurationText(`${m} دقیقه`);
+      }
+    }
+
+    toastSuccess(
+      `محاسبه انجام شد: ${toPersianDigits(totalCount)} جلسه، مجموعاً ${toPersianDigits(totalMin)} دقیقه (${h > 0 ? `${toPersianDigits(h)} ساعت و ` : ""}${toPersianDigits(m)} دقیقه)`
+    );
+  };
 
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -217,13 +457,36 @@ export default function CourseEditorModal({
     try {
       setSubmitting(true);
 
-      const finalPrice = isReservationOnly || price === "" || Number(price) <= 0
-        ? null
-        : Number(price);
+      const finalPrice =
+        isReservationOnly || price === "" || Number(price) <= 0 ? null : Number(price);
 
-      const finalComparePrice = isReservationOnly || compareAtPrice === ""
-        ? null
-        : Number(compareAtPrice);
+      const finalComparePrice =
+        isReservationOnly || compareAtPrice === "" ? null : Number(compareAtPrice);
+
+      // Prepare sanitized sections & episodes
+      const finalSections = sections.map((sec, secIdx) => ({
+        id: sec.id && !sec.id.startsWith("temp-") ? sec.id : undefined,
+        title: sec.title.trim() || `فصل ${secIdx + 1}`,
+        description: sec.description?.trim() || undefined,
+        displayOrder: secIdx + 1,
+        episodes: (sec.episodes || []).map((ep, epIdx) => ({
+          id: ep.id && !ep.id.startsWith("temp-") ? ep.id : undefined,
+          sectionId: sec.id && !sec.id.startsWith("temp-") ? sec.id : undefined,
+          title: ep.title.trim() || `جلسه ${epIdx + 1}`,
+          description: ep.description?.trim() || undefined,
+          durationMinutes: Number(ep.durationMinutes) || 0,
+          durationText: ep.durationText?.trim() || undefined,
+          videoUrl: ep.videoUrl?.trim() || undefined,
+          fileServerUrl: ep.fileServerUrl?.trim() || undefined,
+          attachmentUrl: ep.attachmentUrl?.trim() || undefined,
+          attachmentName: ep.attachmentName?.trim() || undefined,
+          attachmentSizeBytes: ep.attachmentSizeBytes
+            ? Number(ep.attachmentSizeBytes)
+            : undefined,
+          isFreePreview: !!ep.isFreePreview,
+          displayOrder: epIdx + 1,
+        })),
+      }));
 
       const payload = {
         title: title.trim(),
@@ -256,6 +519,7 @@ export default function CourseEditorModal({
         isPublished,
         isFeatured,
         displayOrder: Number(displayOrder) || 0,
+        sections: finalSections,
       };
 
       await onSave(payload);
@@ -267,9 +531,14 @@ export default function CourseEditorModal({
     }
   };
 
+  const totalCurriculumEpisodes = sections.reduce(
+    (acc, s) => acc + (s.episodes?.length || 0),
+    0
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs overflow-y-auto">
-      <div className="card-popup relative w-full max-w-4xl rounded-2xl bg-white border border-[#1c211b]/15 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto">
+      <div className="card-popup relative w-full max-w-5xl rounded-2xl bg-white border border-[#1c211b]/15 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] my-auto">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#1c211b]/10 bg-[#FAF7F0] shrink-0">
           <div className="flex items-center gap-3">
@@ -281,14 +550,14 @@ export default function CourseEditorModal({
                 {courseToEdit ? `ویرایش دوره: ${courseToEdit.title}` : "افزودن دوره آموزشی جدید"}
               </h3>
               <p className="text-xs text-[#5A626A] mt-0.5">
-                تعریف مشخصات، وضعیت ضبط و رزرو، لینک‌های سرور دانلود و مدرس
+                تعریف مشخصات، سرفصل‌ها و جلسات، وضعیت پیش‌ثبت‌نام، لینک‌های دانلود و مدرس
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-[#5A626A] hover:text-[#161A1D] hover:bg-black/5 rounded-full transition-colors"
+            className="p-2 text-[#5A626A] hover:text-[#161A1D] hover:bg-black/5 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -307,6 +576,28 @@ export default function CourseEditorModal({
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>مشخصات پایه</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("curriculum")}
+            className={`px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shrink-0 ${
+              activeTab === "curriculum"
+                ? "bg-[#082719] text-white shadow-xs"
+                : "text-[#5A626A] hover:bg-[#EDE8DC]"
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>سرفصل‌ها و جلسات</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                activeTab === "curriculum"
+                  ? "bg-[#dfc79b] text-[#082719]"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {toPersianDigits(totalCurriculumEpisodes)}
+            </span>
           </button>
 
           <button
@@ -361,7 +652,7 @@ export default function CourseEditorModal({
             }`}
           >
             <HelpCircle className="w-3.5 h-3.5" />
-            <span>سرفصل‌ها و اهداف</span>
+            <span>اهداف و پیش‌نیازها</span>
           </button>
 
           <button
@@ -383,7 +674,7 @@ export default function CourseEditorModal({
           <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6 text-xs text-[#161A1D]">
             {/* 1. GENERAL TAB */}
             {activeTab === "general" && (
-              <div className="flex flex-col gap-4 animate-fadeIn">
+              <div className="flex flex-col gap-5 animate-fadeIn">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label className="font-bold flex items-center justify-between">
@@ -403,7 +694,9 @@ export default function CourseEditorModal({
                   <div className="flex flex-col gap-1.5">
                     <label className="font-bold flex items-center justify-between">
                       <span>نامک آدرس یکتا (Slug)</span>
-                      <span className="text-[10px] text-gray-400 font-normal">اختیاری (خودکار ساخته می‌شود)</span>
+                      <span className="text-[10px] text-gray-400 font-normal">
+                        اختیاری (خودکار ساخته می‌شود)
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -426,52 +719,102 @@ export default function CourseEditorModal({
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold">سطح دوره</label>
-                    <select
-                      value={level}
-                      onChange={(e) => setLevel(Number(e.target.value) as CourseLevel)}
-                      className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-3 py-2.5 text-xs text-[#161A1D] cursor-pointer"
-                    >
-                      <option value={1}>مقدماتی (Beginner)</option>
-                      <option value={2}>متوسط (Intermediate)</option>
-                      <option value={3}>پیشرفته (Advanced)</option>
-                      <option value={4}>از مقدماتی تا پیشرفته (All Levels)</option>
-                    </select>
-                  </div>
+                {/* Level, Language & Duration Controls */}
+                <div className="p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/10 flex flex-col gap-4">
+                  <span className="font-bold text-xs text-[#082719] flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" />
+                      <span>سطح و مدت زمان دوره (ساعت و دقیقه)</span>
+                    </span>
+                    {sections.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleAutoCalculateFromEpisodes}
+                        className="text-[11px] font-bold text-[#082719] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#dfc79b]" />
+                        <span>محاسبه خودکار از سرفصل‌ها</span>
+                      </button>
+                    )}
+                  </span>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold">مدت زمان (دقیقه)</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={durationMinutes}
-                      onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                      className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr"
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-bold">سطح دوره</label>
+                      <select
+                        value={level}
+                        onChange={(e) => setLevel(Number(e.target.value) as CourseLevel)}
+                        className="bg-white border border-[#1c211b]/15 rounded-xl px-3 py-2 text-xs text-[#161A1D] cursor-pointer"
+                      >
+                        <option value={1}>مقدماتی (Beginner)</option>
+                        <option value={2}>متوسط (Intermediate)</option>
+                        <option value={3}>پیشرفته (Advanced)</option>
+                        <option value={4}>از مقدماتی تا پیشرفته (All Levels)</option>
+                      </select>
+                    </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold">متن زمان دوره</label>
-                    <input
-                      type="text"
-                      placeholder="۱۸ ساعت و ۳۰ دقیقه"
-                      value={durationText}
-                      onChange={(e) => setDurationText(e.target.value)}
-                      className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs"
-                    />
-                  </div>
+                    {/* Dual Hours and Minutes Inputs */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-bold">مدت زمان (ساعت و دقیقه)</label>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 flex items-center gap-1 bg-white border border-[#1c211b]/15 rounded-xl px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min={0}
+                            placeholder="۰"
+                            value={courseHours === 0 ? "" : courseHours}
+                            onChange={(e) =>
+                              handleCourseDurationChange(
+                                Number(e.target.value) || 0,
+                                courseMinutes
+                              )
+                            }
+                            className="w-full text-center font-mono text-xs focus:outline-none"
+                          />
+                          <span className="text-[10px] text-gray-500 shrink-0">ساعت</span>
+                        </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold">تعداد کل جلسات / قسمت‌ها</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={totalEpisodesCount}
-                      onChange={(e) => setTotalEpisodesCount(Number(e.target.value))}
-                      className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr"
-                    />
+                        <div className="flex-1 flex items-center gap-1 bg-white border border-[#1c211b]/15 rounded-xl px-2.5 py-1.5">
+                          <input
+                            type="number"
+                            min={0}
+                            max={59}
+                            placeholder="۰"
+                            value={courseMinutes === 0 ? "" : courseMinutes}
+                            onChange={(e) =>
+                              handleCourseDurationChange(
+                                courseHours,
+                                Number(e.target.value) || 0
+                              )
+                            }
+                            className="w-full text-center font-mono text-xs focus:outline-none"
+                          />
+                          <span className="text-[10px] text-gray-500 shrink-0">دقیقه</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-bold">متن نمایش زمان (Duration Text)</label>
+                      <input
+                        type="text"
+                        placeholder="مثال: ۴۵ دقیقه یا ۱۸ ساعت و ۳۰ دقیقه"
+                        value={durationText}
+                        onChange={(e) => setDurationText(e.target.value)}
+                        className="bg-white border border-[#1c211b]/15 rounded-xl px-3 py-2 text-xs"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-bold">تعداد کل جلسات / ویدیوها</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={totalEpisodesCount}
+                        onChange={(e) => setTotalEpisodesCount(Number(e.target.value))}
+                        className="bg-white border border-[#1c211b]/15 rounded-xl px-3 py-2 text-xs font-mono dir-ltr"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -489,15 +832,383 @@ export default function CourseEditorModal({
               </div>
             )}
 
-            {/* 2. PRICING & RESERVATION TAB */}
+            {/* 2. CURRICULUM (SEASONS & EPISODES) TAB */}
+            {activeTab === "curriculum" && (
+              <div className="flex flex-col gap-6 animate-fadeIn">
+                {/* Curriculum Header & Actions */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-[#FAF7F0] border border-[#1c211b]/10">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-bold text-xs text-[#082719] flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-[#8f6d2f]" />
+                      <span>مدیریت فصول و جلسات آموزشی دوره</span>
+                    </span>
+                    <p className="text-[11px] text-[#5A626A] leading-relaxed">
+                      فصل‌ها و جلسات دوره را تعریف کنید. برای هر جلسه می‌توانید عنوان، شرح درس، زمان به ساعت و دقیقه، لینک ویدیو و فایل‌های تمرینی را وارد کنید.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleAutoCalculateFromEpisodes}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#1c211b]/15 text-[#082719] hover:bg-[#EDE8DC] font-bold text-xs transition-colors cursor-pointer"
+                      title="محاسبه خودکار کل زمان دوره بر اساس جمع دقایق جلسات"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-[#8f6d2f]" />
+                      <span>محاسبه خودکار زمان کل</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleAddSection}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#082719] text-white hover:bg-[#162b20] font-bold text-xs transition-colors shadow-xs cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-[#dfc79b]" />
+                      <span>+ افزودن فصل جدید</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Empty State */}
+                {sections.length === 0 ? (
+                  <div className="p-12 text-center rounded-2xl border border-dashed border-[#1c211b]/20 bg-[#FAF7F0]/40 flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-[#EDE8DC] text-[#082719] flex items-center justify-center">
+                      <Layers className="w-6 h-6 opacity-60" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <h4 className="font-bold text-sm text-[#161A1D]">هنوز فصلی برای این دوره تعریف نشده است</h4>
+                      <p className="text-xs text-[#5A626A]">
+                        برای افزودن سرفصل‌ها و جلسات آموزشی، بر روی دکمه زیر کلیک نمایید.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddSection}
+                      className="mt-2 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#082719] text-[#dfc79b] text-xs font-bold hover:bg-[#162b20] transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>افزودن اولین فصل دوره</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-6">
+                    {sections.map((sec, secIdx) => {
+                      const secTotalMinutes = (sec.episodes || []).reduce(
+                        (sum, ep) => sum + (Number(ep.durationMinutes) || 0),
+                        0
+                      );
+                      const secHours = Math.floor(secTotalMinutes / 60);
+                      const secMins = secTotalMinutes % 60;
+
+                      return (
+                        <div
+                          key={sec.id || `sec-${secIdx}`}
+                          className="rounded-2xl border border-[#1c211b]/15 bg-white overflow-hidden shadow-xs"
+                        >
+                          {/* Section Card Header */}
+                          <div className="p-4 bg-[#FAF7F0] border-b border-[#1c211b]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 flex-1">
+                              <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-[#082719] text-[#dfc79b] shrink-0">
+                                فصل {toPersianDigits(secIdx + 1)}
+                              </span>
+
+                              <input
+                                type="text"
+                                placeholder={`عنوان فصل ${secIdx + 1} (مثال: مبانی و آشنایی با نرم‌افزار)`}
+                                value={sec.title}
+                                onChange={(e) =>
+                                  handleUpdateSection(secIdx, "title", e.target.value)
+                                }
+                                className="bg-white border border-[#1c211b]/15 rounded-xl px-3 py-1.5 text-xs font-bold text-[#161A1D] flex-1 focus:outline-none focus:border-[#082719]"
+                              />
+                            </div>
+
+                            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                              <span className="text-[11px] text-[#5A626A] font-mono px-2 py-1 rounded bg-[#EDE8DC]">
+                                {toPersianDigits(sec.episodes?.length || 0)} جلسه •{" "}
+                                {secHours > 0 ? `${toPersianDigits(secHours)}h ` : ""}
+                                {toPersianDigits(secMins)}m
+                              </span>
+
+                              {/* Move buttons */}
+                              <button
+                                type="button"
+                                disabled={secIdx === 0}
+                                onClick={() => handleMoveSection(secIdx, "up")}
+                                className="p-1.5 rounded-lg border border-[#1c211b]/10 bg-white hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                title="انتقال فصل به بالا"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={secIdx === sections.length - 1}
+                                onClick={() => handleMoveSection(secIdx, "down")}
+                                className="p-1.5 rounded-lg border border-[#1c211b]/10 bg-white hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                title="انتقال فصل به پایین"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+
+                              {/* Delete Section */}
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteSection(secIdx)}
+                                className="p-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"
+                                title="حذف فصل"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Section Description */}
+                          <div className="p-4 border-b border-[#1c211b]/08 bg-[#FAF7F0]/30">
+                            <input
+                              type="text"
+                              placeholder="توضیحات و خلاصه مباحث این فصل (اختیاری)"
+                              value={sec.description || ""}
+                              onChange={(e) =>
+                                handleUpdateSection(secIdx, "description", e.target.value)
+                              }
+                              className="w-full bg-white border border-[#1c211b]/12 rounded-lg px-3 py-1.5 text-xs text-[#5A626A] focus:outline-none focus:border-[#082719]"
+                            />
+                          </div>
+
+                          {/* Section Episodes */}
+                          <div className="p-4 flex flex-col gap-4">
+                            {(sec.episodes || []).length === 0 ? (
+                              <div className="p-6 text-center rounded-xl border border-dashed border-[#1c211b]/15 bg-[#FAF7F0]/20 flex flex-col items-center gap-2">
+                                <p className="text-xs text-[#5A626A]">
+                                  هنوز هیچ جلسه‌ای برای این فصل ثبت نشده است.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddEpisode(secIdx)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF7F0] border border-[#1c211b]/15 hover:bg-[#EDE8DC] text-xs font-bold text-[#082719] transition-colors cursor-pointer"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>+ افزودن اولین جلسه</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-3">
+                                {(sec.episodes || []).map((ep, epIdx) => {
+                                  const epHours = Math.floor((ep.durationMinutes || 0) / 60);
+                                  const epMins = (ep.durationMinutes || 0) % 60;
+
+                                  return (
+                                    <div
+                                      key={ep.id || `ep-${secIdx}-${epIdx}`}
+                                      className="p-3.5 rounded-xl border border-[#1c211b]/12 bg-[#FAF7F0]/40 flex flex-col gap-3"
+                                    >
+                                      {/* Episode Header Line */}
+                                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2 flex-1">
+                                          <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
+                                            جلسه {toPersianDigits(epIdx + 1)}
+                                          </span>
+
+                                          <input
+                                            type="text"
+                                            required
+                                            placeholder={`عنوان جلسه (مثال: جلسه ${epIdx + 1}: آشنایی با Sketch و قیود)`}
+                                            value={ep.title}
+                                            onChange={(e) =>
+                                              handleUpdateEpisode(secIdx, epIdx, {
+                                                title: e.target.value,
+                                              })
+                                            }
+                                            className="bg-white border border-[#1c211b]/15 rounded-lg px-3 py-1.5 text-xs font-bold text-[#161A1D] flex-1 focus:outline-none focus:border-[#082719]"
+                                          />
+                                        </div>
+
+                                        <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                                          {/* Free Preview Toggle */}
+                                          <label className="flex items-center gap-1.5 text-[11px] text-[#082719] font-bold cursor-pointer bg-white px-2.5 py-1 rounded-lg border border-[#1c211b]/10">
+                                            <input
+                                              type="checkbox"
+                                              checked={ep.isFreePreview}
+                                              onChange={(e) =>
+                                                handleUpdateEpisode(secIdx, epIdx, {
+                                                  isFreePreview: e.target.checked,
+                                                })
+                                              }
+                                              className="w-3.5 h-3.5 rounded text-[#082719] focus:ring-[#082719] cursor-pointer"
+                                            />
+                                            <span>پیش‌نمایش رایگان</span>
+                                          </label>
+
+                                          {/* Move episode */}
+                                          <button
+                                            type="button"
+                                            disabled={epIdx === 0}
+                                            onClick={() => handleMoveEpisode(secIdx, epIdx, "up")}
+                                            className="p-1 rounded-md border border-[#1c211b]/10 bg-white hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                            title="انتقال جلسه به بالا"
+                                          >
+                                            <ArrowUp className="w-3 h-3" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            disabled={epIdx === (sec.episodes?.length || 0) - 1}
+                                            onClick={() => handleMoveEpisode(secIdx, epIdx, "down")}
+                                            className="p-1 rounded-md border border-[#1c211b]/10 bg-white hover:bg-gray-100 disabled:opacity-30 cursor-pointer"
+                                            title="انتقال جلسه به پایین"
+                                          >
+                                            <ArrowDown className="w-3 h-3" />
+                                          </button>
+
+                                          {/* Delete Episode */}
+                                          <button
+                                            type="button"
+                                            onClick={() => handleDeleteEpisode(secIdx, epIdx)}
+                                            className="p-1 rounded-md bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"
+                                            title="حذف جلسه"
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      </div>
+
+                                      {/* Episode Description */}
+                                      <input
+                                        type="text"
+                                        placeholder="توضیحات و شرح مباحث کلیدی این جلسه (اختیاری)"
+                                        value={ep.description || ""}
+                                        onChange={(e) =>
+                                          handleUpdateEpisode(secIdx, epIdx, {
+                                            description: e.target.value,
+                                          })
+                                        }
+                                        className="w-full bg-white border border-[#1c211b]/12 rounded-lg px-3 py-1.5 text-xs text-[#5A626A] focus:outline-none focus:border-[#082719]"
+                                      />
+
+                                      {/* Episode Duration & Links Grid */}
+                                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                                        {/* Hours & Minutes */}
+                                        <div className="sm:col-span-4 flex items-center gap-1.5">
+                                          <span className="text-[11px] font-bold text-[#5A626A] shrink-0">
+                                            زمان جلسه:
+                                          </span>
+                                          <div className="flex items-center gap-1 flex-1">
+                                            <div className="flex items-center gap-1 bg-white border border-[#1c211b]/15 rounded-lg px-2 py-1 flex-1">
+                                              <input
+                                                type="number"
+                                                min={0}
+                                                placeholder="۰"
+                                                value={epHours === 0 ? "" : epHours}
+                                                onChange={(e) =>
+                                                  handleEpisodeTimeChange(
+                                                    secIdx,
+                                                    epIdx,
+                                                    Number(e.target.value) || 0,
+                                                    epMins
+                                                  )
+                                                }
+                                                className="w-full text-center font-mono text-xs focus:outline-none"
+                                              />
+                                              <span className="text-[10px] text-gray-500">ساعت</span>
+                                            </div>
+
+                                            <div className="flex items-center gap-1 bg-white border border-[#1c211b]/15 rounded-lg px-2 py-1 flex-1">
+                                              <input
+                                                type="number"
+                                                min={0}
+                                                max={59}
+                                                placeholder="۰"
+                                                value={epMins === 0 ? "" : epMins}
+                                                onChange={(e) =>
+                                                  handleEpisodeTimeChange(
+                                                    secIdx,
+                                                    epIdx,
+                                                    epHours,
+                                                    Number(e.target.value) || 0
+                                                  )
+                                                }
+                                                className="w-full text-center font-mono text-xs focus:outline-none"
+                                              />
+                                              <span className="text-[10px] text-gray-500">دقیقه</span>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Video URL */}
+                                        <div className="sm:col-span-4 flex items-center gap-1.5">
+                                          <Video className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                                          <input
+                                            type="url"
+                                            placeholder="لینک مستقیم ویدیو (https://...)"
+                                            value={ep.videoUrl || ""}
+                                            onChange={(e) =>
+                                              handleUpdateEpisode(secIdx, epIdx, {
+                                                videoUrl: e.target.value,
+                                              })
+                                            }
+                                            className="w-full bg-white border border-[#1c211b]/15 rounded-lg px-2.5 py-1 text-xs font-mono dir-ltr focus:outline-none focus:border-[#082719]"
+                                          />
+                                        </div>
+
+                                        {/* Attachment URL & Name */}
+                                        <div className="sm:col-span-4 flex items-center gap-1.5">
+                                          <Paperclip className="w-3.5 h-3.5 text-[#8f6d2f] shrink-0" />
+                                          <input
+                                            type="url"
+                                            placeholder="لینک فایل ضمیمه / پروژه"
+                                            value={ep.attachmentUrl || ""}
+                                            onChange={(e) =>
+                                              handleUpdateEpisode(secIdx, epIdx, {
+                                                attachmentUrl: e.target.value,
+                                              })
+                                            }
+                                            className="w-full bg-white border border-[#1c211b]/15 rounded-lg px-2.5 py-1 text-xs font-mono dir-ltr focus:outline-none focus:border-[#082719]"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Add Episode Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleAddEpisode(secIdx)}
+                              className="self-start inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white border border-[#1c211b]/15 text-[#082719] hover:bg-[#EDE8DC] font-bold text-xs transition-colors cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5 text-[#082719]" />
+                              <span>+ افزودن جلسه به این فصل</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <button
+                      type="button"
+                      onClick={handleAddSection}
+                      className="inline-flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed border-[#1c211b]/20 bg-[#FAF7F0] hover:bg-[#EDE8DC] text-[#082719] font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-[#8f6d2f]" />
+                      <span>+ افزودن فصل جدید به دوره آموزشی</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3. PRICING & RESERVATION TAB */}
             {activeTab === "pricing" && (
               <div className="flex flex-col gap-5 animate-fadeIn">
                 {/* Reservation Banner / Mode Box */}
-                <div className={`p-5 rounded-2xl border transition-all ${
-                  isReservationOnly
-                    ? "bg-amber-50/80 border-amber-300"
-                    : "bg-[#FAF7F0] border-[#1c211b]/10"
-                }`}>
+                <div
+                  className={`p-5 rounded-2xl border transition-all ${
+                    isReservationOnly
+                      ? "bg-amber-50/80 border-amber-300"
+                      : "bg-[#FAF7F0] border-[#1c211b]/10"
+                  }`}
+                >
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -514,24 +1225,26 @@ export default function CourseEditorModal({
                     />
                     <div className="flex flex-col gap-1">
                       <span className="font-black text-sm text-[#161A1D] flex items-center gap-2">
-                        <span>دوره در حال ضبط / پیش‌ثبت‌نام (امکان رزرو توسط کاربران بدون پرداخت شهریه)</span>
+                        <span>پیش‌ثبت‌نام دوره (امکان رزرو توسط کاربران بدون پرداخت شهریه)</span>
                         {isReservationOnly && (
                           <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full">
-                            حالت رزرو فعال
+                            حالت پیش‌ثبت‌نام فعال
                           </span>
                         )}
                       </span>
                       <p className="text-xs text-[#5A626A] leading-relaxed">
-                        با فعال‌سازی این گزینه، فیلد شهریه خالی می‌ماند و کاربران در سایت به جای دکمه «خرید و پرداخت»، دکمه «رزرو و پیش‌ثبت‌نام» را مشاهده می‌کنند. پس از اتمام ضبط و آماده‌سازی دوره، می‌توانید این تیک را بردارید و قیمت نهایی دوره را درج کنید تا فروش آغاز گردد.
+                        با فعال‌سازی این گزینه، فیلد شهریه خالی می‌ماند و کاربران در سایت به جای دکمه «خرید و پرداخت»، دکمه «پیش‌ثبت‌نام و رزرو» را مشاهده می‌کنند. پس از آماده‌سازی و شروع دوره، می‌توانید این گزینه را غیرفعال کرده و قیمت نهایی دوره را درج کنید تا فروش آغاز گردد.
                       </p>
                     </div>
                   </label>
                 </div>
 
                 {/* Price Inputs */}
-                <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 transition-opacity ${
-                  isReservationOnly ? "opacity-40 pointer-events-none" : "opacity-100"
-                }`}>
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 gap-4 transition-opacity ${
+                    isReservationOnly ? "opacity-40 pointer-events-none" : "opacity-100"
+                  }`}
+                >
                   <div className="flex flex-col gap-1.5">
                     <label className="font-bold flex items-center justify-between">
                       <span>شهریه فروش دوره (تومان)</span>
@@ -546,9 +1259,11 @@ export default function CourseEditorModal({
                       min={0}
                       step={1000}
                       disabled={isReservationOnly}
-                      placeholder={isReservationOnly ? "خالی (رزرو دوره بدون شهریه)" : "مثال: ۷۵۰۰۰۰"}
+                      placeholder={isReservationOnly ? "خالی (پیش‌ثبت‌نام بدون شهریه)" : "مثال: ۷۵۰۰۰۰"}
                       value={price}
-                      onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={(e) =>
+                        setPrice(e.target.value === "" ? "" : Number(e.target.value))
+                      }
                       className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr focus:outline-none focus:border-[#082719]"
                     />
                   </div>
@@ -569,7 +1284,9 @@ export default function CourseEditorModal({
                       disabled={isReservationOnly}
                       placeholder={isReservationOnly ? "خالی" : "مثال: ۹۵۰۰۰۰"}
                       value={compareAtPrice}
-                      onChange={(e) => setCompareAtPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={(e) =>
+                        setCompareAtPrice(e.target.value === "" ? "" : Number(e.target.value))
+                      }
                       className="bg-[#FAF7F0] border border-[#1c211b]/15 rounded-xl px-4 py-2.5 text-xs font-mono dir-ltr focus:outline-none focus:border-[#082719]"
                     />
                   </div>
@@ -578,13 +1295,13 @@ export default function CourseEditorModal({
                 <div className="flex items-center gap-2 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs">
                   <Sparkles className="w-4 h-4 shrink-0 text-blue-600" />
                   <span>
-                    <strong>نکته:</strong> در صورتی که دوره در حال ضبط است، گزینه بالا را علامت بزنید یا فیلد قیمت را خالی بگذارید. هر زمان ویدیوها در سرور فایل قرار گرفت، قیمت را به تومان وارد کنید.
+                    <strong>نکته:</strong> در صورتی که دوره در مرحله پیش‌ثبت‌نام است، گزینه بالا را علامت بزنید یا فیلد قیمت را خالی بگذارید. هر زمان ویدیوها در سرور فایل قرار گرفت، قیمت را به تومان وارد کنید.
                   </span>
                 </div>
               </div>
             )}
 
-            {/* 3. MEDIA & FILE SERVER TAB */}
+            {/* 4. MEDIA & FILE SERVER TAB */}
             {activeTab === "media" && (
               <div className="flex flex-col gap-4 animate-fadeIn">
                 <div className="p-4 bg-[#EDE8DC]/50 rounded-xl border border-[#1c211b]/10 flex flex-col gap-1">
@@ -600,7 +1317,9 @@ export default function CourseEditorModal({
                 <div className="flex flex-col gap-1.5">
                   <label className="font-bold flex items-center justify-between">
                     <span>لینک مستقیم ویدیوی معرفی / تیزر دوره (Intro Video URL)</span>
-                    <span className="text-[10px] text-gray-400 font-normal">نمایش در پلیر پیش‌نمایش سایت</span>
+                    <span className="text-[10px] text-gray-400 font-normal">
+                      نمایش در پلیر پیش‌نمایش سایت
+                    </span>
                   </label>
                   <input
                     type="url"
@@ -661,7 +1380,7 @@ export default function CourseEditorModal({
               </div>
             )}
 
-            {/* 4. COVER & INSTRUCTOR TAB */}
+            {/* 5. COVER & INSTRUCTOR TAB */}
             {activeTab === "instructor" && (
               <div className="flex flex-col gap-5 animate-fadeIn">
                 {/* Cover Image Upload & Preview */}
@@ -677,7 +1396,11 @@ export default function CourseEditorModal({
                       onClick={() => fileInputRef.current?.click()}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#082719] text-white text-[11px] font-bold shadow-xs hover:bg-[#162b20] transition-colors disabled:opacity-50 cursor-pointer"
                     >
-                      {uploadingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                      {uploadingImage ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Upload className="w-3.5 h-3.5" />
+                      )}
                       <span>آپلود تصویر کاور</span>
                     </button>
                     <input
@@ -770,12 +1493,12 @@ export default function CourseEditorModal({
               </div>
             )}
 
-            {/* 5. SYLLABUS & OUTCOMES TAB */}
+            {/* 6. SYLLABUS & OUTCOMES TAB */}
             {activeTab === "syllabus" && (
               <div className="flex flex-col gap-4 animate-fadeIn">
                 <div className="flex flex-col gap-1.5">
                   <label className="font-bold flex items-center justify-between">
-                    <span>آنچه در این دوره می‌آموزید (سرفصل‌های کلیدی)</span>
+                    <span>آنچه در این دوره می‌آموزید (اهداف کلیدی)</span>
                     <span className="text-[10px] text-gray-400 font-normal">هر مورد در یک سطر جدید</span>
                   </label>
                   <textarea
@@ -817,7 +1540,7 @@ export default function CourseEditorModal({
               </div>
             )}
 
-            {/* 6. SETTINGS TAB */}
+            {/* 7. SETTINGS TAB */}
             {activeTab === "settings" && (
               <div className="flex flex-col gap-4 animate-fadeIn">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -907,7 +1630,7 @@ export default function CourseEditorModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2.5 rounded-full border border-[#1c211b]/15 text-[#5A626A] hover:bg-[#EDE8DC] text-xs font-bold transition-colors"
+                className="px-5 py-2.5 rounded-full border border-[#1c211b]/15 text-[#5A626A] hover:bg-[#EDE8DC] text-xs font-bold transition-colors cursor-pointer"
               >
                 انصراف
               </button>

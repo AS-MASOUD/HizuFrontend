@@ -47,7 +47,7 @@ export interface ProductListDto {
   sku: string;
   price: number;
   compareAtPrice?: number;
-  stockQuantity: number;
+  stockQuantity: number | null;
   imageUrl?: string;
   isActive: boolean;
   isFeatured: boolean;
@@ -75,7 +75,7 @@ export interface ProductDto {
   sku: string;
   price: number;
   compareAtPrice?: number;
-  stockQuantity: number;
+  stockQuantity: number | null;
   imageUrl?: string;
   isActive: boolean;
   isFeatured: boolean;
@@ -103,7 +103,7 @@ export interface CartItem {
   unitPrice: number;
   quantity: number;
   totalPrice: number;
-  availableStock: number;
+  availableStock: number | null;
 }
 
 export interface Cart {
@@ -236,7 +236,7 @@ export interface CompareItem {
   sku: string;
   price: number;
   compareAtPrice?: number;
-  stockQuantity: number;
+  stockQuantity: number | null;
   imageUrl?: string;
   material?: string;
   technique?: string;

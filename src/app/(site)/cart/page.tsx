@@ -109,7 +109,12 @@ export default function CartPage() {
                       {toPersianDigits(item.quantity)}
                     </span>
                     <button
-                      disabled={loading || item.quantity >= item.availableStock}
+                      disabled={
+                        loading ||
+                        (item.availableStock !== null &&
+                          item.availableStock !== undefined &&
+                          item.quantity >= item.availableStock)
+                      }
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs hover:bg-white transition-colors disabled:opacity-30"
                     >

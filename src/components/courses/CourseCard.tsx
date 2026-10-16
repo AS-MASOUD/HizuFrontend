@@ -153,9 +153,9 @@ export default function CourseCard({ course }: CourseCardProps) {
           {/* Price */}
           {course.isReservationOnly || course.price === null || course.price === undefined || course.price <= 0 ? (
             <div className="flex flex-col">
-              <span className="text-[10px] text-amber-800 font-bold">دوره در حال ضبط</span>
+              <span className="text-[10px] text-amber-800 font-bold">پیش‌ثبت‌نام</span>
               <span className="font-extrabold text-xs text-[#082719]">
-                رزرو و پیش‌ثبت‌نام
+                رزرو رایگان دوره
               </span>
             </div>
           ) : (
